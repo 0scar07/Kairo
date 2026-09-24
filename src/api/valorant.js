@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE = "http://192.168.1.8:3000";
+import { API_BASE as BASE } from "../constants/config";
 
 export const searchValorantPlayer = async (gameName, tagLine) => {
   const account   = await axios.get(`${BASE}/account/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`);

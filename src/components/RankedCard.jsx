@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TIER_COLORS, TIER_ICONS } from "../constants/config";
+import { winrate } from "../utils/lol";
 
 export default function RankedCard({ entry, label }) {
   if (!entry) return null;
   const { tier, rank, leaguePoints, wins, losses } = entry;
-  const total = wins + losses;
-  const wr    = Math.round((wins / total) * 100);
+  const wr    = winrate(wins, losses);
   const color = TIER_COLORS[tier] || "#888";
 
   return (

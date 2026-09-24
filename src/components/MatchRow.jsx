@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { DD } from "../constants/config";
+import { championIcon } from "../api/ddragon";
+import { csOf, queueLabel } from "../utils/lol";
 
 function timeSince(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -27,7 +28,7 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
   const dmg = Math.round(me.totalDamageDealtToChampions / 1000);
   const ago = timeSince(match.info.gameCreation);
   const dur = formatDuration(match.info.gameDuration);
-  const champImg = `${DD}/img/champion/${me.championName?.replace(/\s/g, "")}.png`;
+  const champImg = championIcon(me.championName);
 
   return (
     <TouchableOpacity
@@ -45,6 +46,7 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
           <Text style={styles.meta}>{dur} · {ago}</Text>
         </View>
         <Text style={styles.champName}>{me.championName}</Text>
+        <Text style={styles.queue}>{queueLabel(match.info.queueId)}</Text>
       </View>
       <View style={styles.kdaBlock}>
         <Text style={styles.kdaText}>{kda}</Text>
@@ -55,7 +57,7 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
       </View>
       <View style={styles.dmgBlock}>
         <Text style={styles.dmgText}>{dmg}k dmg</Text>
-        <Text style={styles.csText}>{me.totalMinionsKilled} CS</Text>
+        <Text style={styles.csText}>{csOf(me)} CS</Text>
       </View>
     </TouchableOpacity>
   );
@@ -73,6 +75,7 @@ const styles = StyleSheet.create({
   result:   { fontWeight: "800", fontSize: 12, letterSpacing: 1 },
   meta:     { color: "#556677", fontSize: 11 },
   champName:{ color: "#dce8f5", fontWeight: "700", fontSize: 13, marginTop: 2 },
+  queue:    { color: "#556677", fontSize: 10, marginTop: 1 },
   kdaBlock: { alignItems: "flex-end" },
   kdaText:  { color: "#dce8f5", fontWeight: "700", fontSize: 13 },
   kdaRatio: { fontSize: 11 },

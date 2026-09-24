@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet,
-  RefreshControl, Image, TouchableOpacity,
+  RefreshControl, Image, TouchableOpacity, Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchValorantPlayer } from "../api/valorant";
-import { DD } from "../constants/config";
-
-const FAVORITES_KEY = "loltracker_favorites";
+import { FAVORITES_KEY } from "../constants/config";
+import { profileIconUrl } from "../api/ddragon";
+import { errorMessage } from "../utils/lol";
 
 function timeSince(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -142,7 +142,9 @@ export default function ValorantScreen({ route }) {
     try {
       const fresh = await searchValorantPlayer(account.gameName, account.tagLine);
       setData(fresh);
-    } catch (_) {}
+    } catch (e) {
+      Alert.alert("Error", "No se pudo actualizar: " + errorMessage(e));
+    }
     setRefreshing(false);
   }
 
@@ -163,7 +165,9 @@ export default function ValorantScreen({ route }) {
       }
       await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
       setIsFav(!isFav);
-    } catch (_) {}
+    } catch (e) {
+      Alert.alert("Error", "No se pudo actualizar favoritos: " + errorMessage(e));
+    }
   }
 
   return (
@@ -177,7 +181,7 @@ export default function ValorantScreen({ route }) {
       {/* Perfil */}
       <View style={styles.profileCard}>
         <Image
-          source={{ uri: `${DD}/img/profileicon/${summoner?.profileIconId}.png` }}
+          source={{ uri: profileIconUrl(summoner?.profileIconId) }}
           style={styles.profileIcon}
         />
         <View style={{ marginLeft: 14, flex: 1 }}>

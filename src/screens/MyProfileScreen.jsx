@@ -7,7 +7,9 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LineChart } from "react-native-chart-kit";
 import { searchPlayer } from "../api/riot";
-import { DD, TIER_COLORS, TIER_ICONS } from "../constants/config";
+import { TIER_COLORS, TIER_ICONS } from "../constants/config";
+import { championIcon, profileIconUrl } from "../api/ddragon";
+import { errorMessage, queueLabel, winrate } from "../utils/lol";
 
 const MY_PROFILE_KEY = "ggtracker_my_profile";
 const SCREEN_WIDTH   = Dimensions.get("window").width - 32;
@@ -85,7 +87,7 @@ function ChampRow({ champ, rank }) {
     <View style={champStyles.row}>
       <Text style={[champStyles.rank, { color: rankColors[rank] || "#445566" }]}>#{rank + 1}</Text>
       <Image
-        source={{ uri: `${DD}/img/champion/${champ.name.replace(/\s/g, "")}.png` }}
+        source={{ uri: championIcon(champ.name) }}
         style={champStyles.img}
       />
       <View style={{ flex: 1 }}>
@@ -213,7 +215,8 @@ export default function MyProfileScreen() {
         setShowSetup(true);
         setLoading(false);
       }
-    } catch (_) {
+    } catch (e) {
+      console.warn("No se pudo leer Mi Perfil:", e.message);
       setShowSetup(true);
       setLoading(false);
     }
@@ -226,7 +229,7 @@ export default function MyProfileScreen() {
       setData(fresh);
       await AsyncStorage.setItem(MY_PROFILE_KEY, JSON.stringify({ gameName, tagLine }));
     } catch (e) {
-      Alert.alert("Error", "No se pudo cargar el perfil");
+      Alert.alert("Error", "No se pudo cargar el perfil: " + errorMessage(e));
       setShowSetup(true);
     }
     setLoading(false);
@@ -240,7 +243,9 @@ export default function MyProfileScreen() {
       const { gameName, tagLine } = JSON.parse(raw);
       const fresh = await searchPlayer(gameName, tagLine);
       setData(fresh);
-    } catch (_) {}
+    } catch (e) {
+      Alert.alert("Error", "No se pudo actualizar: " + errorMessage(e));
+    }
     setRefreshing(false);
   }
 
@@ -306,7 +311,7 @@ export default function MyProfileScreen() {
       {/* Header */}
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: `${DD}/img/profileicon/${summoner.profileIconId}.png` }}
+          source={{ uri: profileIconUrl(summoner.profileIconId) }}
           style={styles.profileImg}
         />
         <View style={{ flex: 1, marginLeft: 14 }}>
@@ -348,7 +353,7 @@ export default function MyProfileScreen() {
               <Text style={styles.recordText}>{soloQ.wins}V / {soloQ.losses}D</Text>
               <View style={styles.barBg}>
                 <View style={[styles.barFill, {
-                  width: `${Math.round((soloQ.wins / (soloQ.wins + soloQ.losses)) * 100)}%`,
+                  width: `${winrate(soloQ.wins, soloQ.losses)}%`,
                   backgroundColor: TIER_COLORS[soloQ.tier],
                 }]} />
               </View>
@@ -363,7 +368,7 @@ export default function MyProfileScreen() {
               <Text style={styles.recordText}>{flex.wins}V / {flex.losses}D</Text>
               <View style={styles.barBg}>
                 <View style={[styles.barFill, {
-                  width: `${Math.round((flex.wins / (flex.wins + flex.losses)) * 100)}%`,
+                  width: `${winrate(flex.wins, flex.losses)}%`,
                   backgroundColor: TIER_COLORS[flex.tier],
                 }]} />
               </View>
@@ -467,14 +472,14 @@ export default function MyProfileScreen() {
                 backgroundColor: p.win ? "#0a1f14" : "#1f0a0a",
               }]}>
                 <Image
-                  source={{ uri: `${DD}/img/champion/${p.championName?.replace(/\s/g, "")}.png` }}
+                  source={{ uri: championIcon(p.championName) }}
                   style={styles.histChamp}
                 />
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.histResult, { color: p.win ? "#4fc97a" : "#e05555" }]}>
                     {p.win ? "VICTORIA" : "DERROTA"}
                   </Text>
-                  <Text style={styles.histChampName}>{p.championName}</Text>
+                  <Text style={styles.histChampName}>{p.championName} · {queueLabel(m.info.queueId)}</Text>
                 </View>
                 <Text style={styles.histKda}>{p.kills}/{p.deaths}/{p.assists}</Text>
                 <Text style={styles.histDmg}>{Math.round(p.totalDamageDealtToChampions / 1000)}k dmg</Text>

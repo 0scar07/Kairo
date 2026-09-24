@@ -1,18 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
-import { DD } from "../constants/config";
+import { championIcon, itemIcon } from "../api/ddragon";
+import { csOf, playerName } from "../utils/lol";
 
 function formatDuration(s) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
 function ItemIcon({ itemId }) {
-  if (!itemId) return <View style={itemStyles.empty} />;
+  const [failed, setFailed] = useState(false);
+  if (!itemId || failed) return <View style={itemStyles.empty} />;
   return (
     <Image
-      source={{ uri: `${DD}/img/item/${itemId}.png` }}
+      source={{ uri: itemIcon(itemId) }}
       style={itemStyles.icon}
-      onError={e => { e.target = null; }}
+      onError={() => setFailed(true)}
     />
   );
 }
@@ -24,7 +26,7 @@ const itemStyles = StyleSheet.create({
 
 function PlayerRow({ p, isMe, maxDmg }) {
   const dmgPct   = (p.totalDamageDealtToChampions / maxDmg) * 100;
-  const champImg = `${DD}/img/champion/${p.championName?.replace(/\s/g, "")}.png`;
+  const champImg = championIcon(p.championName);
   const items    = [p.item0, p.item1, p.item2, p.item3, p.item4, p.item5, p.item6];
 
   return (
@@ -32,7 +34,7 @@ function PlayerRow({ p, isMe, maxDmg }) {
       <Image source={{ uri: champImg }} style={styles.champImg} />
       <View style={{ flex: 1, gap: 4 }}>
         <Text style={[styles.playerName, isMe && { color: "#c89b3c" }]} numberOfLines={1}>
-          {p.summonerName}
+          {playerName(p)}
         </Text>
         {/* Items */}
         <View style={styles.itemsRow}>
@@ -50,7 +52,7 @@ function PlayerRow({ p, isMe, maxDmg }) {
         <Text style={styles.kdaText}>{p.kills}/{p.deaths}/{p.assists}</Text>
         <Text style={styles.dmgNum}>{Math.round(p.totalDamageDealtToChampions / 1000)}k dmg</Text>
         <Text style={styles.goldNum}>🪙 {Math.round(p.goldEarned / 1000)}k</Text>
-        <Text style={styles.csNum}>{p.totalMinionsKilled} CS</Text>
+        <Text style={styles.csNum}>{csOf(p)} CS</Text>
       </View>
     </View>
   );
@@ -61,7 +63,7 @@ export default function MatchDetail({ match, myPuuid }) {
   const { participants, gameDuration } = match.info;
   const team1  = participants.filter(p => p.teamId === 100);
   const team2  = participants.filter(p => p.teamId === 200);
-  const maxDmg = Math.max(...participants.map(p => p.totalDamageDealtToChampions));
+  const maxDmg = Math.max(1, ...participants.map(p => p.totalDamageDealtToChampions));
 
   // Stats del equipo
   function teamStats(team) {

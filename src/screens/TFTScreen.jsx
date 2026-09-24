@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet,
-  RefreshControl, TouchableOpacity, Image,
+  RefreshControl, TouchableOpacity, Image, Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchTFTPlayer } from "../api/tft";
-import { TIER_COLORS, TIER_ICONS, DD } from "../constants/config";
-
-const FAVORITES_KEY = "loltracker_favorites";
+import { TIER_COLORS, TIER_ICONS, FAVORITES_KEY } from "../constants/config";
+import { championIcon } from "../api/ddragon";
+import { errorMessage } from "../utils/lol";
 
 function timeSince(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -66,7 +66,7 @@ function MatchCard({ match, puuid }) {
             {me.units?.slice(0, 8).map((u, i) => (
               <View key={i} style={[styles.unitBox, { borderColor: u.tier === 3 ? "#FFD700" : u.tier === 2 ? "#C0C0C0" : "#1e2a3a" }]}>
                 <Image
-                  source={{ uri: `${DD}/img/champion/${u.character_id?.replace("TFT_Mobile_", "").replace(/.*_/, "")}.png` }}
+                  source={{ uri: championIcon(u.character_id?.replace("TFT_Mobile_", "").replace(/.*_/, "")) }}
                   style={styles.unitImg}
                 />
                 {u.tier > 1 && (
@@ -148,7 +148,9 @@ export default function TFTScreen({ route }) {
     try {
       const fresh = await searchTFTPlayer(account.gameName, account.tagLine);
       setData(fresh);
-    } catch (_) {}
+    } catch (e) {
+      Alert.alert("Error", "No se pudo actualizar: " + errorMessage(e));
+    }
     setRefreshing(false);
   }
 
@@ -171,7 +173,9 @@ export default function TFTScreen({ route }) {
       }
       await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
       setIsFav(!isFav);
-    } catch (_) {}
+    } catch (e) {
+      Alert.alert("Error", "No se pudo actualizar favoritos: " + errorMessage(e));
+    }
   }
 
   return (

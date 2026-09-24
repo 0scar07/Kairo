@@ -8,10 +8,10 @@ import ProfileIcon from "../components/ProfileIcon";
 import RankedCard  from "../components/RankedCard";
 import MatchRow    from "../components/MatchRow";
 import MatchDetail from "../components/MatchDetail";
-import { searchPlayer, getMatchIds, getMatchDetail } from "../api/riot";
-import { DD } from "../constants/config";
-
-const FAVORITES_KEY = "loltracker_favorites";
+import { searchPlayer, getMoreMatches, MATCH_PAGE } from "../api/riot";
+import { championIcon } from "../api/ddragon";
+import { FAVORITES_KEY } from "../constants/config";
+import { errorMessage } from "../utils/lol";
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 function getChampionStats(matches, puuid) {
@@ -107,7 +107,7 @@ function OverallStats({ stats, topChamp }) {
             <View style={overallStyles.divider} />
             <View style={overallStyles.block}>
               <Image
-                source={{ uri: `${DD}/img/champion/${topChamp.name.replace(/\s/g, "")}.png` }}
+                source={{ uri: championIcon(topChamp.name) }}
                 style={overallStyles.champImg}
               />
               <Text style={overallStyles.sub}>{topChamp.games} partidas</Text>
@@ -148,7 +148,7 @@ function ChampionStatsRow({ champ }) {
   return (
     <View style={champStyles.row}>
       <Image
-        source={{ uri: `${DD}/img/champion/${champ.name.replace(/\s/g, "")}.png` }}
+        source={{ uri: championIcon(champ.name) }}
         style={champStyles.img}
       />
       <View style={{ flex: 1 }}>
@@ -204,8 +204,9 @@ export default function ProfileScreen({ route }) {
   const [filterChamp, setFilterChamp] = useState("all");
   const [isFav,       setIsFav]       = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [error,       setError]       = useState(null);
 
-  const { account, summoner, ranked, matches } = data;
+  const { account, summoner, ranked, matches, hasMore, nextStart } = data;
   const soloQ      = ranked?.find(r => r.queueType === "RANKED_SOLO_5x5");
   const flex       = ranked?.find(r => r.queueType === "RANKED_FLEX_SR");
   const champStats = getChampionStats(matches || [], account.puuid);
@@ -238,7 +239,9 @@ export default function ProfileScreen({ route }) {
       const raw = await AsyncStorage.getItem(FAVORITES_KEY);
       const favs = raw ? JSON.parse(raw) : [];
       setIsFav(favs.some(f => f.puuid === account.puuid));
-    } catch (_) {}
+    } catch (e) {
+      console.warn("No se pudieron leer los favoritos:", e.message);
+    }
   }
 
   async function toggleFavorite() {
@@ -249,6 +252,7 @@ export default function ProfileScreen({ route }) {
         favs = favs.filter(f => f.puuid !== account.puuid);
       } else {
         favs.push({
+          game:     "lol",
           puuid:    account.puuid,
           gameName: account.gameName,
           tagLine:  account.tagLine,
@@ -259,28 +263,37 @@ export default function ProfileScreen({ route }) {
       }
       await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
       setIsFav(!isFav);
-    } catch (_) {}
+    } catch (e) {
+      setError("No se pudo actualizar favoritos: " + errorMessage(e));
+    }
   }
 
   async function onRefresh() {
     setRefreshing(true);
+    setError(null);
     try {
       const fresh = await searchPlayer(account.gameName, account.tagLine);
       setData(fresh);
       setActiveMatch(null);
-    } catch (_) {}
+    } catch (e) {
+      setError("No se pudo actualizar: " + errorMessage(e));
+    }
     setRefreshing(false);
   }
 
   async function loadMore() {
     setLoadingMore(true);
+    setError(null);
     try {
-      const currentCount = matches.length;
-      const ids     = await getMatchIds(account.puuid, currentCount + 10);
-      const newIds  = ids.slice(currentCount);
-      const newMatches = await Promise.all(newIds.map(id => getMatchDetail(id)));
-      setData(prev => ({ ...prev, matches: [...prev.matches, ...newMatches.filter(Boolean)] }));
-    } catch (_) {}
+      const page = await getMoreMatches(account.puuid, nextStart, MATCH_PAGE);
+      setData(prev => {
+        const known = new Set(prev.matches.map(m => m.metadata.matchId));
+        const fresh = page.matches.filter(m => !known.has(m.metadata.matchId));
+        return { ...prev, matches: [...prev.matches, ...fresh], hasMore: page.hasMore, nextStart: page.nextStart };
+      });
+    } catch (e) {
+      setError("No se pudieron cargar más partidas: " + errorMessage(e));
+    }
     setLoadingMore(false);
   }
 
@@ -292,6 +305,12 @@ export default function ProfileScreen({ route }) {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#c89b3c" />
       }
     >
+      {error && (
+        <TouchableOpacity style={styles.errorBanner} onPress={() => setError(null)}>
+          <Text style={styles.errorText}>⚠ {error}</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Perfil */}
       <View style={styles.profileCard}>
         <ProfileIcon iconId={summoner.profileIconId} level={summoner.summonerLevel} size={72} />
@@ -399,7 +418,7 @@ export default function ProfileScreen({ route }) {
                   onPress={() => setFilterChamp(filterChamp === c ? "all" : c)}
                 >
                   <Image
-                    source={{ uri: `${DD}/img/champion/${c.replace(/\s/g, "")}.png` }}
+                    source={{ uri: championIcon(c) }}
                     style={styles.champFilterImg}
                   />
                   <Text style={[styles.champFilterText, filterChamp === c && styles.champFilterTextActive]}>
@@ -432,12 +451,12 @@ export default function ProfileScreen({ route }) {
 
           {/* Cargar más */}
           <TouchableOpacity
-            style={[styles.loadMoreBtn, loadingMore && { opacity: 0.6 }]}
+            style={[styles.loadMoreBtn, (loadingMore || !hasMore) && { opacity: 0.5 }]}
             onPress={loadMore}
-            disabled={loadingMore}
+            disabled={loadingMore || !hasMore}
           >
             <Text style={styles.loadMoreText}>
-              {loadingMore ? "Cargando..." : "⬇ Cargar más partidas"}
+              {loadingMore ? "Cargando..." : hasMore ? "⬇ Cargar más partidas" : "No hay más partidas"}
             </Text>
           </TouchableOpacity>
         </>
@@ -509,4 +528,9 @@ const styles = StyleSheet.create({
     borderColor: "#1e2a3a", borderRadius: 10, alignItems: "center",
   },
   loadMoreText:       { color: "#c89b3c", fontWeight: "700", fontSize: 13 },
+  errorBanner:        {
+    backgroundColor: "#2a0d0d", borderWidth: 1, borderColor: "#e05555",
+    borderRadius: 8, padding: 10, marginBottom: 14,
+  },
+  errorText:          { color: "#e05555", fontSize: 12, fontWeight: "600" },
 });

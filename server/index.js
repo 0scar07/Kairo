@@ -62,9 +62,10 @@ app.get("/ranked/:summonerId", async (req, res) => {
 
 app.get("/matches/:puuid", async (req, res) => {
   try {
-    const count = req.query.count || 10;
+    const count = Math.min(parseInt(req.query.count, 10) || 10, 20);
+    const start = Math.max(parseInt(req.query.start, 10) || 0, 0);
     const r = await axios.get(
-      `${ROUTING}/lol/match/v5/matches/by-puuid/${req.params.puuid}/ids?count=${count}`,
+      `${ROUTING}/lol/match/v5/matches/by-puuid/${req.params.puuid}/ids?start=${start}&count=${count}`,
       { headers }
     );
     res.json(r.data);

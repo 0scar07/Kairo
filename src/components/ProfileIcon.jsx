@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
-import { DD } from "../constants/config";
+import { profileIconUrl } from "../api/ddragon";
 
 export default function ProfileIcon({ iconId, level, size = 72 }) {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Image
-        source={{ uri: `${DD}/img/profileicon/${iconId}.png` }}
+        source={{ uri: profileIconUrl(iconId) }}
         style={[styles.image, { width: size, height: size, borderRadius: size / 2 }]}
       />
       <View style={styles.levelBadge}>

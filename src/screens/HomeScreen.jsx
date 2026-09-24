@@ -7,9 +7,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchPlayer } from "../api/riot";
 import { searchValorantPlayer } from "../api/valorant";
 import { searchTFTPlayer } from "../api/tft";
-import { DD } from "../constants/config";
-
-const FAVORITES_KEY = "loltracker_favorites";
+import { profileIconUrl } from "../api/ddragon";
+import { FAVORITES_KEY } from "../constants/config";
+import { errorMessage } from "../utils/lol";
 
 const GAMES = [
   {
@@ -60,8 +60,11 @@ export default function HomeScreen({ navigation }) {
   async function loadFavorites() {
     try {
       const raw = await AsyncStorage.getItem(FAVORITES_KEY);
-      if (raw) setFavorites(JSON.parse(raw));
-    } catch (_) {}
+      // Los favoritos antiguos de LoL no tenían campo game
+      if (raw) setFavorites(JSON.parse(raw).map(f => ({ ...f, game: f.game || "lol" })));
+    } catch (e) {
+      console.warn("No se pudieron leer los favoritos:", e.message);
+    }
   }
 
   async function handleSearch(gameName, tagLine) {
@@ -78,7 +81,7 @@ export default function HomeScreen({ navigation }) {
       const data = await activeGame.search(name, tag);
       navigation.navigate(activeGame.screen, { data });
     } catch (e) {
-      Alert.alert("Error", e.response?.data?.error || "Jugador no encontrado");
+      Alert.alert("Error", e.response?.status === 404 ? "Jugador no encontrado" : errorMessage(e, "Jugador no encontrado"));
     }
     setLoading(false);
   }
@@ -86,7 +89,11 @@ export default function HomeScreen({ navigation }) {
   async function removeFavorite(puuid) {
     const updated = favorites.filter(f => f.puuid !== puuid);
     setFavorites(updated);
-    await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+    try {
+      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+    } catch (e) {
+      Alert.alert("Error", "No se pudo guardar los cambios: " + e.message);
+    }
   }
 
   const gameFavs = favorites.filter(f => f.game === activeGame.key);
@@ -161,7 +168,7 @@ export default function HomeScreen({ navigation }) {
                 >
                   {fav.iconId ? (
                     <Image
-                      source={{ uri: `${DD}/img/profileicon/${fav.iconId}.png` }}
+                      source={{ uri: profileIconUrl(fav.iconId) }}
                       style={[styles.favIcon, { borderColor: activeGame.color }]}
                     />
                   ) : (

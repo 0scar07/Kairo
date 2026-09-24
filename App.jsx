@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -9,6 +9,7 @@ import ProfileScreen   from "./src/screens/ProfileScreen";
 import ValorantScreen  from "./src/screens/ValorantScreen";
 import TFTScreen       from "./src/screens/TFTScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
+import { initDataDragon } from "./src/api/ddragon";
 
 const Stack = createNativeStackNavigator();
 const Tab   = createBottomTabNavigator();
@@ -44,6 +45,15 @@ function MyProfileStack() {
 }
 
 export default function App() {
+  const [ready, setReady] = useState(false);
+
+  // Lee la versión vigente de Data Dragon antes de mostrar imágenes
+  useEffect(() => {
+    initDataDragon().finally(() => setReady(true));
+  }, []);
+
+  if (!ready) return null;
+
   return (
     <NavigationContainer>
       <StatusBar style="light" />
