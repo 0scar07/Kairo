@@ -10,6 +10,7 @@ import MatchRow from "./components/MatchRow";
 import MatchDetail from "./components/MatchDetail";
 import ChampionStatsRow from "./components/ChampionStatsRow";
 import MineExtras from "./MineExtras";
+import MasteryCard from "./components/MasteryCard";
 import { getMoreMatches } from "./api";
 import { findMe, getChampionStats, getOverallStats, getStreak } from "./utils";
 import { championIcon } from "../../api/ddragon";
@@ -39,7 +40,7 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
   const [filterChamp, setFilterChamp] = useState("all");
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const { account, ranked, rankedError, matches, hasMore, nextStart, region } = data;
+  const { account, ranked, rankedError, matches, hasMore, nextStart, region, mastery } = data;
   const soloQ      = ranked?.find(r => r.queueType === "RANKED_SOLO_5x5");
   const flex       = ranked?.find(r => r.queueType === "RANKED_FLEX_SR");
   const champStats = getChampionStats(matches || [], account.puuid).slice(0, 5);
@@ -101,6 +102,12 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
             </View>
           )}
       </Reveal>
+
+      {mastery && (
+        <Reveal order={2}>
+          <MasteryCard mastery={mastery} />
+        </Reveal>
+      )}
 
       {streak && (
         <Reveal order={2}>

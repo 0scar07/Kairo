@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { GAMES, UPCOMING_GAMES, getGame } from "../games";
@@ -25,13 +25,22 @@ const FAVORITES_PREVIEW = 4;
 export default function HomeScreen({ navigation }) {
   const { gameId, accent, setGameId } = useActiveGame();
   const {
-    favorites: bootFavorites, recents: bootRecents, region, setRegion, serverOnline, retryServer,
+    favorites: bootFavorites, recents: bootRecents, region, setRegion, serverOnline, retryServer, gameEnabled,
   } = useBootData();
   const [input,     setInput]     = useState("");
   const [favorites, setFavorites] = useState(bootFavorites);
   const [recents,   setRecents]   = useState(bootRecents);
 
   const game = getGame(gameId) || GAMES[0];
+  const Extras = game.HomeExtras;
+
+  // Si el juego activo dejó de estar disponible (la key no tiene esa API), se pasa al primero que sí lo esté
+  useEffect(() => {
+    if (!gameEnabled(gameId)) {
+      const first = GAMES.find(g => gameEnabled(g.id));
+      if (first) setGameId(first.id);
+    }
+  }, [gameId, gameEnabled]);
 
   useFocusEffect(useCallback(() => {
     loadFavorites().then(setFavorites).catch(e => console.warn("No se pudieron leer los favoritos:", e.message));
@@ -131,6 +140,16 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.gameSelector}>
             {GAMES.map(g => {
               const active = g.id === game.id;
+              // Un juego que la key del servidor no puede consultar aparece como "PRONTO"
+              if (!gameEnabled(g.id)) {
+                return (
+                  <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
+                    <Text style={styles.gameIcon}>{g.icon}</Text>
+                    <Text style={styles.gameShort}>{g.short}</Text>
+                    <Text style={styles.soon}>PRONTO</Text>
+                  </View>
+                );
+              }
               return (
                 <PressableScale
                   key={g.id}
@@ -153,9 +172,16 @@ export default function HomeScreen({ navigation }) {
           </View>
         </Reveal>
 
+        {/* Extras propios del juego (LoL: estado del servidor y rotación gratuita) */}
+        {Extras && (
+          <Reveal order={3} baseDelay={HANDOFF_MS}>
+            <Extras region={region} />
+          </Reveal>
+        )}
+
         {/* Búsquedas recientes */}
         {recents.length > 0 && (
-          <Reveal order={3} baseDelay={HANDOFF_MS}>
+          <Reveal order={4} baseDelay={HANDOFF_MS}>
             <View style={styles.sectionHeader}>
               <SectionLabel style={styles.sectionLabel}>Recientes</SectionLabel>
               <TouchableOpacity onPress={onClearRecents} hitSlop={spacing.md}>
@@ -180,7 +206,7 @@ export default function HomeScreen({ navigation }) {
         )}
 
         {/* Favoritos */}
-        <Reveal order={4} baseDelay={HANDOFF_MS}>
+        <Reveal order={5} baseDelay={HANDOFF_MS}>
           <View style={styles.sectionHeader}>
             <SectionLabel style={styles.sectionLabel}>⭐ Favoritos — {game.short}</SectionLabel>
             {gameFavs.length > 0 && (

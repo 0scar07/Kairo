@@ -46,6 +46,8 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
 - 🚀 **Pantalla de carga animada** con progreso real de arranque y aparición escalonada de las secciones.
 - 🫧 **Skeletons**, estados vacíos amables y errores con botón de reintentar.
 - 📳 **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
+- 📊 **LoL extra:** maestría de campeones (top 3 con nivel y puntos), rotación gratuita de la semana y aviso de mantenimiento del servidor de tu región.
+- 🧭 **Juegos según tu key:** el backend detecta qué APIs habilita tu key de Riot; lo que no esté habilitado aparece como "PRONTO" en vez de dar errores.
 - 🎯 **Valorant**: próximamente (su API de partidas requiere una *production key* aprobada por Riot).
 
 ## 📸 Capturas
@@ -168,6 +170,8 @@ Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad
 | `RATE_LIMIT_PER_MIN` | Peticiones por minuto y por IP (por defecto `240`) |
 | `CORS_ORIGINS` | Orígenes web permitidos, separados por comas (vacío = abierto) |
 | `TRUST_PROXY` | Proxies delante del servidor (por defecto `1` en producción) |
+| `RIOT_RATE_LIMITS` | Cupo hacia Riot, `peticiones:segundos` (por defecto `18:1,95:120`) |
+| `PROBE_RIOT_ID` | Cuenta pública para detectar qué juegos habilita la key (`Nombre#TAG@region`) |
 
 App
 
@@ -181,12 +185,15 @@ Todas las rutas aceptan `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1
 
 | Ruta | Descripción |
 |------|-------------|
-| `GET /health` | Estado y regiones disponibles |
+| `GET /health` | Estado, regiones, cola hacia Riot y **qué juegos habilita la key** (`games`) |
 | `GET /{lol\|tft}/account/:gameName/:tagLine` | Cuenta Riot (PUUID) |
 | `GET /{lol\|tft}/summoner/:puuid` | Perfil de invocador (ícono, nivel) |
 | `GET /{lol\|tft}/ranked/:puuid` | Rangos del jugador |
 | `GET /{lol\|tft}/matches/:puuid?start=0&count=10` | IDs de partidas (máx. 20 por página) |
 | `GET /{lol\|tft}/match/:matchId` | Detalle de una partida |
+| `GET /lol/mastery/:puuid?count=3` | Maestría: top de campeones y puntaje total |
+| `GET /lol/rotation` | Rotación semanal gratuita (IDs de campeón) |
+| `GET /lol/status` | Mantenimientos e incidencias del servidor de la región |
 
 Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, `/match`) siguen funcionando como alias de `/lol/…`.
 
@@ -250,6 +257,8 @@ Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** pa
 - [ ] Valorant (requiere aprobación de Riot)
 - [ ] Modo sin conexión con el último perfil visto
 - [ ] Notificaciones cuando un favorito cambia de rango
+- [x] Cola de salida hacia Riot que respeta el cupo, y juegos no habilitados como "PRONTO"
+- [x] Maestría, rotación gratuita y estado del servidor (LoL)
 - [ ] Comparar dos jugadores
 
 La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).

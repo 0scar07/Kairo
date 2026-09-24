@@ -2,6 +2,9 @@
 export const APEX_TIERS = ["MASTER", "GRANDMASTER", "CHALLENGER"];
 export const tierLabel = (tier, rank) => (APEX_TIERS.includes(tier) ? tier : `${tier} ${rank || ""}`.trim());
 
+// 623792 -> "623.792"
+export const formatNumber = n => String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
 // 1 partida / 2 partidas
 export const plural = (n, singular, plural = `${singular}s`) => `${n} ${n === 1 ? singular : plural}`;
 

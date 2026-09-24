@@ -121,6 +121,8 @@ Con una URL `https://`, el APK **no** habilita el tráfico HTTP sin cifrar (`app
 | `RATE_LIMIT_PER_MIN` | `240` | Peticiones por minuto y por IP. Un perfil completo hace ~14 |
 | `CORS_ORIGINS` | vacío (abierto) | Orígenes web permitidos, separados por comas. Las apps nativas no lo necesitan |
 | `TRUST_PROXY` | `1` en producción | Proxies delante del servidor, para ver la IP real del cliente |
+| `RIOT_RATE_LIMITS` | `18:1,95:120` | Cupo hacia Riot (`peticiones:segundos`); pon el de tu key un poco por debajo |
+| `PROBE_RIOT_ID` | `Hide on bush#KR1@kr` | Cuenta pública para detectar qué juegos habilita la key |
 
 ## Qué protege el backend
 

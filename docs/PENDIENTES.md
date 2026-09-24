@@ -5,7 +5,10 @@
 - [ ] **Desplegar el backend**: ya está listo (`render.yaml`, `Dockerfile`, límite de peticiones, CORS). Sigue [DESPLIEGUE.md](DESPLIEGUE.md). Con una key de desarrollo solo sirve para pruebas (caduca a las 24 h): pide una *Personal* o *Production API Key* a Riot.
 - [ ] Registrar el producto en el portal de Riot y pedir la key ([RIOT-FORMULARIO.md](RIOT-FORMULARIO.md)); activar GitHub Pages (Settings → Pages → `main` / `docs`).
 - [ ] **Habilitar las APIs de TFT** en el producto de Riot (hoy la key responde 403 en `tft-summoner`, `tft-league` y `tft-match`); mientras tanto, TFT muestra un error en la app.
-- [ ] Cola de salida hacia Riot que respete 20 peticiones/s y 100 cada 2 min (hoy solo hay límite por IP hacia nuestro servidor).
+- [x] Cola de salida hacia Riot que respeta el cupo de la key.
+- [ ] **Actualizaciones por internet (EAS Update)**: corregir la app sin compilar un APK nuevo. Requiere `expo-updates` y un build nuevo con esa dependencia.
+- [ ] Gráfico de oro y experiencia por minuto en el detalle de partida (match-v5 timeline; tu key ya tiene acceso).
+- [ ] Nivel y puntos de desafíos en el perfil (lol-challenges-v1; tu key ya tiene acceso).
 - [ ] Si se publica para el público: pedir una key de **producción** e integrar **RSO** para "Mi perfil" (ver las reglas de Riot en [RIOT-FORMULARIO.md](RIOT-FORMULARIO.md)); Valorant requiere RSO y no admite keys personales.
 - [ ] Revisar el aviso legal, buscar el nombre "Kairo" en Play Store / App Store y en el registro de marcas.
 - [ ] `eas init` de nuevo: el `projectId` de EAS sigue ligado al slug antiguo (`ggtracker`). El paquete Android sigue siendo `com.camavingaaa.ggtracker`; cámbialo si quieres identidad nueva.
@@ -13,6 +16,7 @@
 - [ ] Probar el `Dockerfile` (no había Docker instalado) y el despliegue real en Render.
 - [ ] Base de datos solo si hace falta: favoritos sincronizados entre dispositivos (cuentas + Postgres/Supabase), caché persistente (Redis) o historial propio de LP.
 - [ ] Mostrar "el servidor está despertando…" cuando el plan gratuito de Render tarda en responder.
+- [x] Mostrar los juegos no habilitados como "PRONTO" (detección automática con `/health`).
 - [ ] Actualizar `expo` al último parche (`npx expo install expo@~54.0.37`).
 
 ## Funcionalidad

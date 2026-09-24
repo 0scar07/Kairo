@@ -14,6 +14,7 @@ export function createGameClient(gameId) {
     api.get(`/${gameId}${path}`, { params: { region, ...params } }).then(r => r.data);
 
   return {
+    get, // ruta libre del juego, para datos extra (maestría, rotación…)
     account:   (gameName, tagLine, region) =>
       get(`/account/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`, region),
     summoner:  (puuid, region) => get(`/summoner/${puuid}`, region),
@@ -35,14 +36,24 @@ export async function fetchMatches(client, ids, region) {
  * Perfil común a los juegos: cuenta + resumen + rango + primera página de partidas.
  * El rango es opcional: si falla, el perfil se muestra igual con `rankedError`.
  */
-export async function loadProfile(client, { gameName, tagLine, region, pageSize }) {
+export async function loadProfile(client, { gameName, tagLine, region, pageSize, extra }) {
   const account = await client.account(gameName, tagLine, region);
-  const [summoner, ranked, page] = await Promise.all([
+  // extra(account) -> { nombre: promesa }: datos opcionales; si uno falla el perfil se muestra igual
+  const extras = extra ? extra(account) : {};
+  const extraKeys = Object.keys(extras);
+  const [summoner, ranked, page, ...extraResults] = await Promise.all([
     client.summoner(account.puuid, region),
     client.ranked(account.puuid, region).then(data => ({ data }), error => ({ error })),
     loadMatchPage(client, account.puuid, region, 0, pageSize),
+    ...extraKeys.map(k => extras[k].then(data => ({ data }), error => ({ error }))),
   ]);
+  const optional = {};
+  extraKeys.forEach((k, i) => {
+    if (extraResults[i].error) console.warn(`Dato opcional "${k}" no disponible:`, extraResults[i].error.message);
+    else optional[k] = extraResults[i].data;
+  });
   return {
+    ...optional,
     region,
     account,
     summoner,

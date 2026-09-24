@@ -4,10 +4,11 @@ import { DD_VERSION as FALLBACK_VERSION } from "../constants/config";
 
 const VERSIONS_URL = "https://ddragon.leagueoflegends.com/api/versions.json";
 const VERSION_KEY  = "dd_version";
-const CHAMPS_KEY   = "dd_champions";
+const CHAMPS_KEY   = "dd_champions_v2";   // v2: incluye la clave numérica de cada campeón
 
 let version = FALLBACK_VERSION;
 let champIds = {}; // nombre normalizado -> ID de Data Dragon
+let champKeys = {}; // clave numérica (championId de Riot) -> { id, name }
 
 const norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -41,7 +42,7 @@ async function loadChampions() {
   if (!list) {
     try {
       const { data } = await axios.get(`${ddBase()}/data/en_US/champion.json`, { timeout: 8000 });
-      list = Object.values(data.data).map(c => ({ id: c.id, name: c.name }));
+      list = Object.values(data.data).map(c => ({ id: c.id, name: c.name, key: Number(c.key) }));
       await storageSet(cacheKey, JSON.stringify(list));
     } catch (e) {
       console.warn("Data Dragon: sin lista de campeones -", e.message);
@@ -49,7 +50,11 @@ async function loadChampions() {
     }
   }
   champIds = {};
-  list.forEach(c => { champIds[norm(c.id)] = c.id; champIds[norm(c.name)] = c.id; });
+  champKeys = {};
+  list.forEach(c => {
+    champIds[norm(c.id)] = c.id; champIds[norm(c.name)] = c.id;
+    champKeys[c.key] = { id: c.id, name: c.name };
+  });
 }
 
 export async function initDataDragon() {
@@ -60,6 +65,9 @@ export async function initDataDragon() {
 
 export const ddVersion = () => version;
 export const ddBase = () => `https://ddragon.leagueoflegends.com/cdn/${version}`;
+
+// Campeón a partir del ID numérico de Riot (7 -> { id: "Leblanc", name: "LeBlanc" }); null si no se conoce
+export const championByKey = key => champKeys[key] || null;
 
 // Normaliza el nombre de campeón de la partida al ID de Data Dragon
 export function championId(name) {

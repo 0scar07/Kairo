@@ -111,6 +111,19 @@ server/
 | Rango | 2 min |
 | Lista de IDs de partidas | 1 min |
 
+### Cola de salida hacia Riot
+
+La key tiene un cupo (por ejemplo 20 peticiones/s y 100 cada 2 min) compartido por **todos** los usuarios. `lib/limiter.js` pone en fila las llamadas reales a Riot y las despacha en cuanto hay hueco (ventanas deslizantes, orden FIFO), en vez de dejar que fallen con 429:
+
+- Solo pasa por la cola lo que no está en caché.
+- Si Riot responde 429, se pausan las salidas durante el `Retry-After`.
+- Si una petición espera más de 20 s, o la cola pasa de 300, se rechaza con 429 ("servidor ocupado").
+- Cupo configurable con `RIOT_RATE_LIMITS`; `npm test` en `server/` cubre el comportamiento.
+
+### Qué juegos habilita la key
+
+Riot habilita cada API por producto: una key puede consultar LoL y no TFT (403). `lib/access.js` consulta cada 10 min una cuenta pública y publica el resultado en `/health` → `games`. La app lo lee al arrancar y muestra como "PRONTO" lo que no esté disponible. Solo se marca un juego como no disponible si la cuenta de prueba se resolvió (la key es válida) y aun así la API del juego dio 403.
+
 | Error de Riot | Respuesta del backend |
 |---------------|-----------------------|
 | 404 | 404 con mensaje del recurso ("Jugador no encontrado") |

@@ -12,7 +12,8 @@ import { colors, spacing, sizes, fontSizes, type, tracking } from "../theme";
 
 // Todos los favoritos, con filtro por juego
 export default function FavoritesScreen({ navigation }) {
-  const { favorites: bootFavorites } = useBootData();
+  const { favorites: bootFavorites, gameEnabled } = useBootData();
+  const availableGames = GAMES.filter(g => gameEnabled(g.id));
   const [favorites, setFavorites] = useState(bootFavorites);
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState(null);
@@ -21,7 +22,7 @@ export default function FavoritesScreen({ navigation }) {
     loadFavorites().then(setFavorites).catch(e => setError("No se pudieron leer los favoritos: " + errorMessage(e)));
   }, []));
 
-  const known = favorites.filter(f => GAMES.some(g => g.id === f.gameId));
+  const known = favorites.filter(f => availableGames.some(g => g.id === f.gameId));
   const visible = known.filter(f => filter === "all" || f.gameId === filter);
 
   function open(fav) {
@@ -51,7 +52,7 @@ export default function FavoritesScreen({ navigation }) {
         <Reveal order={1}>
           <View style={styles.filters}>
             <Chip label="Todos" active={filter === "all"} onPress={() => setFilter("all")} />
-            {GAMES.map(g => (
+            {availableGames.map(g => (
               <Chip key={g.id} label={`${g.icon} ${g.short}`} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
             ))}
           </View>

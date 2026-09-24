@@ -12,6 +12,7 @@ import valorant from "./valorant/meta";
  *  - getProfile(data) -> { avatar, name, tag, subtitle, ranked }   cabecera del perfil
  *  - toFavorite(data) -> { puuid, gameName, tagLine, iconId, tier, rank }
  *  - ProfileBody({ data, setData, setError, mine })         contenido propio del juego
+ *  - HomeExtras({ region })                                 (opcional) extras de Inicio propios del juego
  */
 export const GAMES = [lol, tft];
 

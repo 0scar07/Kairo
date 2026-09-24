@@ -7,11 +7,14 @@ import { setHapticsEnabled } from "../utils/haptics";
 const BootContext = createContext({
   favorites: [], recents: [], region: DEFAULT_REGION, setRegion: () => {},
   haptics: true, setHaptics: () => {}, serverOnline: true, retryServer: async () => {},
+  gameEnabled: () => true,
 });
 
 // Datos que dejó el arranque y preferencias del usuario, disponibles para las pantallas
 export function BootProvider({ boot, children }) {
-  const [serverOnline, setServerOnline] = useState(boot.server !== false);
+  const [serverOnline, setServerOnline] = useState(boot.server?.ok !== false);
+  // Juegos que la key del servidor puede consultar ({ lol: true, tft: false }); sin datos, todos se asumen disponibles
+  const [games, setGames] = useState(boot.server?.games || {});
   const [region, setRegionState] = useState(boot.prefs?.region || DEFAULT_REGION);
   const [haptics, setHapticsState] = useState(boot.prefs?.haptics !== false);
 
@@ -19,7 +22,8 @@ export function BootProvider({ boot, children }) {
 
   const retryServer = useCallback(async () => {
     try {
-      await pingServer();
+      const health = await pingServer();
+      setGames(health.games || {});
       setServerOnline(true);
     } catch (e) {
       setServerOnline(false);
@@ -43,8 +47,9 @@ export function BootProvider({ boot, children }) {
       recents: boot.recents || [],
       region, setRegion, haptics, setHaptics,
       serverOnline, retryServer,
+      gameEnabled: id => games[id] !== false,
     }),
-    [boot, region, haptics, serverOnline, setRegion, setHaptics, retryServer]
+    [boot, region, haptics, serverOnline, games, setRegion, setHaptics, retryServer]
   );
   return <BootContext.Provider value={value}>{children}</BootContext.Provider>;
 }

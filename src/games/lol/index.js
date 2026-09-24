@@ -3,6 +3,7 @@ import meta from "./meta";
 import { searchPlayer } from "./api";
 import ProfileIcon from "./components/ProfileIcon";
 import ProfileBody from "./ProfileBody";
+import HomeExtras from "./HomeExtras";
 
 // Módulo de League of Legends: lo que las pantallas genéricas necesitan saber del juego.
 export default {
@@ -32,4 +33,5 @@ export default {
   },
 
   ProfileBody,
+  HomeExtras,   // opcional: extras en Inicio (estado del servidor, rotación gratuita)
 };

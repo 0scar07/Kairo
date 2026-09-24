@@ -48,8 +48,8 @@ export const BOOT_TASKS = [
   {
     key: "server",
     // Que el backend no responda no es un error de arranque: se avisa en Home
-    run: () => pingServer().then(() => true, () => false),
-    fallback: false,
+    run: () => pingServer().then(health => ({ ok: true, games: health.games || {} }), () => ({ ok: false, games: {} })),
+    fallback: { ok: false, games: {} },
   },
 ];
 
