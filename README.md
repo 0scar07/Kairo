@@ -66,6 +66,12 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
     <td align="center"><img src="docs/screenshots/champions-lol.png" width="200" /><br /><sub><b>Campeones</b></sub></td>
   </tr>
   <tr>
+    <td align="center"><img src="docs/screenshots/mastery-lol.png" width="200" /><br /><sub><b>Maestría de campeones</b></sub></td>
+    <td align="center"><img src="docs/screenshots/rotation-lol.png" width="200" /><br /><sub><b>Rotación gratuita</b></sub></td>
+    <td align="center"><img src="docs/screenshots/status-lol.png" width="200" /><br /><sub><b>Aviso de mantenimiento*</b></sub></td>
+    <td></td>
+  </tr>
+  <tr>
     <td align="center"><img src="docs/screenshots/home-tft.png" width="200" /><br /><sub><b>Inicio en TFT</b></sub></td>
     <td align="center"><img src="docs/screenshots/profile-tft.png" width="200" /><br /><sub><b>Perfil de TFT</b></sub></td>
     <td align="center"><img src="docs/screenshots/matches-tft.png" width="200" /><br /><sub><b>Posiciones y unidades</b></sub></td>
@@ -78,6 +84,8 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
     <td align="center"><img src="docs/screenshots/settings.png" width="200" /><br /><sub><b>Ajustes</b></sub></td>
   </tr>
 </table>
+
+<sub>* El aviso de mantenimiento se muestra solo cuando Riot reporta uno activo; en la captura se simuló uno para enseñar el diseño. Las demás son datos reales de la API.</sub>
 
 ## 🧱 Stack
 
