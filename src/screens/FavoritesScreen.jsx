@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import FavoriteCard from "../components/FavoriteCard";
 import Reveal from "../components/Reveal";
+import GameLogo from "../components/GameLogo";
 import { Chip, EmptyState, ErrorBanner } from "../components/ui";
 import { GAMES } from "../games";
 import { errorMessage } from "../utils/format";
@@ -53,7 +54,7 @@ export default function FavoritesScreen({ navigation }) {
           <View style={styles.filters}>
             <Chip label="Todos" active={filter === "all"} onPress={() => setFilter("all")} />
             {availableGames.map(g => (
-              <Chip key={g.id} label={`${g.icon} ${g.short}`} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
+              <Chip key={g.id} label={g.short} icon={<GameLogo game={g.id} size={sizes.avatarXs} color={filter === g.id ? g.accent : colors.textMuted} />} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
             ))}
           </View>
         </Reveal>

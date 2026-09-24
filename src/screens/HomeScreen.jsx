@@ -13,6 +13,7 @@ import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
+import GameLogo from "../components/GameLogo";
 import { useBootData } from "../boot/BootContext";
 import {
   colors, radii, sizes, spacing, fontSizes, type, tracking, glow, textGlow, withAlpha, useActiveGame,
@@ -144,7 +145,7 @@ export default function HomeScreen({ navigation }) {
               if (!gameEnabled(g.id)) {
                 return (
                   <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
-                    <Text style={styles.gameIcon}>{g.icon}</Text>
+                    <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} />
                     <Text style={styles.gameShort}>{g.short}</Text>
                     <Text style={styles.soon}>PRONTO</Text>
                   </View>
@@ -157,14 +158,14 @@ export default function HomeScreen({ navigation }) {
                   onPress={() => { if (!active) { select(); setGameId(g.id); } }}
                   style={[styles.gameBtn, active && { backgroundColor: withAlpha(g.accent, 0.14), borderColor: g.accent }]}
                 >
-                  <Text style={styles.gameIcon}>{g.icon}</Text>
+                  <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={active ? g.accent : colors.textMuted} />
                   <Text style={[styles.gameShort, active && { color: g.accent }]}>{g.short}</Text>
                 </PressableScale>
               );
             })}
             {UPCOMING_GAMES.map(g => (
               <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
-                <Text style={styles.gameIcon}>{g.icon}</Text>
+                <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} />
                 <Text style={styles.gameShort}>{g.short}</Text>
                 <Text style={styles.soon}>PRONTO</Text>
               </View>
@@ -197,7 +198,7 @@ export default function HomeScreen({ navigation }) {
                   onPress={() => openProfile({ gameId: r.gameId, gameName: r.gameName, tagLine: r.tagLine, region: r.region })}
                   style={styles.recent}
                 >
-                  <Text style={styles.recentIcon}>{getGame(r.gameId).icon}</Text>
+                  <GameLogo game={r.gameId} size={sizes.avatarXs} color={getGame(r.gameId).accent} />
                   <Text style={styles.recentText} numberOfLines={1}>{r.gameName}<Text style={styles.recentTag}> #{r.tagLine}</Text></Text>
                 </PressableScale>
               ))}
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border, borderRadius: radii.lg,
   },
   gameBtnSoon:   { opacity: 0.45 },
-  gameIcon:      { fontSize: fontSizes.xxl, marginBottom: spacing.xs },
+  gameIcon:      { marginBottom: spacing.xs },
   gameShort:     { ...type.label, color: colors.textMuted, fontSize: fontSizes.xs },
   soon:          { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.sm },
@@ -282,7 +283,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md, paddingVertical: spacing.sm, marginRight: spacing.sm,
     borderRadius: radii.pill, backgroundColor: colors.surface, borderWidth: sizes.hairline, borderColor: colors.border,
   },
-  recentIcon:    { fontSize: fontSizes.base },
   recentText:    { ...type.smallStrong, color: colors.text, flexShrink: 1 },
   recentTag:     { color: colors.textMuted },
   grid:          { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },

@@ -4,6 +4,7 @@ import { PressableScale } from "./ui";
 import { getGame } from "../games";
 import { profileIconUrl } from "../api/ddragon";
 import RankEmblem from "./RankEmblem";
+import GameLogo from "./GameLogo";
 import { tierLabel } from "../utils/format";
 import { getRegion } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, withAlpha } from "../theme";
@@ -25,7 +26,7 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
           <Image source={{ uri: profileIconUrl(fav.iconId) }} style={[styles.icon, { borderColor: tint }]} />
         ) : (
           <View style={[styles.icon, styles.iconPlaceholder, { borderColor: tint }]}>
-            <Text style={styles.emoji}>{game?.icon}</Text>
+            <GameLogo game={fav.gameId} size={sizes.item} color={tint} />
           </View>
         )}
         {onRemove && (
@@ -56,7 +57,6 @@ const styles = StyleSheet.create({
   top:             { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: spacing.sm },
   icon:            { width: sizes.avatarLg + spacing.sm, height: sizes.avatarLg + spacing.sm, borderRadius: radii.pill, borderWidth: sizes.borderThick },
   iconPlaceholder: { backgroundColor: colors.surfaceHigh, alignItems: "center", justifyContent: "center" },
-  emoji:           { fontSize: fontSizes.xl },
   remove:          { padding: spacing.xs },
   removeText:      { ...type.caption, color: colors.textFaint },
   name:            { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },

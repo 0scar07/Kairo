@@ -1,19 +1,20 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet } from "react-native";
 import meta from "./meta";
 import { searchPlayer } from "./api";
 import ProfileBody from "./ProfileBody";
+import GameLogo from "../../components/GameLogo";
 import { profileIconUrl } from "../../api/ddragon";
-import { colors, sizes, fontSizes, accents } from "../../theme";
+import { colors, sizes, accents } from "../../theme";
 
-// Ícono de perfil (es de la cuenta Riot: el mismo que en LoL); si falta, el emoji del juego
+// Ícono de perfil (es de la cuenta Riot: el mismo que en LoL); si falta, el logo del juego
 function TftAvatar({ iconId }) {
   const accent = accents[meta.id];
   return (
     <View style={[styles.avatar, { borderColor: accent }]}>
       {iconId != null
         ? <Image source={{ uri: profileIconUrl(iconId) }} style={styles.img} />
-        : <Text style={styles.emoji}>{meta.icon}</Text>}
+        : <GameLogo game="tft" size={sizes.avatarSm} color={accent} />}
     </View>
   );
 }
@@ -53,5 +54,4 @@ const styles = StyleSheet.create({
     justifyContent: "center", alignItems: "center", overflow: "hidden",
   },
   img:   { width: "100%", height: "100%" },
-  emoji: { fontSize: fontSizes.hero },
 });

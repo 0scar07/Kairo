@@ -5,7 +5,7 @@ import { select } from "../../utils/haptics";
 import { colors, radii, sizes, spacing, type, useAccent, withAlpha } from "../../theme";
 
 // Botón tipo píldora para filtros; opcionalmente con imagen
-export default function Chip({ label, active, onPress, image, game }) {
+export default function Chip({ label, active, onPress, image, icon, game }) {
   const accent = useAccent(game);
   return (
     <PressableScale
@@ -13,6 +13,7 @@ export default function Chip({ label, active, onPress, image, game }) {
       scaleTo={0.94}
       onPress={() => { select(); onPress(); }}
     >
+      {icon}
       {image ? <Image source={{ uri: image }} style={styles.img} /> : null}
       <Text style={[styles.text, active && { color: accent }]}>{label}</Text>
     </PressableScale>
