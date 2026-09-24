@@ -8,7 +8,10 @@ const REGIONS = {
 
 const DEFAULT_REGION = process.env.DEFAULT_REGION || "la1";
 
-const platformHost = region => `https://${region}.api.riotgames.com`;
+// PH2 y TH2 se fusionaron en SG2 (TFT y LoL): sus consultas de plataforma van al host de SG2
+const PLATFORM_ALIASES = { ph2: "sg2", th2: "sg2" };
+
+const platformHost = region => `https://${PLATFORM_ALIASES[region] || region}.api.riotgames.com`;
 const routingHost  = region => `https://${REGIONS[region]}.api.riotgames.com`;
 // account-v1 no existe en el clúster "sea": se consulta en "asia"
 const accountHost  = region => `https://${REGIONS[region] === "sea" ? "asia" : REGIONS[region]}.api.riotgames.com`;

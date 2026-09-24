@@ -55,6 +55,31 @@ El repo incluye una página en [`docs/index.html`](index.html) y la política de
 
 Requiere que el repositorio sea **público** (o un plan que permita Pages en privados). Si vuelves a renombrar el repositorio, cambia el nombre en las URLs de este archivo y de las páginas.
 
+## Reglas de Riot que afectan a Kairo
+
+Extraídas de las políticas oficiales de TFT y Valorant (Developer Portal → Support). Léelas de nuevo antes de solicitar algo: Riot las actualiza.
+
+| Tema | Qué dice Riot | Estado en Kairo |
+|------|---------------|-----------------|
+| **Key personal** | Casos aprobados: *sitios personales, proyectos escolares, prueba de concepto para una key de producción*. Es para proyectos "pequeños y personales" | ✅ Kairo es un proyecto personal con pocos usuarios |
+| **Key de producción** | Aprobados con RSO: estadísticas **del propio jugador**, torneos, entrenamiento con tu propio historial, LFG. Sin RSO: solo estadísticas agregadas y rankings oficiales | ⚠️ "Buscar a cualquier jugador" no figura en la lista: Riot podría pedir RSO. No está garantizado |
+| **Scouting** | Prohibido ver las unidades/jugadas del rival durante la partida | ✅ Solo se muestran partidas terminadas |
+| **Tiempo real** | Prohibidas las apps con datos dinámicos que dicten decisiones | ✅ No hay datos en vivo |
+| **Win rates en TFT** | Prohibido mostrar win rates de *Legends* y de *Augments de Legend* | ✅ No se muestran |
+| **MMR / ELO** | Prohibido crear alternativas al ranking oficial | ✅ Solo se muestra el rango oficial |
+| **Riot IDs históricos** | No se pueden exponer nombres anteriores de un jugador | ✅ Solo el nombre actual |
+| **Monetización** | Debe haber un nivel gratuito; nada de apuestas | ✅ Gratis y sin anuncios |
+| **Registro** | Hay que mantener actualizada la descripción del producto | ⚠️ Actualízala si añades funciones |
+| **Valorant** | No admite keys personales; exige **RSO** (opt-in del jugador) y no aprueba el *scouting* ni las apps de uso personal | ⏳ Fuera de alcance por ahora |
+
+**Sobre TFT y Data Dragon:** Riot avisa de que Data Dragon se actualiza a mano y puede tardar tras un parche, y que solo incluye los sets vigentes. Por eso las unidades de sets antiguos usan un placeholder.
+
+**TH2 y PH2 se fusionaron en SG2:** el backend redirige esas dos regiones al host de SG2.
+
+### Párrafo recomendado al pedir TFT
+
+> Kairo is currently a personal project shared with a small group of friends, in line with the Personal Key use cases. If it grows into a public release, I will apply for a Production Key and integrate RSO where required.
+
 ## Lista de comprobación antes de enviar
 
 - [ ] La página pública abre y muestra capturas y la política de privacidad
