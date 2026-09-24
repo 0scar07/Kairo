@@ -79,29 +79,23 @@ Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, 
     <td align="center"><img src="docs/screenshots/mastery-lol.png" width="200" /><br /><sub><b>Maestría de campeones</b></sub></td>
     <td align="center"><img src="docs/screenshots/rotation-lol.png" width="200" /><br /><sub><b>Rotación gratuita</b></sub></td>
     <td align="center"><img src="docs/screenshots/status-lol.png" width="200" /><br /><sub><b>Aviso de mantenimiento*</b></sub></td>
-    <td></td>
+    <td align="center"><img src="docs/screenshots/favorites.png" width="200" /><br /><sub><b>Favoritos</b></sub></td>
   </tr>
   <tr>
     <td align="center"><img src="docs/screenshots/brawlstars-profile.png" width="200" /><br /><sub><b>Brawl Stars</b></sub></td>
-    <td align="center"><img src="docs/screenshots/brawlstars-battles.png" width="200" /><br /><sub><b>Batallas</b></sub></td>
+    <td align="center"><img src="docs/screenshots/brawlstars-battles.png" width="200" /><br /><sub><b>Batallas de Brawl Stars</b></sub></td>
     <td align="center"><img src="docs/screenshots/clashroyale-profile.png" width="200" /><br /><sub><b>Clash Royale</b></sub></td>
     <td align="center"><img src="docs/screenshots/clashofclans-profile.png" width="200" /><br /><sub><b>Clash of Clans</b></sub></td>
   </tr>
   <tr>
     <td align="center"><img src="docs/screenshots/clashofclans-heroes.png" width="200" /><br /><sub><b>Héroes y clan</b></sub></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
     <td align="center"><img src="docs/screenshots/home-tft.png" width="200" /><br /><sub><b>Inicio en TFT</b></sub></td>
     <td align="center"><img src="docs/screenshots/profile-tft.png" width="200" /><br /><sub><b>Perfil de TFT</b></sub></td>
     <td align="center"><img src="docs/screenshots/matches-tft.png" width="200" /><br /><sub><b>Posiciones y unidades</b></sub></td>
-    <td align="center"><img src="docs/screenshots/match-detail-tft.png" width="200" /><br /><sub><b>Los 8 jugadores</b></sub></td>
   </tr>
   <tr>
+    <td align="center"><img src="docs/screenshots/match-detail-tft.png" width="200" /><br /><sub><b>Los 8 jugadores</b></sub></td>
     <td align="center"><img src="docs/screenshots/favorite.png" width="200" /><br /><sub><b>Favorito marcado</b></sub></td>
-    <td align="center"><img src="docs/screenshots/favorites.png" width="200" /><br /><sub><b>Favoritos</b></sub></td>
     <td align="center"><img src="docs/screenshots/home-recents.png" width="200" /><br /><sub><b>Recientes</b></sub></td>
     <td align="center"><img src="docs/screenshots/settings.png" width="200" /><br /><sub><b>Ajustes</b></sub></td>
   </tr>
