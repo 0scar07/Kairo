@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
-import { profileIconUrl } from "../api/ddragon";
-import { colors, radii, sizes, spacing, type, glow, useAccent } from "../theme";
+import { profileIconUrl } from "../../../api/ddragon";
+import { colors, radii, sizes, spacing, type, glow, useAccent } from "../../../theme";
 
 export default function ProfileIcon({ iconId, level, size = sizes.avatarXl, game = "lol" }) {
   const accent = useAccent(game);

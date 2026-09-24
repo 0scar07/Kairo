@@ -1,7 +1,10 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { pingServer } from "../api/riot";
+import { pingServer } from "../api/client";
+import { DEFAULT_REGION } from "../constants/regions";
 
-const BootContext = createContext({ favorites: [], serverOnline: true, retryServer: async () => {} });
+const BootContext = createContext({
+  favorites: [], region: DEFAULT_REGION, serverOnline: true, retryServer: async () => {},
+});
 
 // Datos que dejó el arranque, disponibles para las pantallas
 export function BootProvider({ boot, children }) {
@@ -17,7 +20,12 @@ export function BootProvider({ boot, children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ favorites: boot.favorites || [], serverOnline, retryServer }),
+    () => ({
+      favorites: boot.favorites || [],
+      region: boot.prefs?.region || DEFAULT_REGION,
+      serverOnline,
+      retryServer,
+    }),
     [boot, serverOnline, retryServer]
   );
   return <BootContext.Provider value={value}>{children}</BootContext.Provider>;

@@ -1,20 +1,9 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { championIcon } from "../api/ddragon";
-import { csOf, queueLabel, kdaRatio as calcKda } from "../utils/lol";
-import { colors, radii, sizes, spacing, fontSizes, type, tracking, kdaColor, useAccent } from "../theme";
-
-function timeSince(ts) {
-  const s = Math.floor((Date.now() - ts) / 1000);
-  if (s < 60)    return `${s}s`;
-  if (s < 3600)  return `${Math.floor(s / 60)}m`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h`;
-  return `${Math.floor(s / 86400)}d`;
-}
-
-function formatDuration(s) {
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-}
+import { championIcon } from "../../../api/ddragon";
+import { csOf, queueLabel, kdaRatio as calcKda } from "../utils";
+import { timeSince, formatDuration } from "../../../utils/format";
+import { colors, radii, sizes, spacing, fontSizes, type, tracking, kdaColor, useAccent } from "../../../theme";
 
 export default function MatchRow({ match, myPuuid, onPress, expanded }) {
   const accent = useAccent("lol");

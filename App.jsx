@@ -8,10 +8,9 @@ import { StatusBar } from "expo-status-bar";
 import { Text } from "react-native";
 import HomeScreen      from "./src/screens/HomeScreen";
 import ProfileScreen   from "./src/screens/ProfileScreen";
-import ValorantScreen  from "./src/screens/ValorantScreen";
-import TFTScreen       from "./src/screens/TFTScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
 import LoadingScreen from "./src/screens/LoadingScreen";
+import { getGame } from "./src/games";
 import { useBoot } from "./src/boot/useBoot";
 import { BootProvider } from "./src/boot/BootContext";
 import {
@@ -40,15 +39,17 @@ function SearchStack() {
   return (
     <Stack.Navigator screenOptions={stackOptions}>
       <Stack.Screen name="Home"     component={HomeScreen}     options={{ headerShown: false }} />
-      <Stack.Screen name="Profile"  component={ProfileScreen}  options={{ title: "League of Legends" }} />
-      <Stack.Screen name="Valorant" component={ValorantScreen} options={{ title: "Valorant" }} />
-      <Stack.Screen name="TFT"      component={TFTScreen}      options={{ title: "TFT" }} />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={({ route }) => ({ title: getGame(route.params.gameId)?.name ?? "Perfil" })}
+      />
     </Stack.Navigator>
   );
 }
 
 function MyProfileStack() {
-  const accent = useAccent("lol"); // Mi Perfil es siempre de LoL
+  const accent = useAccent();
   return (
     <Stack.Navigator screenOptions={{
       headerStyle:      { backgroundColor: colors.surface },
@@ -104,7 +105,7 @@ export default function App() {
       {/* La app se monta al llegar a 100 %, justo cuando la pantalla de carga empieza su fade-out */}
       {finished && result && (
         <BootProvider boot={result}>
-          <GameProvider initialGame={result.activeGame}>
+          <GameProvider initialGame={result.prefs.activeGame}>
             <NavigationContainer theme={navTheme}>
               <Tabs />
             </NavigationContainer>

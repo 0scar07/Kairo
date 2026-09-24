@@ -7,12 +7,6 @@ export function playerName(p) {
   return p.summonerName || p.championName || "Jugador";
 }
 
-// Porcentaje de victorias sin dividir entre cero
-export function winrate(wins, losses) {
-  const total = (wins || 0) + (losses || 0);
-  return total ? Math.round((wins / total) * 100) : 0;
-}
-
 // KDA como texto: "Perfect" si no hay muertes
 export const kdaRatio = (kills, deaths, assists) =>
   deaths === 0 ? "Perfect" : ((kills + assists) / deaths).toFixed(2);
@@ -30,14 +24,6 @@ const QUEUES = {
 
 export function queueLabel(queueId) {
   return QUEUES[queueId] || "Otro modo";
-}
-
-// Mensaje de error legible para mostrar en pantalla
-export function errorMessage(e, fallback = "Ocurrió un error inesperado") {
-  if (e?.response?.status === 429) return "Demasiadas solicitudes a Riot, espera un momento";
-  if (e?.response?.data?.error) return e.response.data.error;
-  if (e?.code === "ERR_NETWORK" || e?.message === "Network Error") return "Sin conexión con el servidor";
-  return e?.message || fallback;
 }
 
 // ─── Estadísticas de LoL a partir de las partidas ────────────────────────────

@@ -1,3 +1,5 @@
+import { GAME_META } from "../games/registry";
+
 // Paleta de Kairo: base casi negra con un toque verdoso, superficies en capas y bordes sutiles.
 export const colors = {
   bg:            "#070C0F",
@@ -21,9 +23,13 @@ export const colors = {
   lossBgStrong:  "#2A0D0D",
   gold:          "#F1C40F",   // KDA perfecto, victorias destacadas
   orange:        "#FF6B35",
+  info:          "#0BC4E3",
 
   onAccent:      "#070C0F",   // texto sobre un botón de color de acento
   overlay:       "#000000AA",
+
+  // Costo de las unidades de TFT (1 a 5)
+  cost: { 1: "#8A97A8", 2: "#3FBF6B", 3: "#3A8DFF", 4: "#B45CFF", 5: "#FFC533" },
 
   placement: { first: "#FFD700", second: "#C0C0C0", third: "#CD7F32" },
   rank:      ["#FFD700", "#C0C0C0", "#CD7F32"],
@@ -36,18 +42,24 @@ export const colors = {
   },
 };
 
-// Cada juego tiene su color de acento; "brand" es el de Kairo
+// Cada juego declara su acento en src/games/<juego>/meta.js; "brand" es el de Kairo
 export const accents = {
-  brand:    "#35E0A1",
-  lol:      "#C89B3C",
-  tft:      "#0BC4E3",
-  valorant: "#FF4655",
+  brand: "#35E0A1",
+  ...Object.fromEntries(GAME_META.map(g => [g.id, g.accent])),
 };
 
 // "#RRGGBB" + opacidad (0-1) -> "#RRGGBBAA"
 export function withAlpha(hex, alpha) {
   const a = Math.round(Math.min(Math.max(alpha, 0), 1) * 255).toString(16).padStart(2, "0");
   return `${hex}${a}`;
+}
+
+// Mezcla dos colores "#RRGGBB" (t de 0 a 1)
+export function mixHex(a, b, t) {
+  const ch = (hex, i) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+  return "#" + [0, 1, 2]
+    .map(i => Math.round(ch(a, i) + (ch(b, i) - ch(a, i)) * t).toString(16).padStart(2, "0"))
+    .join("");
 }
 
 // Semáforo de porcentaje de victorias

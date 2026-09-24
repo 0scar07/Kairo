@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl, Image } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import ProfileIcon from "../components/ProfileIcon";
-import RankedCard from "../components/RankedCard";
-import MatchRow from "../components/MatchRow";
-import MatchDetail from "../components/MatchDetail";
-import ChampionStatsRow from "../components/ChampionStatsRow";
-import Reveal from "../components/Reveal";
-import { Card, SectionLabel, SegmentedTabs, Chip, ErrorBanner, ProfileHeader, OverallCard } from "../components/ui";
-import { searchPlayer, getMoreMatches, MATCH_PAGE } from "../api/riot";
-import { championIcon } from "../api/ddragon";
-import { FAVORITES_KEY } from "../constants/config";
-import { errorMessage, findMe, getChampionStats, getOverallStats, getStreak } from "../utils/lol";
+import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
+import RankedCard from "../../components/RankedCard";
+import Reveal from "../../components/Reveal";
 import {
-  colors, radii, sizes, spacing, type, kdaColor, winrateColor, useAccent, withAlpha,
-} from "../theme";
+  Card, SectionLabel, SegmentedTabs, Chip, OverallCard, LoadMoreButton, Notice,
+} from "../../components/ui";
+import MatchRow from "./components/MatchRow";
+import MatchDetail from "./components/MatchDetail";
+import ChampionStatsRow from "./components/ChampionStatsRow";
+import MineExtras from "./MineExtras";
+import { getMoreMatches } from "./api";
+import { findMe, getChampionStats, getOverallStats, getStreak } from "./utils";
+import { championIcon } from "../../api/ddragon";
+import { errorMessage } from "../../utils/format";
+import { colors, radii, sizes, spacing, type, kdaColor, winrateColor, useAccent } from "../../theme";
 
 const GAME = "lol";
 
@@ -29,23 +28,19 @@ const RESULT_FILTERS = [
   { key: "loss", label: "✗ Derrotas" },
 ];
 
-export default function ProfileScreen({ route }) {
+// Contenido del perfil de League of Legends (la cabecera, favoritos y refresco los pone el perfil genérico)
+export default function LolProfileBody({ data, setData, setError, mine }) {
   const accent = useAccent(GAME);
-  const [data,        setData]        = useState(route.params.data);
   const [activeMatch, setActiveMatch] = useState(null);
-  const [refreshing,  setRefreshing]  = useState(false);
   const [activeTab,   setActiveTab]   = useState("partidas");
   const [filterWin,   setFilterWin]   = useState("all");
   const [filterChamp, setFilterChamp] = useState("all");
-  const [isFav,       setIsFav]       = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [error,       setError]       = useState(null);
 
-  const { account, summoner, ranked, matches, hasMore, nextStart } = data;
+  const { account, ranked, rankedError, matches, hasMore, nextStart, region } = data;
   const soloQ      = ranked?.find(r => r.queueType === "RANKED_SOLO_5x5");
   const flex       = ranked?.find(r => r.queueType === "RANKED_FLEX_SR");
-  const allChamps  = getChampionStats(matches || [], account.puuid);
-  const champStats = allChamps.slice(0, 5);
+  const champStats = getChampionStats(matches || [], account.puuid).slice(0, 5);
   const overall    = getOverallStats(matches || [], account.puuid);
   const streak     = getStreak(matches || [], account.puuid);
   const topChamp   = champStats[0];
@@ -63,60 +58,11 @@ export default function ProfileScreen({ route }) {
     return true;
   });
 
-  useEffect(() => { checkFavorite(); }, []);
-
-  async function checkFavorite() {
-    try {
-      const raw  = await AsyncStorage.getItem(FAVORITES_KEY);
-      const favs = raw ? JSON.parse(raw) : [];
-      setIsFav(favs.some(f => f.puuid === account.puuid));
-    } catch (e) {
-      console.warn("No se pudieron leer los favoritos:", e.message);
-    }
-  }
-
-  async function toggleFavorite() {
-    try {
-      const raw = await AsyncStorage.getItem(FAVORITES_KEY);
-      let favs  = raw ? JSON.parse(raw) : [];
-      if (isFav) {
-        favs = favs.filter(f => f.puuid !== account.puuid);
-      } else {
-        favs.push({
-          game:     GAME,
-          puuid:    account.puuid,
-          gameName: account.gameName,
-          tagLine:  account.tagLine,
-          iconId:   summoner.profileIconId,
-          tier:     soloQ?.tier || null,
-          rank:     soloQ?.rank || null,
-        });
-      }
-      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
-      setIsFav(!isFav);
-    } catch (e) {
-      setError("No se pudo actualizar favoritos: " + errorMessage(e));
-    }
-  }
-
-  async function onRefresh() {
-    setRefreshing(true);
-    setError(null);
-    try {
-      const fresh = await searchPlayer(account.gameName, account.tagLine);
-      setData(fresh);
-      setActiveMatch(null);
-    } catch (e) {
-      setError("No se pudo actualizar: " + errorMessage(e));
-    }
-    setRefreshing(false);
-  }
-
   async function loadMore() {
     setLoadingMore(true);
     setError(null);
     try {
-      const page = await getMoreMatches(account.puuid, nextStart, MATCH_PAGE);
+      const page = await getMoreMatches(account.puuid, nextStart, region);
       setData(prev => {
         const known = new Set(prev.matches.map(m => m.metadata.matchId));
         const fresh = page.matches.filter(m => !known.has(m.metadata.matchId));
@@ -139,125 +85,102 @@ export default function ProfileScreen({ route }) {
   ];
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
-    >
-      <ErrorBanner message={error} onDismiss={() => setError(null)} />
-
-      <Reveal order={0}>
-      <ProfileHeader
-        game={GAME}
-        avatar={<ProfileIcon iconId={summoner.profileIconId} level={summoner.summonerLevel} game={GAME} />}
-        name={account.gameName}
-        tag={account.tagLine}
-        badge={soloQ ? `${soloQ.tier} ${soloQ.rank} · ${soloQ.leaguePoints} LP` : null}
-        action={isFav ? "⭐" : "☆"}
-        onAction={toggleFavorite}
-      />
-      </Reveal>
-
-      <Reveal order={1}>
+    <>
       {streak && (
-        <View style={[styles.streak, {
-          backgroundColor: streak.isWin ? colors.winBgStrong : colors.lossBgStrong,
-          borderColor:     streak.isWin ? colors.win : colors.loss,
-        }]}>
-          <Text style={[styles.streakText, { color: streak.isWin ? colors.win : colors.loss }]}>
-            {streak.isWin ? "🔥" : "❄️"} Racha de {streak.count} {streak.isWin ? "victorias" : "derrotas"}
-          </Text>
-        </View>
+        <Reveal order={1}>
+          <View style={[styles.streak, {
+            backgroundColor: streak.isWin ? colors.winBgStrong : colors.lossBgStrong,
+            borderColor:     streak.isWin ? colors.win : colors.loss,
+          }]}>
+            <Text style={[styles.streakText, { color: streak.isWin ? colors.win : colors.loss }]}>
+              {streak.isWin ? "🔥" : "❄️"} Racha de {streak.count} {streak.isWin ? "victorias" : "derrotas"}
+            </Text>
+          </View>
+        </Reveal>
       )}
-      </Reveal>
 
-      <Reveal order={2}>
       {overall && (
-        <OverallCard
-          label={`Resumen — últimas ${overall.games} partidas`}
-          blocks={summaryBlocks}
-          bar={{ value: overall.wr, color: winrateColor(overall.wr, accent) }}
-        />
+        <Reveal order={2}>
+          <OverallCard
+            label={`Resumen — últimas ${overall.games} partidas`}
+            blocks={summaryBlocks}
+            bar={{ value: overall.wr, color: winrateColor(overall.wr, accent) }}
+          />
+        </Reveal>
       )}
-      </Reveal>
 
       <Reveal order={3}>
-      {(soloQ || flex) && (
-        <View style={styles.rankedRow}>
-          {soloQ && <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />}
-          {flex  && <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />}
-        </View>
-      )}
+        {rankedError && <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>}
+        {(soloQ || flex) && (
+          <View style={styles.rankedRow}>
+            {soloQ && <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />}
+            {flex  && <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />}
+          </View>
+        )}
       </Reveal>
 
+      {mine && <MineExtras data={data} />}
+
       <Reveal order={4}>
-      <SegmentedTabs tabs={TABS} value={activeTab} onChange={setActiveTab} game={GAME} />
+        <SegmentedTabs tabs={TABS} value={activeTab} onChange={setActiveTab} game={GAME} />
       </Reveal>
 
       <Reveal order={5}>
-      {activeTab === "campeones" && (
-        <Card>
-          <SectionLabel>Más jugados (últimas {matches?.length} partidas)</SectionLabel>
-          {champStats.map(c => <ChampionStatsRow key={c.name} champ={c} game={GAME} />)}
-        </Card>
-      )}
+        {activeTab === "campeones" && (
+          <Card>
+            <SectionLabel>Más jugados (últimas {matches?.length} partidas)</SectionLabel>
+            {champStats.map((c, i) => (
+              <ChampionStatsRow key={c.name} champ={c} game={GAME} rank={mine ? i : undefined} />
+            ))}
+          </Card>
+        )}
 
-      {activeTab === "partidas" && (
-        <>
-          <View style={styles.filters}>
-            <View style={styles.filterRow}>
-              {RESULT_FILTERS.map(f => (
-                <Chip key={f.key} label={f.label} active={filterWin === f.key} game={GAME} onPress={() => setFilterWin(f.key)} />
-              ))}
+        {activeTab === "partidas" && (
+          <>
+            <View style={styles.filters}>
+              <View style={styles.filterRow}>
+                {RESULT_FILTERS.map(f => (
+                  <Chip key={f.key} label={f.label} active={filterWin === f.key} game={GAME} onPress={() => setFilterWin(f.key)} />
+                ))}
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <Chip label="Todos" active={filterChamp === "all"} game={GAME} onPress={() => setFilterChamp("all")} />
+                {uniqueChamps.map(c => (
+                  <Chip
+                    key={c}
+                    label={c}
+                    image={championIcon(c)}
+                    active={filterChamp === c}
+                    game={GAME}
+                    onPress={() => setFilterChamp(filterChamp === c ? "all" : c)}
+                  />
+                ))}
+              </ScrollView>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <Chip label="Todos" active={filterChamp === "all"} game={GAME} onPress={() => setFilterChamp("all")} />
-              {uniqueChamps.map(c => (
-                <Chip
-                  key={c}
-                  label={c}
-                  image={championIcon(c)}
-                  active={filterChamp === c}
-                  game={GAME}
-                  onPress={() => setFilterChamp(filterChamp === c ? "all" : c)}
+
+            <SectionLabel>{filteredMatches.length} partidas</SectionLabel>
+
+            {filteredMatches.map(m => (
+              <View key={m.metadata.matchId}>
+                <MatchRow
+                  match={m}
+                  myPuuid={account.puuid}
+                  expanded={activeMatch === m.metadata.matchId}
+                  onPress={() => setActiveMatch(activeMatch === m.metadata.matchId ? null : m.metadata.matchId)}
                 />
-              ))}
-            </ScrollView>
-          </View>
+                {activeMatch === m.metadata.matchId && <MatchDetail match={m} myPuuid={account.puuid} />}
+              </View>
+            ))}
 
-          <SectionLabel>{filteredMatches.length} partidas</SectionLabel>
-
-          {filteredMatches.map(m => (
-            <View key={m.metadata.matchId}>
-              <MatchRow
-                match={m}
-                myPuuid={account.puuid}
-                expanded={activeMatch === m.metadata.matchId}
-                onPress={() => setActiveMatch(activeMatch === m.metadata.matchId ? null : m.metadata.matchId)}
-              />
-              {activeMatch === m.metadata.matchId && <MatchDetail match={m} myPuuid={account.puuid} />}
-            </View>
-          ))}
-
-          <TouchableOpacity
-            style={[styles.loadMoreBtn, { borderColor: withAlpha(accent, 0.4) }, (loadingMore || !hasMore) && styles.disabled]}
-            onPress={loadMore}
-            disabled={loadingMore || !hasMore}
-          >
-            <Text style={[styles.loadMoreText, { color: accent }]}>
-              {loadingMore ? "Cargando..." : hasMore ? "⬇ Cargar más partidas" : "No hay más partidas"}
-            </Text>
-          </TouchableOpacity>
-        </>
-      )}
+            <LoadMoreButton game={GAME} loading={loadingMore} hasMore={hasMore} onPress={loadMore} />
+          </>
+        )}
       </Reveal>
-    </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: colors.bg },
-  content:      { padding: spacing.lg, paddingBottom: spacing.xxxl },
   topChampImg:  { width: sizes.avatarLg, height: sizes.avatarLg, borderRadius: radii.md, backgroundColor: colors.surfaceHigh },
   rankedRow:    { flexDirection: "row", gap: spacing.md, marginBottom: spacing.lg },
   streak:       {
@@ -267,11 +190,4 @@ const styles = StyleSheet.create({
   streakText:   { ...type.bodyStrong },
   filters:      { marginBottom: spacing.md },
   filterRow:    { flexDirection: "row", marginBottom: spacing.md },
-  loadMoreBtn:  {
-    marginTop: spacing.md, padding: spacing.lg,
-    backgroundColor: colors.surface, borderWidth: sizes.hairline,
-    borderRadius: radii.md, alignItems: "center",
-  },
-  loadMoreText: { ...type.bodyStrong },
-  disabled:     { opacity: 0.5 },
 });

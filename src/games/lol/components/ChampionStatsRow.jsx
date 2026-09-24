@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { ProgressBar } from "./ui";
-import { championIcon } from "../api/ddragon";
-import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../theme";
+import { ProgressBar } from "../../../components/ui";
+import { championIcon } from "../../../api/ddragon";
+import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../../../theme";
 
 // Fila de estadísticas por campeón. `rank` (0,1,2…) muestra el puesto; `detail` reemplaza el subtítulo.
 export default function ChampionStatsRow({ champ, rank, detail, game = "lol" }) {

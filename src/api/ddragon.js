@@ -58,6 +58,7 @@ export async function initDataDragon() {
   return version;
 }
 
+export const ddVersion = () => version;
 export const ddBase = () => `https://ddragon.leagueoflegends.com/cdn/${version}`;
 
 // Normaliza el nombre de campeón de la partida al ID de Data Dragon

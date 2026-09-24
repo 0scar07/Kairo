@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { championIcon, itemIcon } from "../api/ddragon";
-import { csOf, playerName } from "../utils/lol";
-import { colors, radii, sizes, spacing, fontSizes, type, tracking, useAccent } from "../theme";
-
-function formatDuration(s) {
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-}
+import { championIcon, itemIcon } from "../../../api/ddragon";
+import { csOf, playerName } from "../utils";
+import { formatDuration } from "../../../utils/format";
+import { colors, radii, sizes, spacing, fontSizes, type, tracking, useAccent } from "../../../theme";
 
 function ItemIcon({ itemId }) {
   const [failed, setFailed] = useState(false);

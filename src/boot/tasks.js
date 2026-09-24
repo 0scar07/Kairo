@@ -1,10 +1,12 @@
 import * as Font from "expo-font";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { initDataDragon } from "../api/ddragon";
-import { pingServer } from "../api/riot";
+import { pingServer } from "../api/client";
 import { migrateLegacyStorage } from "../utils/storage";
-import { FAVORITES_KEY, ACTIVE_GAME_KEY } from "../constants/config";
-import { fontAssets, accents } from "../theme";
+import { loadFavorites } from "../utils/favorites";
+import { loadActiveGame, loadRegion } from "../utils/prefs";
+import { getGameMeta } from "../games/registry";
+import { DEFAULT_REGION } from "../constants/regions";
+import { fontAssets } from "../theme";
 
 // Cada tarea avanza la barra de carga un 100/N %. Si una falla, se usa `fallback` y el arranque sigue.
 export const BOOT_TASKS = [
@@ -20,21 +22,22 @@ export const BOOT_TASKS = [
   },
   {
     key: "favorites",
+    // Migra las claves antiguas y los favoritos sin gameId/región (se guardan ya migrados)
     run: async () => {
       await migrateLegacyStorage();
-      const raw = await AsyncStorage.getItem(FAVORITES_KEY);
-      // Los favoritos antiguos de LoL no tenían campo game
-      return raw ? JSON.parse(raw).map(f => ({ ...f, game: f.game || "lol" })) : [];
+      return loadFavorites();
     },
     fallback: [],
   },
   {
-    key: "activeGame",
+    key: "prefs",
+    // Último juego y última región usados
     run: async () => {
-      const saved = await AsyncStorage.getItem(ACTIVE_GAME_KEY);
-      return saved && accents[saved] && saved !== "brand" ? saved : "lol";
+      const [saved, region] = await Promise.all([loadActiveGame(), loadRegion()]);
+      const meta = getGameMeta(saved);
+      return { activeGame: meta?.available ? saved : "lol", region };
     },
-    fallback: "lol",
+    fallback: { activeGame: "lol", region: DEFAULT_REGION },
   },
   {
     key: "server",

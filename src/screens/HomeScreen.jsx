@@ -1,114 +1,89 @@
 import React, { useState, useEffect } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Alert, ScrollView, Image,
+  View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Image,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { searchPlayer } from "../api/riot";
-import { searchValorantPlayer } from "../api/valorant";
-import { searchTFTPlayer } from "../api/tft";
+import { GAMES, UPCOMING_GAMES, getGame } from "../games";
 import { profileIconUrl } from "../api/ddragon";
-import { FAVORITES_KEY, APP_NAME, APP_TAGLINE } from "../constants/config";
-import { errorMessage } from "../utils/lol";
+import { APP_NAME, APP_TAGLINE } from "../constants/config";
+import { getRegion } from "../constants/regions";
+import { errorMessage } from "../utils/format";
+import { loadFavorites, removeFavorite } from "../utils/favorites";
+import { saveRegion } from "../utils/prefs";
 import { Card, SectionLabel } from "../components/ui";
+import { RegionButton } from "../components/RegionPicker";
 import Reveal from "../components/Reveal";
 import { useBootData } from "../boot/BootContext";
 import {
-  colors, accents, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, glow, withAlpha, useActiveGame,
+  colors, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, glow, withAlpha, useActiveGame,
 } from "../theme";
-
-const GAMES = [
-  {
-    key:         "lol",
-    name:        "League of Legends",
-    short:       "LoL",
-    icon:        "⚔️",
-    placeholder: "Nombre#TAG  (ej: Faker#KR1)",
-    screen:      "Profile",
-    search:      searchPlayer,
-  },
-  {
-    key:         "valorant",
-    name:        "Valorant",
-    short:       "VAL",
-    icon:        "🎯",
-    placeholder: "Nombre#TAG  (ej: TenZ#000)",
-    screen:      "Valorant",
-    search:      searchValorantPlayer,
-  },
-  {
-    key:         "tft",
-    name:        "Teamfight Tactics",
-    short:       "TFT",
-    icon:        "♟️",
-    placeholder: "Nombre#TAG  (ej: Mortdog#TFT)",
-    screen:      "TFT",
-    search:      searchTFTPlayer,
-  },
-];
 
 // Espera a que la pantalla de carga se desvanezca antes de empezar la aparición escalonada
 const HANDOFF_MS = 250;
 
 export default function HomeScreen({ navigation }) {
-  const { gameKey, setGameKey } = useActiveGame();
-  const { favorites: bootFavorites, serverOnline, retryServer } = useBootData();
+  const { gameId, accent, setGameId } = useActiveGame();
+  const { favorites: bootFavorites, region: bootRegion, serverOnline, retryServer } = useBootData();
   const [input,     setInput]     = useState("");
   const [loading,   setLoading]   = useState(false);
   const [favorites, setFavorites] = useState(bootFavorites);
+  const [region,    setRegion]    = useState(bootRegion);
 
-  const activeGame = GAMES.find(g => g.key === gameKey) || GAMES[0];
-  const accent     = accents[activeGame.key];
+  const game = getGame(gameId) || GAMES[0];
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", loadFavorites);
-    return unsubscribe;
-  }, [navigation]);
-
-  async function loadFavorites() {
+  async function refreshFavorites() {
     try {
-      const raw = await AsyncStorage.getItem(FAVORITES_KEY);
-      // Los favoritos antiguos de LoL no tenían campo game
-      if (raw) setFavorites(JSON.parse(raw).map(f => ({ ...f, game: f.game || "lol" })));
+      setFavorites(await loadFavorites());
     } catch (e) {
       console.warn("No se pudieron leer los favoritos:", e.message);
     }
   }
 
-  async function handleSearch(gameName, tagLine) {
-    const parts = (gameName || input.trim()).split("#");
-    const name  = gameName || parts[0];
-    const tag   = tagLine  || parts[1];
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", refreshFavorites);
+    return unsubscribe;
+  }, [navigation]);
+
+  function changeRegion(id) {
+    setRegion(id);
+    saveRegion(id).catch(e => console.warn("No se pudo guardar la región:", e.message));
+  }
+
+  // fav: si se busca desde un favorito se usa su nombre, tag y región
+  async function handleSearch(fav) {
+    const text = input.trim();
+    const cut  = text.lastIndexOf("#");
+    const name = fav ? fav.gameName : text.slice(0, cut < 0 ? undefined : cut).trim();
+    const tag  = fav ? fav.tagLine  : (cut < 0 ? "" : text.slice(cut + 1).trim());
 
     if (!name || !tag) {
-      Alert.alert("Formato incorrecto", `Usa el formato: Nombre#TAG\nEjemplo: ${activeGame.placeholder}`);
+      Alert.alert("Formato incorrecto", `Usa el formato: Nombre#TAG\nEjemplo: ${game.placeholder.replace(/^Nombre#TAG\s*\(ej: /, "").replace(/\)$/, "")}`);
       return;
     }
     setLoading(true);
     try {
-      const data = await activeGame.search(name, tag);
-      navigation.navigate(activeGame.screen, { data });
+      const data = await game.api.search(name, tag, fav ? fav.region : region);
+      navigation.navigate("Profile", { gameId: game.id, data });
     } catch (e) {
-      Alert.alert("Error", e.response?.status === 404 ? "Jugador no encontrado" : errorMessage(e, "Jugador no encontrado"));
+      Alert.alert(e.response?.status === 404 ? "Jugador no encontrado" : "Error", errorMessage(e, "No se pudo buscar al jugador"));
     }
     setLoading(false);
   }
 
-  async function removeFavorite(puuid) {
-    const updated = favorites.filter(f => f.puuid !== puuid);
-    setFavorites(updated);
+  async function onRemoveFavorite(fav) {
+    setFavorites(prev => prev.filter(f => !(f.gameId === fav.gameId && f.puuid === fav.puuid)));
     try {
-      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+      await removeFavorite(fav.gameId, fav.puuid);
     } catch (e) {
-      Alert.alert("Error", "No se pudo guardar los cambios: " + e.message);
+      Alert.alert("Error", "No se pudo guardar los cambios: " + errorMessage(e));
+      refreshFavorites();
     }
   }
 
-  const gameFavs = favorites.filter(f => f.game === activeGame.key);
+  const gameFavs = favorites.filter(f => f.gameId === game.id);
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.inner}>
+      <ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
 
         {!serverOnline && (
           <Reveal order={0} baseDelay={HANDOFF_MS}>
@@ -127,90 +102,97 @@ export default function HomeScreen({ navigation }) {
         </Reveal>
 
         <Reveal order={1} baseDelay={HANDOFF_MS}>
-        <View style={styles.gameSelector}>
-          {GAMES.map(g => {
-            const active = activeGame.key === g.key;
-            const color  = accents[g.key];
-            return (
-              <TouchableOpacity
-                key={g.key}
-                style={[styles.gameBtn, active && { backgroundColor: withAlpha(color, 0.12), borderColor: color }]}
-                onPress={() => { setGameKey(g.key); setInput(""); }}
-              >
+          <View style={styles.gameSelector}>
+            {GAMES.map(g => {
+              const active = g.id === game.id;
+              return (
+                <TouchableOpacity
+                  key={g.id}
+                  style={[styles.gameBtn, active && { backgroundColor: withAlpha(g.accent, 0.12), borderColor: g.accent }]}
+                  onPress={() => setGameId(g.id)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.gameIcon}>{g.icon}</Text>
+                  <Text style={[styles.gameShort, active && { color: g.accent }]}>{g.short}</Text>
+                </TouchableOpacity>
+              );
+            })}
+            {UPCOMING_GAMES.map(g => (
+              <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
                 <Text style={styles.gameIcon}>{g.icon}</Text>
-                <Text style={[styles.gameShort, active && { color }]}>{g.short}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                <Text style={styles.gameShort}>{g.short}</Text>
+                <Text style={styles.soon}>PRONTO</Text>
+              </View>
+            ))}
+          </View>
         </Reveal>
 
         <Reveal order={2} baseDelay={HANDOFF_MS}>
-          <Text style={[styles.gameName, { color: accent }]}>{activeGame.name}</Text>
+          <Text style={[styles.gameName, { color: accent }]}>{game.name}</Text>
         </Reveal>
 
         <Reveal order={3} baseDelay={HANDOFF_MS}>
-        <View style={styles.searchBox}>
-          <TextInput
-            value={input}
-            onChangeText={setInput}
-            onSubmitEditing={() => handleSearch()}
-            placeholder={activeGame.placeholder}
-            placeholderTextColor={colors.textFaint}
-            style={[styles.input, { borderColor: loading ? accent : colors.border }]}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <TouchableOpacity
-            style={[styles.btn, { backgroundColor: accent }, glow(accent, spacing.md, 0.4), loading && styles.disabled]}
-            onPress={() => handleSearch()}
-            disabled={loading}
-          >
-            <Text style={styles.btnText}>{loading ? "..." : "🔍"}</Text>
-          </TouchableOpacity>
-        </View>
-
+          <View style={styles.searchBox}>
+            <RegionButton value={region} onChange={changeRegion} disabled={loading} />
+            <TextInput
+              value={input}
+              onChangeText={setInput}
+              onSubmitEditing={() => handleSearch()}
+              placeholder={game.placeholder}
+              placeholderTextColor={colors.textFaint}
+              style={[styles.input, { borderColor: loading ? accent : colors.border }]}
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="search"
+            />
+            <TouchableOpacity
+              style={[styles.btn, { backgroundColor: accent }, glow(accent, spacing.md, 0.4), loading && styles.disabled]}
+              onPress={() => handleSearch()}
+              disabled={loading}
+              accessibilityLabel={`Buscar en ${getRegion(region).name}`}
+            >
+              <Text style={styles.btnText}>{loading ? "..." : "🔍"}</Text>
+            </TouchableOpacity>
+          </View>
         </Reveal>
 
         <Reveal order={4} baseDelay={HANDOFF_MS}>
-        {gameFavs.length > 0 && (
-          <View style={styles.favSection}>
-            <SectionLabel>⭐ Favoritos — {activeGame.short}</SectionLabel>
-            {gameFavs.map(fav => (
-              <Card key={fav.puuid} padded={false} style={styles.favRow}>
-                <TouchableOpacity style={styles.favInfo} onPress={() => handleSearch(fav.gameName, fav.tagLine)}>
-                  {fav.iconId ? (
-                    <Image source={{ uri: profileIconUrl(fav.iconId) }} style={[styles.favIcon, { borderColor: accent }]} />
-                  ) : (
-                    <View style={[styles.favIcon, styles.favIconPlaceholder, { borderColor: accent }]}>
-                      <Text style={styles.favEmoji}>{activeGame.icon}</Text>
+          {gameFavs.length > 0 ? (
+            <View style={styles.favSection}>
+              <SectionLabel>⭐ Favoritos — {game.short}</SectionLabel>
+              {gameFavs.map(fav => (
+                <Card key={`${fav.gameId}-${fav.puuid}`} padded={false} style={styles.favRow}>
+                  <TouchableOpacity style={styles.favInfo} onPress={() => handleSearch(fav)}>
+                    {fav.iconId != null ? (
+                      <Image source={{ uri: profileIconUrl(fav.iconId) }} style={[styles.favIcon, { borderColor: accent }]} />
+                    ) : (
+                      <View style={[styles.favIcon, styles.favIconPlaceholder, { borderColor: accent }]}>
+                        <Text style={styles.favEmoji}>{game.icon}</Text>
+                      </View>
+                    )}
+                    <View style={styles.favText}>
+                      <Text style={styles.favName} numberOfLines={1}>{fav.gameName}</Text>
+                      <Text style={styles.favTag}>#{fav.tagLine} · {getRegion(fav.region).label}</Text>
                     </View>
-                  )}
-                  <View>
-                    <Text style={styles.favName}>{fav.gameName}</Text>
-                    <Text style={styles.favTag}>#{fav.tagLine}</Text>
-                  </View>
-                  {fav.tier && (
-                    <View style={styles.favTierBadge}>
-                      <Text style={[styles.favTierText, { color: accent }]}>{fav.tier} {fav.rank}</Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => removeFavorite(fav.puuid)} style={styles.favRemove}>
-                  <Text style={styles.favRemoveText}>✕</Text>
-                </TouchableOpacity>
-              </Card>
-            ))}
-          </View>
-        )}
-
-        {gameFavs.length === 0 && (
-          <Text style={styles.hint}>
-            Busca un jugador con formato{"\n"}
-            <Text style={{ color: accent }}>Nombre#TAG</Text>
-            {"\n\n"}Guarda tus favoritos para acceder{"\n"}rápido desde aquí
-          </Text>
-        )}
+                    {fav.tier && (
+                      <View style={styles.favTierBadge}>
+                        <Text style={[styles.favTierText, { color: colors.tier[fav.tier] || accent }]}>{fav.tier} {fav.rank}</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => onRemoveFavorite(fav)} style={styles.favRemove} accessibilityLabel="Quitar de favoritos">
+                    <Text style={styles.favRemoveText}>✕</Text>
+                  </TouchableOpacity>
+                </Card>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.hint}>
+              Busca un jugador con formato{"\n"}
+              <Text style={{ color: accent }}>Nombre#TAG</Text>
+              {"\n\n"}Guarda tus favoritos para acceder{"\n"}rápido desde aquí
+            </Text>
+          )}
         </Reveal>
 
       </ScrollView>
@@ -238,10 +220,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, borderWidth: sizes.hairline,
     borderColor: colors.border, borderRadius: radii.md,
   },
+  gameBtnSoon:        { opacity: 0.45 },
   gameIcon:           { fontSize: fontSizes.xl, marginBottom: spacing.xs },
   gameShort:          { ...type.label, color: colors.textMuted, fontSize: fontSizes.xs },
+  soon:               { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
   gameName:           { ...type.heading, textAlign: "center", marginBottom: spacing.lg },
-  searchBox:          { flexDirection: "row", gap: spacing.md, marginBottom: spacing.xl },
+  searchBox:          { flexDirection: "row", gap: spacing.sm, marginBottom: spacing.xl },
   input:              {
     ...type.body, flex: 1, backgroundColor: colors.surface,
     borderWidth: sizes.hairline, borderRadius: radii.md, padding: spacing.lg, color: colors.text,
@@ -259,6 +243,7 @@ const styles = StyleSheet.create({
   favIcon:            { width: sizes.avatarMd, height: sizes.avatarMd, borderRadius: sizes.avatarMd / 2, borderWidth: sizes.borderThick },
   favIconPlaceholder: { backgroundColor: colors.surfaceHigh, justifyContent: "center", alignItems: "center" },
   favEmoji:           { fontSize: fontSizes.lg },
+  favText:            { flex: 1 },
   favName:            { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   favTag:             { ...type.small, color: colors.textMuted },
   favTierBadge:       { backgroundColor: colors.bg, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radii.md },

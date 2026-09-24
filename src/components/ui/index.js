@@ -6,3 +6,5 @@ export { default as Chip } from "./Chip";
 export { default as ErrorBanner } from "./ErrorBanner";
 export { default as ProfileHeader } from "./ProfileHeader";
 export { default as OverallCard } from "./OverallCard";
+export { default as LoadMoreButton } from "./LoadMoreButton";
+export { default as Notice } from "./Notice";

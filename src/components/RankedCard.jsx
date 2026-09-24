@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, ProgressBar, SectionLabel } from "./ui";
 import { TIER_ICONS } from "../constants/config";
-import { winrate } from "../utils/lol";
+import { winrate } from "../utils/format";
 import { colors, spacing, fontSizes, type, tracking, winrateColor, useAccent } from "../theme";
 
 // Tarjeta de rango. `game` define el color de acento (LP, barra media).
