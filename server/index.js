@@ -1,174 +1,41 @@
 require("dotenv").config();
 const express = require("express");
-const axios   = require("axios");
 const cors    = require("cors");
+const { HttpError, errorHandler } = require("./lib/riot");
+const { REGIONS, DEFAULT_REGION } = require("./lib/regions");
+const lolRouter = require("./routes/lol");
+const tftRouter = require("./routes/tft");
 
-const app      = express();
-const API_KEY  = process.env.RIOT_API_KEY;
-if (!API_KEY) {
+if (!process.env.RIOT_API_KEY) {
   console.error("Falta RIOT_API_KEY en server/.env (ver .env.example)");
   process.exit(1);
 }
-const ROUTING  = "https://americas.api.riotgames.com";
-const PLATFORM = "https://la1.api.riotgames.com";
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-const headers = { "X-Riot-Token": API_KEY };
+app.get("/health", (_req, res) => res.json({ ok: true, regions: Object.keys(REGIONS), defaultRegion: DEFAULT_REGION }));
 
-// ─── CUENTA ───────────────────────────────────────────────────────────────────
-app.get("/account/:gameName/:tagLine", async (req, res) => {
-  try {
-    const { gameName, tagLine } = req.params;
-    console.log("Buscando:", gameName, tagLine);
-    const r = await axios.get(
-      `${ROUTING}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
+// Rutas por juego: /lol/... y /tft/...  (todas aceptan ?region=la1|la2|na1|br1|euw1|kr...)
+app.use("/lol", lolRouter);
+app.use("/tft", tftRouter);
+
+// Alias antiguos (/account, /summoner, /ranked, /matches, /match) = /lol/...
+// Se mantienen mientras alguna versión de la app los use; avisan una vez por ruta.
+const LEGACY_ROUTES = new Set(["account", "summoner", "ranked", "matches", "match"]);
+const warned = new Set();
+app.use((req, _res, next) => {
+  const route = req.path.split("/")[1];
+  if (LEGACY_ROUTES.has(route) && !warned.has(route)) {
+    warned.add(route);
+    console.warn(`Ruta antigua "/${route}/..." usada: es un alias de "/lol/${route}/..."`);
   }
-});
+  next();
+}, lolRouter);
 
-// ─── LOL ──────────────────────────────────────────────────────────────────────
-app.get("/summoner/:puuid", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${PLATFORM}/lol/summoner/v4/summoners/by-puuid/${req.params.puuid}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error summoner:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
+app.use((_req, _res, next) => next(new HttpError(404, "Ruta no encontrada")));
+app.use(errorHandler);
 
-app.get("/ranked/:puuid", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${PLATFORM}/lol/league/v4/entries/by-puuid/${req.params.puuid}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error ranked:", e.response?.status, e.message);
-    res.json([]);
-  }
-});
-
-app.get("/matches/:puuid", async (req, res) => {
-  try {
-    const count = Math.min(parseInt(req.query.count, 10) || 10, 20);
-    const start = Math.max(parseInt(req.query.start, 10) || 0, 0);
-    const r = await axios.get(
-      `${ROUTING}/lol/match/v5/matches/by-puuid/${req.params.puuid}/ids?start=${start}&count=${count}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error matches:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
-
-app.get("/match/:matchId", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${ROUTING}/lol/match/v5/matches/${req.params.matchId}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error match:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
-
-// ─── VALORANT ─────────────────────────────────────────────────────────────────
-app.get("/val/matches/:puuid", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${ROUTING}/val/match/v1/matchlists/by-puuid/${req.params.puuid}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error val matches:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
-
-app.get("/val/match/:matchId", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${ROUTING}/val/match/v1/matches/${req.params.matchId}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error val match:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
-
-// ─── TFT ──────────────────────────────────────────────────────────────────────
-app.get("/tft/summoner/:puuid", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${PLATFORM}/tft/summoner/v1/summoners/by-puuid/${req.params.puuid}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error tft summoner:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
-
-app.get("/tft/ranked/:puuid", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${PLATFORM}/tft/league/v1/by-puuid/${req.params.puuid}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error tft ranked:", e.response?.status, e.message);
-    res.json([]);
-  }
-});
-
-app.get("/tft/matches/:puuid", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${ROUTING}/tft/match/v1/matches/by-puuid/${req.params.puuid}/ids?count=10`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error tft matches:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
-
-app.get("/tft/match/:matchId", async (req, res) => {
-  try {
-    const r = await axios.get(
-      `${ROUTING}/tft/match/v1/matches/${req.params.matchId}`,
-      { headers }
-    );
-    res.json(r.data);
-  } catch (e) {
-    console.log("Error tft match:", e.response?.status, e.message);
-    res.status(e.response?.status || 500).json({ error: e.message });
-  }
-});
-
-app.get("/health", (_req, res) => res.json({ ok: true }));
-
-const PORT_NUM = process.env.PORT || 3000;
-app.listen(PORT_NUM, () => console.log(`✅ Backend corriendo en http://localhost:${PORT_NUM}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Backend corriendo en http://localhost:${PORT}`));
