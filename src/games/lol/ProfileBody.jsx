@@ -15,6 +15,7 @@ import { getMoreMatches } from "./api";
 import { findMe, getChampionStats, getOverallStats, getStreak } from "./utils";
 import { championIcon } from "../../api/ddragon";
 import Icon from "../../components/Icon";
+import LiveBanner from "./components/LiveBanner";
 import { errorMessage } from "../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../../theme";
 
@@ -93,6 +94,8 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
 
   return (
     <>
+      <LiveBanner puuid={account.puuid} region={region} />
+
       <Reveal order={1}>
         {rankedError
           ? <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>

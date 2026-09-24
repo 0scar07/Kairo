@@ -27,3 +27,6 @@ export const getRotation = region => client.get("/rotation", region);
 
 // Estado del servidor: { name, maintenances: [{ title, status }], incidents: [{ title, severity }] }
 export const getStatus = region => client.get("/status", region);
+
+// Partida en curso: { inGame: false } o { inGame: true, queueId, startTime, bans, participants: [...] }
+export const getLive = (puuid, region) => client.get(`/live/${puuid}`, region);

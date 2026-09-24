@@ -2,8 +2,10 @@ const { createGameRouter, regionOf, puuidOf } = require("./gameRouter");
 const { riotGet, handle } = require("../lib/riot");
 const { platformHost } = require("../lib/regions");
 const PATHS = require("../lib/paths");
+const { HttpError } = require("../lib/errors");
+const { normalizeLive, soloEntry } = require("../lib/live");
 
-// League of Legends: summoner-v4, league-v4, match-v5 + maestría, rotación y estado del servidor
+// League of Legends: summoner-v4, league-v4, match-v5 + maestría, rotación, estado del servidor y partida en vivo
 const router = createGameRouter("lol", PATHS.lol);
 
 const MIN = 60_000;
@@ -44,6 +46,30 @@ router.get("/status", handle(async (req, res) => {
     maintenances: (data.maintenances || []).map(m => ({ id: m.id, status: m.maintenance_status, title: pickTitle(m.titles) })),
     incidents: (data.incidents || []).map(i => ({ id: i.id, severity: i.incident_severity, title: pickTitle(i.titles) })),
   });
+}));
+
+// Partida en curso (Spectator-V5) con el rango Solo/Dúo de cada jugador. Que el jugador no esté jugando no es un
+// error: responde { inGame: false }. Los rangos son opcionales; si alguno falla, ese jugador queda sin rango.
+router.get("/live/:puuid", handle(async (req, res) => {
+  const puuid = puuidOf(req);
+  const host = platformHost(regionOf(req));
+
+  let game;
+  try {
+    game = await riotGet(`${host}/lol/spectator/v5/active-games/by-summoner/${puuid}`, { ttl: 15_000, notFound: "No está en partida" });
+  } catch (e) {
+    if (e instanceof HttpError && e.status === 404) return res.json({ inGame: false });
+    throw e;
+  }
+
+  const players = (game.participants || []).filter(p => p.puuid);
+  const results = await Promise.allSettled(
+    players.map(p => riotGet(`${host}${PATHS.lol.ranked(p.puuid)}`, { ttl: 2 * MIN }))
+  );
+  const ranks = {};
+  players.forEach((p, i) => { ranks[p.puuid] = results[i].status === "fulfilled" ? soloEntry(results[i].value) : null; });
+
+  res.json(normalizeLive(game, ranks));
 }));
 
 module.exports = router;

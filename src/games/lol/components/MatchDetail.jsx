@@ -1,19 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { championIcon, itemIcon } from "../../../api/ddragon";
 import { spellIcon, perkIcon, perksOf } from "../assets";
+import Mini from "./Mini";
 import { csOf, playerName } from "../utils";
 import Icon from "../../../components/Icon";
 import { formatDuration } from "../../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, tracking, useAccent } from "../../../theme";
-
-// Ícono pequeño con placeholder si falta o falla la imagen
-function Mini({ uri, size, round }) {
-  const [failed, setFailed] = useState(false);
-  const style = [{ width: size, height: size, borderRadius: round ? size / 2 : radii.xs, backgroundColor: colors.surfaceHigh }];
-  if (!uri || failed) return <View style={style} />;
-  return <Image source={{ uri }} style={style} onError={() => setFailed(true)} />;
-}
 
 function ItemIcon({ itemId }) {
   return <Mini uri={itemId ? itemIcon(itemId) : null} size={sizes.item} />;

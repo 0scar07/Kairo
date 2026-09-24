@@ -126,6 +126,10 @@ La key tiene un cupo (por ejemplo 20 peticiones/s y 100 cada 2 min) compartido p
 
 En la app, estos juegos declaran `tagSearch: true` y `hasRegion: false` en su `meta.js`: la búsqueda de Inicio pide solo el `#TAG` y no muestra el selector de región. Para que las pantallas genéricas sigan sin conocer ningún juego, `search()` devuelve `{ region: "global", account: { gameName, tagLine, puuid } }` con el tag como identificador.
 
+### Partida en vivo (LoL)
+
+`GET /lol/live/:puuid` consulta Spectator-V5 y, en paralelo, el rango Solo/Dúo de cada jugador (league-v4, con la caché y la cola habituales). Que el jugador no esté jugando no es un error: responde `{ inGame: false }`. `lib/live.js` normaliza la respuesta y tiene pruebas. En la app, `LiveBanner` (en el perfil de LoL) comprueba cada minuto y abre `LiveGameScreen`, que se refresca sola cada 30 s y muestra el cronómetro.
+
 ### Qué juegos habilita la key
 
 Riot habilita cada API por producto: una key puede consultar LoL y no TFT (403). `lib/access.js` consulta cada 10 min una cuenta pública y publica el resultado en `/health` → `games`. La app lo lee al arrancar y muestra como "PRONTO" lo que no esté disponible. Solo se marca un juego como no disponible si la cuenta de prueba se resolvió (la key es válida) y aun así la API del juego dio 403.
