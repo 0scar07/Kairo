@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert } from "react-native";
 import ProfileView from "../components/ProfileView";
+import Icon from "../components/Icon";
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import { ErrorState } from "../components/ui";
 import { RegionChips } from "../components/RegionPicker";
@@ -23,7 +24,7 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <Text style={styles.modalTitle}>{game.icon} Mi perfil de {game.short}</Text>
+          <Text style={styles.modalTitle}>Mi perfil de {game.short}</Text>
           <Text style={styles.modalSubtitle}>Ingresa tu Riot ID para configurar tu perfil personal</Text>
           <TextInput
             value={name}
@@ -125,7 +126,7 @@ export default function MyProfileScreen() {
           gameId={gameId}
           initialData={state.data}
           mine
-          headerAction={{ icon: "✏️", onPress: () => setShowSetup(true) }}
+          headerAction={{ icon: <Icon name="edit" size={sizes.avatarXs} color={colors.textMuted} />, onPress: () => setShowSetup(true) }}
         />
       </>
     );
@@ -138,7 +139,7 @@ export default function MyProfileScreen() {
       {setup}
       {state.status === "setup" && (
         <>
-          <Text style={styles.message}>{game.icon} Aún no configuras tu perfil de {game.name}</Text>
+          <Text style={styles.message}>Aún no configuras tu perfil de {game.name}</Text>
           <TouchableOpacity style={[styles.btn, styles.centerBtn, { backgroundColor: accent }]} onPress={() => setShowSetup(true)}>
             <Text style={styles.btnText}>Configurar mi perfil</Text>
           </TouchableOpacity>

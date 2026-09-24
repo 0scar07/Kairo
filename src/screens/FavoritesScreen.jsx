@@ -63,7 +63,7 @@ export default function FavoritesScreen({ navigation }) {
       {known.length === 0 ? (
         <Reveal order={1}>
           <EmptyState
-            icon="⭐"
+            icon="star"
             title="Aún no tienes favoritos"
             text="Abre el perfil de un jugador y toca la estrella para guardarlo aquí."
             actionLabel="Buscar un jugador"
@@ -71,7 +71,7 @@ export default function FavoritesScreen({ navigation }) {
           />
         </Reveal>
       ) : visible.length === 0 ? (
-        <EmptyState compact icon="🔎" title="Sin favoritos de este juego" />
+        <EmptyState compact icon="search" title="Sin favoritos de este juego" />
       ) : (
         <View style={styles.grid}>
           {visible.map((fav, i) => (

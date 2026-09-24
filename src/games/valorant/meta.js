@@ -3,7 +3,6 @@ export default {
   id: "valorant",
   name: "Valorant",
   short: "VAL",
-  icon: "🎯",
   accent: "#FF4655",
   placeholder: "Nombre#TAG",
   available: false,

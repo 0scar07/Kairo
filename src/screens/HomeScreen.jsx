@@ -209,7 +209,7 @@ export default function HomeScreen({ navigation }) {
         {/* Favoritos */}
         <Reveal order={5} baseDelay={HANDOFF_MS}>
           <View style={styles.sectionHeader}>
-            <SectionLabel style={styles.sectionLabel}>⭐ Favoritos — {game.short}</SectionLabel>
+            <SectionLabel style={styles.sectionLabel} icon="star" iconColor={colors.gold}>Favoritos — {game.short}</SectionLabel>
             {gameFavs.length > 0 && (
               <TouchableOpacity onPress={() => navigation.navigate("Favoritos")} hitSlop={spacing.md}>
                 <Text style={styles.link}>Ver todos</Text>
@@ -231,7 +231,7 @@ export default function HomeScreen({ navigation }) {
           ) : (
             <EmptyState
               compact
-              icon="⭐"
+              icon="star"
               title="Sin favoritos en este juego"
               text="Busca un jugador y toca la estrella de su perfil para tenerlo siempre a mano."
             />

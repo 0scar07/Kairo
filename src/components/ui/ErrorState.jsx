@@ -5,7 +5,7 @@ import EmptyState from "./EmptyState";
 export default function ErrorState({ message, onRetry, retryLabel = "Reintentar" }) {
   return (
     <EmptyState
-      icon="⚠️"
+      icon="alert"
       title="Algo salió mal"
       text={message}
       actionLabel={onRetry ? retryLabel : undefined}

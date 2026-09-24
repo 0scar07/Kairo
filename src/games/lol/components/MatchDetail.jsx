@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { championIcon, itemIcon } from "../../../api/ddragon";
 import { spellIcon, perkIcon, perksOf } from "../assets";
 import { csOf, playerName } from "../utils";
+import Icon from "../../../components/Icon";
 import { formatDuration } from "../../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, tracking, useAccent } from "../../../theme";
 
@@ -60,7 +61,10 @@ function PlayerRow({ p, isMe, maxDmg, accent }) {
       <View style={styles.statsCol}>
         <Text style={styles.kdaText}>{p.kills}/{p.deaths}/{p.assists}</Text>
         <Text style={styles.dmgNum}>{Math.round(p.totalDamageDealtToChampions / 1000)}k dmg</Text>
-        <Text style={[styles.goldNum, { color: accent }]}>🪙 {Math.round(p.goldEarned / 1000)}k</Text>
+        <View style={styles.goldRow}>
+          <Icon name="coins" size={fontSizes.sm} color={accent} />
+          <Text style={[styles.goldNum, { color: accent }]}>{Math.round(p.goldEarned / 1000)}k</Text>
+        </View>
         <Text style={styles.csNum}>{csOf(p)} CS</Text>
       </View>
     </View>
@@ -143,6 +147,7 @@ const styles = StyleSheet.create({
   statsCol:     { alignItems: "flex-end", gap: spacing.xxs },
   kdaText:      { ...type.smallStrong, color: colors.text },
   dmgNum:       { ...type.micro, color: colors.loss },
+  goldRow:      { flexDirection: "row", alignItems: "center", gap: spacing.xxs },
   goldNum:      { ...type.micro },
   csNum:        { ...type.micro, color: colors.textMuted },
   duration:     { ...type.caption, textAlign: "center", color: colors.textMuted, padding: spacing.sm },

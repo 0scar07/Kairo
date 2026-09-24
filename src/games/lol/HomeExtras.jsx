@@ -10,8 +10,8 @@ function StatusNotice({ status }) {
   const items = [...(status?.maintenances || []), ...(status?.incidents || [])].filter(i => i.title).slice(0, 2);
   if (!items.length) return null;
   return (
-    <Notice tone="warn">
-      🛠️ {status.name}: {items.map(i => i.title).join(" · ")}
+    <Notice tone="warn" icon="tool">
+      {status.name}: {items.map(i => i.title).join(" · ")}
     </Notice>
   );
 }

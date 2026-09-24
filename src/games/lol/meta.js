@@ -3,7 +3,6 @@ export default {
   id: "lol",
   name: "League of Legends",
   short: "LoL",
-  icon: "⚔️",
   accent: "#C89B3C",
   placeholder: "Nombre#TAG",
   available: true,

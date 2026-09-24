@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import Reveal from "../../components/Reveal";
+import Icon from "../../components/Icon";
 import { Card, SectionLabel } from "../../components/ui";
 import { findMe } from "./utils";
 import { winrate } from "../../utils/format";
@@ -23,19 +24,19 @@ function getBadges(me) {
   me.forEach(p => { (byChamp[p.championName] = byChamp[p.championName] || []).push(p.win); });
   const top        = Object.values(byChamp).sort((a, b) => b.length - a.length)[0];
   const topWr      = top ? (top.filter(Boolean).length / top.length) * 100 : 0;
-  if (avgKda >= 4)     badges.push({ icon: "⚡", label: "KDA Machine",    color: colors.gold });
-  if (avgDmg >= 25000) badges.push({ icon: "💥", label: "Damage Dealer",  color: colors.loss });
-  if (wr >= 60)        badges.push({ icon: "🏆", label: "Win Streak God", color: colors.win });
-  if (pentakills > 0)  badges.push({ icon: "👑", label: "Pentakill",      color: accents.lol });
-  if (topWr >= 65)     badges.push({ icon: "🎯", label: "One Trick",      color: colors.info });
-  if (me.length >= 20) badges.push({ icon: "🔥", label: "Grinder",        color: colors.orange });
+  if (avgKda >= 4)     badges.push({ icon: "zap", label: "KDA Machine",    color: colors.gold });
+  if (avgDmg >= 25000) badges.push({ icon: "target", label: "Damage Dealer",  color: colors.loss });
+  if (wr >= 60)        badges.push({ icon: "trophy", label: "Win Streak God", color: colors.win });
+  if (pentakills > 0)  badges.push({ icon: "crown", label: "Pentakill",      color: accents.lol });
+  if (topWr >= 65)     badges.push({ icon: "award",  label: "One Trick",      color: colors.info });
+  if (me.length >= 20) badges.push({ icon: "flame", label: "Grinder",        color: colors.orange });
   return badges;
 }
 
 function Badge({ badge }) {
   return (
     <View style={[styles.badge, { borderColor: badge.color }]}>
-      <Text style={styles.badgeIcon}>{badge.icon}</Text>
+      <Icon name={badge.icon} size={fontSizes.base} color={badge.color} />
       <Text style={[styles.badgeLabel, { color: badge.color }]}>{badge.label}</Text>
     </View>
   );
@@ -79,7 +80,7 @@ export default function MineExtras({ data }) {
       {badges.length > 0 && (
         <Reveal order={3}>
           <Card>
-            <SectionLabel>🏅 Insignias</SectionLabel>
+            <SectionLabel icon="award">Insignias</SectionLabel>
             <View style={styles.badgesRow}>
               {badges.map(b => <Badge key={b.label} badge={b} />)}
             </View>
@@ -89,7 +90,7 @@ export default function MineExtras({ data }) {
 
       <Reveal order={3}>
         <Card>
-          <SectionLabel>📊 Estadísticas generales</SectionLabel>
+          <SectionLabel icon="barChart">Estadísticas generales</SectionLabel>
           <View style={styles.statsGrid}>
             {statBoxes.map(s => (
               <View key={s.label} style={styles.statBox}>
@@ -104,7 +105,7 @@ export default function MineExtras({ data }) {
       {me.length >= 3 && (
         <Reveal order={4}>
           <Card>
-            <SectionLabel>📈 KDA últimas {Math.min(me.length, 10)} partidas</SectionLabel>
+            <SectionLabel icon="trending">KDA últimas {Math.min(me.length, 10)} partidas</SectionLabel>
             <LineChart
               data={chartData}
               width={CHART_WIDTH}
@@ -141,7 +142,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill, borderWidth: sizes.hairline,
     backgroundColor: colors.bg, marginRight: spacing.sm, marginBottom: spacing.sm,
   },
-  badgeIcon:  { fontSize: fontSizes.base },
   badgeLabel: { ...type.smallStrong },
   statsGrid:  { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },
   statBox:    {

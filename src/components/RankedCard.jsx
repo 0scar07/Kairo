@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, ProgressBar, SectionLabel } from "./ui";
 import RankEmblem from "./RankEmblem";
+import Icon from "./Icon";
 import { winrate, tierLabel } from "../utils/format";
 import { colors, spacing, sizes, fontSizes, type, tracking, winrateColor, useAccent, withAlpha } from "../theme";
 
@@ -13,7 +14,7 @@ export default function RankedCard({ entry, label, game = "lol" }) {
     return (
       <Card style={styles.card}>
         <SectionLabel>{label}</SectionLabel>
-        <Text style={styles.unrankedIcon}>🛡️</Text>
+        <Icon name="shield" size={sizes.avatarMd} color={colors.textMuted} style={styles.unrankedIcon} />
         <Text style={styles.unranked}>Sin clasificar</Text>
         <Text style={styles.record}>Aún no juega partidas de este modo</Text>
       </Card>
@@ -52,6 +53,6 @@ const styles = StyleSheet.create({
   record:       { ...type.caption, color: colors.textSecondary },
   wr:           { ...type.stat, fontSize: fontSizes.lg },
   bar:          { marginTop: spacing.sm, height: sizes.bar },
-  unrankedIcon: { fontSize: fontSizes.xxl, marginBottom: spacing.xs },
+  unrankedIcon: { marginVertical: spacing.xs },
   unranked:     { ...type.heading, color: colors.textSecondary },
 });

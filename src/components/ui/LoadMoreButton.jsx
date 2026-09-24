@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
-import { colors, radii, sizes, spacing, type, useAccent, withAlpha } from "../../theme";
+import Icon from "../Icon";
+import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../../theme";
 
 // Botón "cargar más": se desactiva mientras carga o cuando ya no hay más
 export default function LoadMoreButton({ loading, hasMore, onPress, game }) {
@@ -13,8 +14,9 @@ export default function LoadMoreButton({ loading, hasMore, onPress, game }) {
       disabled={disabled}
       activeOpacity={0.8}
     >
+      {!loading && hasMore ? <Icon name="arrowDown" size={fontSizes.base} color={accent} /> : null}
       <Text style={[styles.text, { color: accent }]}>
-        {loading ? "Cargando..." : hasMore ? "⬇ Cargar más partidas" : "No hay más partidas"}
+        {loading ? "Cargando..." : hasMore ? "Cargar más partidas" : "No hay más partidas"}
       </Text>
     </TouchableOpacity>
   );
@@ -24,7 +26,7 @@ const styles = StyleSheet.create({
   btn: {
     marginTop: spacing.md, padding: spacing.lg,
     backgroundColor: colors.surface, borderWidth: sizes.hairline,
-    borderRadius: radii.md, alignItems: "center",
+    borderRadius: radii.md, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: spacing.sm,
   },
   text:     { ...type.bodyStrong },
   disabled: { opacity: 0.5 },

@@ -14,21 +14,22 @@ import MasteryCard from "./components/MasteryCard";
 import { getMoreMatches } from "./api";
 import { findMe, getChampionStats, getOverallStats, getStreak } from "./utils";
 import { championIcon } from "../../api/ddragon";
+import Icon from "../../components/Icon";
 import { errorMessage } from "../../utils/format";
-import { colors, radii, sizes, spacing, type, kdaColor, winrateColor, useAccent } from "../../theme";
+import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../../theme";
 
 const GAME = "lol";
 const STRIP_MAX = 20;
 
 const TABS = [
-  { key: "partidas",  label: "🎮 PARTIDAS" },
-  { key: "campeones", label: "🏆 CAMPEONES" },
+  { key: "partidas",  label: "PARTIDAS",  icon: "gamepad" },
+  { key: "campeones", label: "CAMPEONES", icon: "trophy" },
 ];
 
 const RESULT_FILTERS = [
   { key: "all",  label: "Todas" },
-  { key: "win",  label: "✓ Victorias" },
-  { key: "loss", label: "✗ Derrotas" },
+  { key: "win",  label: "Victorias" },
+  { key: "loss", label: "Derrotas" },
 ];
 
 // Contenido del perfil de League of Legends (la cabecera, favoritos y refresco los pone el perfil genérico)
@@ -115,8 +116,9 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
             backgroundColor: streak.isWin ? colors.winBgStrong : colors.lossBgStrong,
             borderColor:     streak.isWin ? colors.win : colors.loss,
           }]}>
+            <Icon name={streak.isWin ? "flame" : "snowflake"} size={fontSizes.lg} color={streak.isWin ? colors.win : colors.loss} />
             <Text style={[styles.streakText, { color: streak.isWin ? colors.win : colors.loss }]}>
-              {streak.isWin ? "🔥" : "❄️"} Racha de {streak.count} {streak.isWin ? "victorias" : "derrotas"}
+              Racha de {streak.count} {streak.isWin ? "victorias" : "derrotas"}
             </Text>
           </View>
         </Reveal>
@@ -153,13 +155,13 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
               ))}
             </Card>
           ) : (
-            <EmptyState icon="🏆" title="Sin campeones todavía" text="Cuando juegue partidas verás aquí sus campeones más jugados." />
+            <EmptyState icon="trophy" title="Sin campeones todavía" text="Cuando juegue partidas verás aquí sus campeones más jugados." />
           )
         )}
 
         {activeTab === "partidas" && (
           !matches?.length ? (
-            <EmptyState icon="🎮" title="Sin partidas recientes" text="Este jugador no tiene partidas registradas en este momento." />
+            <EmptyState icon="gamepad" title="Sin partidas recientes" text="Este jugador no tiene partidas registradas en este momento." />
           ) : (
             <>
               <View style={styles.filters}>
@@ -187,7 +189,7 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
 
               {filteredMatches.length === 0 && (
                 <EmptyState
-                  compact icon="🔎" title="Nada con esos filtros"
+                  compact icon="search" title="Nada con esos filtros"
                   actionLabel="Quitar filtros"
                   onAction={() => { setFilterWin("all"); setFilterChamp("all"); }}
                 />
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
   rankedRow:    { flexDirection: "row", gap: spacing.md, marginBottom: spacing.lg },
   streak:       {
     padding: spacing.md, borderRadius: radii.md, borderWidth: sizes.hairline,
-    marginBottom: spacing.lg, alignItems: "center",
+    marginBottom: spacing.lg, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: spacing.sm,
   },
   streakText:   { ...type.bodyStrong },
   filters:      { marginBottom: spacing.md },

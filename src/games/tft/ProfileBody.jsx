@@ -110,7 +110,7 @@ export default function TftProfileBody({ data, setData, setError }) {
             <LoadMoreButton game={GAME} loading={loadingMore} hasMore={hasMore} onPress={loadMore} />
           </>
         ) : (
-          <EmptyState icon="♟️" title="Sin partidas de TFT" text="Este jugador no tiene partidas de Teamfight Tactics registradas." />
+          <EmptyState icon="gamepad" title="Sin partidas de TFT" text="Este jugador no tiene partidas de Teamfight Tactics registradas." />
         )}
       </Reveal>
     </>

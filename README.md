@@ -46,6 +46,7 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
 - 🚀 **Pantalla de carga animada** con progreso real de arranque y aparición escalonada de las secciones.
 - 🫧 **Skeletons**, estados vacíos amables y errores con botón de reintentar.
 - 📳 **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
+- ✨ **Sin emojis:** toda la interfaz usa íconos vectoriales propios (SVG) que se ven nítidos y toman el color del juego.
 - 🎮 **Logos oficiales de cada juego** (LoL, TFT, Valorant) en el selector, recientes y favoritos.
 - 🏅 **Emblemas de rango oficiales** (Iron → Challenger) en el perfil, las tarjetas de ranked y Favoritos.
 - 📊 **LoL extra:** maestría de campeones (top 3 con nivel y puntos), rotación gratuita de la semana y aviso de mantenimiento del servidor de tu región.

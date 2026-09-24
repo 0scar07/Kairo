@@ -4,6 +4,7 @@ import { PressableScale } from "./ui";
 import { getGame } from "../games";
 import { profileIconUrl } from "../api/ddragon";
 import RankEmblem from "./RankEmblem";
+import Icon from "./Icon";
 import GameLogo from "./GameLogo";
 import { tierLabel } from "../utils/format";
 import { getRegion } from "../constants/regions";
@@ -31,7 +32,7 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
         )}
         {onRemove && (
           <PressableScale onPress={onRemove} scaleTo={0.8} hitSlop={spacing.md} style={styles.remove} accessibilityLabel="Quitar de favoritos">
-            <Text style={styles.removeText}>✕</Text>
+            <Icon name="close" size={fontSizes.base} color={colors.textFaint} />
           </PressableScale>
         )}
       </View>
@@ -58,7 +59,6 @@ const styles = StyleSheet.create({
   icon:            { width: sizes.avatarLg + spacing.sm, height: sizes.avatarLg + spacing.sm, borderRadius: radii.pill, borderWidth: sizes.borderThick },
   iconPlaceholder: { backgroundColor: colors.surfaceHigh, alignItems: "center", justifyContent: "center" },
   remove:          { padding: spacing.xs },
-  removeText:      { ...type.caption, color: colors.textFaint },
   name:            { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   tag:             { ...type.caption, color: colors.textMuted },
   rank:            { marginTop: spacing.sm, alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: spacing.xs, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radii.pill },
