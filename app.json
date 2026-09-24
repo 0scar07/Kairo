@@ -6,15 +6,15 @@
     "version": "1.0.0",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#070b12"
+      "backgroundColor": "#070C0F"
     },
     "android": {
       "package": "com.camavingaaa.ggtracker",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#070b12"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#070C0F"
       }
     },
     "extra": {
@@ -24,6 +24,11 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#070C0F",
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
   }
 }

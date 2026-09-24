@@ -5,7 +5,8 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
-    "ios": "expo start --ios"
+    "ios": "expo start --ios",
+    "icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
