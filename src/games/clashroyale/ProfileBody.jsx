@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import Reveal from "../../components/Reveal";
 import { Card, SectionLabel, StatGrid, ResultsStrip, BattleRow, EmptyState } from "../../components/ui";
-import { averageElixir, battleView, cardIcon } from "./utils";
+import { averageElixir, battleView, cardIcon, displayLevel } from "./utils";
 import { formatNumber, timeSince, winrate } from "../../utils/format";
 import { colors, radii, sizes, spacing, type, useAccent } from "../../theme";
 
@@ -16,7 +16,7 @@ function DeckCard({ card }) {
         ? <Image source={{ uri: cardIcon(card) }} style={styles.cardImg} resizeMode="contain" />
         : <View style={[styles.cardImg, styles.cardEmpty]} />}
       <Text style={styles.cardName} numberOfLines={1}>{card.name}</Text>
-      <Text style={styles.cardLevel}>Nv {card.level}</Text>
+      <Text style={styles.cardLevel}>Nv {displayLevel(card)}</Text>
     </View>
   );
 }
@@ -103,7 +103,7 @@ export default function ClashRoyaleProfileBody({ data }) {
                 color={v.result.color}
                 result={v.result.label}
                 title={`vs ${v.rivalName}`}
-                subtitle={v.mode === v.kind ? v.mode : `${v.mode} · ${v.kind}`}
+                subtitle={v.kind}
                 value={v.score}
                 valueSub={[v.trophyChange != null && v.trophyChange !== 0 ? `${v.trophyChange > 0 ? "+" : ""}${v.trophyChange}` : null, timeSince(v.time)].filter(Boolean).join(" · ")}
               />

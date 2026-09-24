@@ -76,6 +76,18 @@ Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, 
     <td></td>
   </tr>
   <tr>
+    <td align="center"><img src="docs/screenshots/brawlstars-profile.png" width="200" /><br /><sub><b>Brawl Stars</b></sub></td>
+    <td align="center"><img src="docs/screenshots/brawlstars-battles.png" width="200" /><br /><sub><b>Batallas</b></sub></td>
+    <td align="center"><img src="docs/screenshots/clashroyale-profile.png" width="200" /><br /><sub><b>Clash Royale</b></sub></td>
+    <td align="center"><img src="docs/screenshots/clashofclans-profile.png" width="200" /><br /><sub><b>Clash of Clans</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/clashofclans-heroes.png" width="200" /><br /><sub><b>Héroes y clan</b></sub></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
     <td align="center"><img src="docs/screenshots/home-tft.png" width="200" /><br /><sub><b>Inicio en TFT</b></sub></td>
     <td align="center"><img src="docs/screenshots/profile-tft.png" width="200" /><br /><sub><b>Perfil de TFT</b></sub></td>
     <td align="center"><img src="docs/screenshots/matches-tft.png" width="200" /><br /><sub><b>Posiciones y unidades</b></sub></td>
@@ -88,6 +100,8 @@ Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, 
     <td align="center"><img src="docs/screenshots/settings.png" width="200" /><br /><sub><b>Ajustes</b></sub></td>
   </tr>
 </table>
+
+<sub>Las capturas de Brawl Stars, Clash Royale y Clash of Clans usan datos reales de la API de Supercell. Las de TFT son anteriores al rediseño de íconos.</sub>
 
 <sub>* El aviso de mantenimiento se muestra solo cuando Riot reporta uno activo; en la captura se simuló uno para enseñar el diseño. Las demás son datos reales de la API.</sub>
 
