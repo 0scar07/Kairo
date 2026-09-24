@@ -6,6 +6,7 @@ import RankedCard from "../components/RankedCard";
 import MatchRow from "../components/MatchRow";
 import MatchDetail from "../components/MatchDetail";
 import ChampionStatsRow from "../components/ChampionStatsRow";
+import Reveal from "../components/Reveal";
 import { Card, SectionLabel, SegmentedTabs, Chip, ErrorBanner, ProfileHeader, OverallCard } from "../components/ui";
 import { searchPlayer, getMoreMatches, MATCH_PAGE } from "../api/riot";
 import { championIcon } from "../api/ddragon";
@@ -145,6 +146,7 @@ export default function ProfileScreen({ route }) {
     >
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
+      <Reveal order={0}>
       <ProfileHeader
         game={GAME}
         avatar={<ProfileIcon iconId={summoner.profileIconId} level={summoner.summonerLevel} game={GAME} />}
@@ -154,7 +156,9 @@ export default function ProfileScreen({ route }) {
         action={isFav ? "⭐" : "☆"}
         onAction={toggleFavorite}
       />
+      </Reveal>
 
+      <Reveal order={1}>
       {streak && (
         <View style={[styles.streak, {
           backgroundColor: streak.isWin ? colors.winBgStrong : colors.lossBgStrong,
@@ -165,7 +169,9 @@ export default function ProfileScreen({ route }) {
           </Text>
         </View>
       )}
+      </Reveal>
 
+      <Reveal order={2}>
       {overall && (
         <OverallCard
           label={`Resumen — últimas ${overall.games} partidas`}
@@ -173,16 +179,22 @@ export default function ProfileScreen({ route }) {
           bar={{ value: overall.wr, color: winrateColor(overall.wr, accent) }}
         />
       )}
+      </Reveal>
 
+      <Reveal order={3}>
       {(soloQ || flex) && (
         <View style={styles.rankedRow}>
           {soloQ && <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />}
           {flex  && <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />}
         </View>
       )}
+      </Reveal>
 
+      <Reveal order={4}>
       <SegmentedTabs tabs={TABS} value={activeTab} onChange={setActiveTab} game={GAME} />
+      </Reveal>
 
+      <Reveal order={5}>
       {activeTab === "campeones" && (
         <Card>
           <SectionLabel>Más jugados (últimas {matches?.length} partidas)</SectionLabel>
@@ -238,6 +250,7 @@ export default function ProfileScreen({ route }) {
           </TouchableOpacity>
         </>
       )}
+      </Reveal>
     </ScrollView>
   );
 }

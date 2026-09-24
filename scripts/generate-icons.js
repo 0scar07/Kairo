@@ -24,7 +24,13 @@ async function main() {
   await render(svg, 1024, "icon.png");
   // El símbolo ya cae dentro del 66 % central (zona segura de Android)
   await render(transparent, 1024, "adaptive-icon.png");
-  await render(transparent, 1024, "splash-icon.png");
+
+  // Splash: solo el símbolo, recortado para que ocupe más lienzo y sin el glow de fondo
+  // (el glow lo anima la pantalla de carga). Debe coincidir con imageWidth de app.json.
+  const splash = transparent
+    .replace(/<circle id="glow"[^>]*\/>/, "")
+    .replace('viewBox="0 0 1024 1024"', 'viewBox="96 96 832 832"');
+  await render(splash, 1024, "splash-icon.png");
   await render(svg, 48, "favicon.png");
 }
 

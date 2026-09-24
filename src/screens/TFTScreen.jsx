@@ -9,6 +9,7 @@ import { TIER_ICONS, FAVORITES_KEY } from "../constants/config";
 import { championIcon } from "../api/ddragon";
 import { errorMessage, winrate } from "../utils/lol";
 import { Card, SectionLabel, ProfileHeader, OverallCard } from "../components/ui";
+import Reveal from "../components/Reveal";
 import {
   colors, radii, sizes, spacing, fontSizes, type, winrateColor, useAccent,
 } from "../theme";
@@ -179,6 +180,7 @@ export default function TFTScreen({ route }) {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
+      <Reveal order={0}>
       <ProfileHeader
         game={GAME}
         avatar={
@@ -192,7 +194,9 @@ export default function TFTScreen({ route }) {
         action={isFav ? "⭐" : "☆"}
         onAction={toggleFavorite}
       />
+      </Reveal>
 
+      <Reveal order={1}>
       {tftRanked && (
         <Card accent={colors.tier[tftRanked.tier] || colors.textMuted}>
           <SectionLabel>Ranked TFT</SectionLabel>
@@ -211,7 +215,9 @@ export default function TFTScreen({ route }) {
           </View>
         </Card>
       )}
+      </Reveal>
 
+      <Reveal order={2}>
       {avgPlacement && (
         <OverallCard
           label={`Resumen — últimas ${games} partidas`}
@@ -222,7 +228,9 @@ export default function TFTScreen({ route }) {
           ]}
         />
       )}
+      </Reveal>
 
+      <Reveal order={3}>
       <SectionLabel>Últimas partidas</SectionLabel>
       {matches?.length > 0
         ? matches.map((m, i) => (
@@ -230,6 +238,7 @@ export default function TFTScreen({ route }) {
           ))
         : <Text style={styles.empty}>No se encontraron partidas</Text>
       }
+      </Reveal>
     </ScrollView>
   );
 }

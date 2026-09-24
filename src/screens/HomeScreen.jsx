@@ -11,6 +11,8 @@ import { profileIconUrl } from "../api/ddragon";
 import { FAVORITES_KEY, APP_NAME, APP_TAGLINE } from "../constants/config";
 import { errorMessage } from "../utils/lol";
 import { Card, SectionLabel } from "../components/ui";
+import Reveal from "../components/Reveal";
+import { useBootData } from "../boot/BootContext";
 import {
   colors, accents, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, glow, withAlpha, useActiveGame,
 } from "../theme";
@@ -45,16 +47,18 @@ const GAMES = [
   },
 ];
 
+// Espera a que la pantalla de carga se desvanezca antes de empezar la aparición escalonada
+const HANDOFF_MS = 250;
+
 export default function HomeScreen({ navigation }) {
   const { gameKey, setGameKey } = useActiveGame();
+  const { favorites: bootFavorites, serverOnline, retryServer } = useBootData();
   const [input,     setInput]     = useState("");
   const [loading,   setLoading]   = useState(false);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(bootFavorites);
 
   const activeGame = GAMES.find(g => g.key === gameKey) || GAMES[0];
   const accent     = accents[activeGame.key];
-
-  useEffect(() => { loadFavorites(); }, []);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", loadFavorites);
@@ -106,13 +110,23 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.inner}>
 
-        <View style={styles.logo}>
+        {!serverOnline && (
+          <Reveal order={0} baseDelay={HANDOFF_MS}>
+            <TouchableOpacity style={styles.offline} onPress={retryServer} activeOpacity={0.8}>
+              <View style={styles.offlineDot} />
+              <Text style={styles.offlineText}>Sin conexión con el servidor · toca para reintentar</Text>
+            </TouchableOpacity>
+          </Reveal>
+        )}
+
+        <Reveal order={0} baseDelay={HANDOFF_MS} style={styles.logo}>
           <Text style={[styles.logoText, { color: accent }, glow(accent, spacing.lg, 0.4)]}>
             {APP_NAME.toUpperCase()}
           </Text>
           <Text style={styles.logoSub}>{APP_TAGLINE.toUpperCase()}</Text>
-        </View>
+        </Reveal>
 
+        <Reveal order={1} baseDelay={HANDOFF_MS}>
         <View style={styles.gameSelector}>
           {GAMES.map(g => {
             const active = activeGame.key === g.key;
@@ -129,9 +143,13 @@ export default function HomeScreen({ navigation }) {
             );
           })}
         </View>
+        </Reveal>
 
-        <Text style={[styles.gameName, { color: accent }]}>{activeGame.name}</Text>
+        <Reveal order={2} baseDelay={HANDOFF_MS}>
+          <Text style={[styles.gameName, { color: accent }]}>{activeGame.name}</Text>
+        </Reveal>
 
+        <Reveal order={3} baseDelay={HANDOFF_MS}>
         <View style={styles.searchBox}>
           <TextInput
             value={input}
@@ -152,6 +170,9 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
+        </Reveal>
+
+        <Reveal order={4} baseDelay={HANDOFF_MS}>
         {gameFavs.length > 0 && (
           <View style={styles.favSection}>
             <SectionLabel>⭐ Favoritos — {activeGame.short}</SectionLabel>
@@ -190,6 +211,7 @@ export default function HomeScreen({ navigation }) {
             {"\n\n"}Guarda tus favoritos para acceder{"\n"}rápido desde aquí
           </Text>
         )}
+        </Reveal>
 
       </ScrollView>
     </View>
@@ -199,6 +221,14 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container:          { flex: 1, backgroundColor: colors.bg },
   inner:              { padding: spacing.xl, paddingTop: spacing.hero },
+  offline:            {
+    flexDirection: "row", alignItems: "center", alignSelf: "center", gap: spacing.sm,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.xs, marginBottom: spacing.lg,
+    borderRadius: radii.pill, borderWidth: sizes.hairline,
+    borderColor: withAlpha(colors.loss, 0.4), backgroundColor: withAlpha(colors.loss, 0.1),
+  },
+  offlineDot:         { width: sizes.dot, height: sizes.dot, borderRadius: sizes.dot / 2, backgroundColor: colors.loss },
+  offlineText:        { ...type.caption, color: colors.textSecondary },
   logo:               { alignItems: "center", marginBottom: spacing.xxl },
   logoText:           { ...type.brand, fontSize: fontSizes.hero, letterSpacing: tracking.brand },
   logoSub:            { ...type.label, color: colors.textMuted, letterSpacing: tracking.widest, marginTop: spacing.sm },

@@ -5,11 +5,6 @@
     "scheme": "kairo",
     "version": "1.0.0",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#070C0F"
-    },
     "android": {
       "package": "com.camavingaaa.ggtracker",
       "adaptiveIcon": {
@@ -23,7 +18,16 @@
       }
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 260,
+          "resizeMode": "contain",
+          "backgroundColor": "#070C0F"
+        }
+      ]
     ],
     "userInterfaceStyle": "dark",
     "backgroundColor": "#070C0F",

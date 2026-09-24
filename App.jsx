@@ -1,20 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { View } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer, DarkTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StatusBar } from "expo-status-bar";
 import { Text } from "react-native";
-import { useFonts } from "expo-font";
 import HomeScreen      from "./src/screens/HomeScreen";
 import ProfileScreen   from "./src/screens/ProfileScreen";
 import ValorantScreen  from "./src/screens/ValorantScreen";
 import TFTScreen       from "./src/screens/TFTScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
-import { initDataDragon } from "./src/api/ddragon";
-import { migrateLegacyStorage } from "./src/utils/storage";
+import LoadingScreen from "./src/screens/LoadingScreen";
+import { useBoot } from "./src/boot/useBoot";
+import { BootProvider } from "./src/boot/BootContext";
 import {
-  colors, fontAssets, fonts, fontSizes, sizes, spacing, tracking, GameProvider, useAccent,
+  colors, fonts, fontSizes, sizes, spacing, tracking, GameProvider, useAccent,
 } from "./src/theme";
+
+// El splash nativo se queda visible hasta que la pantalla de carga animada esté montada
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const Stack = createNativeStackNavigator();
 const Tab   = createBottomTabNavigator();
@@ -89,22 +94,32 @@ function Tabs() {
 }
 
 export default function App() {
-  const [fontsLoaded, fontError] = useFonts(fontAssets);
-  const [ready, setReady] = useState(false);
-
-  // Lee la versión vigente de Data Dragon y migra claves antiguas antes de mostrar la interfaz
-  useEffect(() => {
-    Promise.all([migrateLegacyStorage(), initDataDragon()]).finally(() => setReady(true));
-  }, []);
-
-  if (!(fontsLoaded || fontError) || !ready) return null;
+  const { progress, fontsReady, result, finished } = useBoot();
+  const [loaderGone, setLoaderGone] = useState(false);
 
   return (
-    <GameProvider>
-      <NavigationContainer theme={navTheme}>
-        <StatusBar style="light" />
-        <Tabs />
-      </NavigationContainer>
-    </GameProvider>
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      <StatusBar style="light" />
+
+      {/* La app se monta al llegar a 100 %, justo cuando la pantalla de carga empieza su fade-out */}
+      {finished && result && (
+        <BootProvider boot={result}>
+          <GameProvider initialGame={result.activeGame}>
+            <NavigationContainer theme={navTheme}>
+              <Tabs />
+            </NavigationContainer>
+          </GameProvider>
+        </BootProvider>
+      )}
+
+      {!loaderGone && (
+        <LoadingScreen
+          progress={progress}
+          textsReady={fontsReady}
+          finished={finished}
+          onHidden={() => setLoaderGone(true)}
+        />
+      )}
+    </View>
   );
 }

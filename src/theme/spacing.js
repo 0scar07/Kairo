@@ -24,7 +24,11 @@ export const sizes = {
   avatarXl:  72,
   avatarHero: 80,
   iconHero:  96,
+  dot:       6,
   chart:     120,
+  splashLogo: 260,   // debe coincidir con imageWidth del plugin expo-splash-screen en app.json
+  splashBar:  160,
+  splashGlow: 560,
 };
 
 // Resplandor de color (sombra sin desplazamiento)

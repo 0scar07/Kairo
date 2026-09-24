@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LineChart } from "react-native-chart-kit";
 import RankedCard from "../components/RankedCard";
 import ChampionStatsRow from "../components/ChampionStatsRow";
+import Reveal from "../components/Reveal";
 import { Card, SectionLabel, SegmentedTabs, ProfileHeader } from "../components/ui";
 import { searchPlayer } from "../api/riot";
 import { championIcon, profileIconUrl } from "../api/ddragon";
@@ -220,6 +221,7 @@ export default function MyProfileScreen() {
         if (n && t) fetchProfile(n, t);
       }} />
 
+      <Reveal order={0}>
       <ProfileHeader
         game={GAME}
         avatar={
@@ -235,7 +237,9 @@ export default function MyProfileScreen() {
         action="✏️"
         onAction={() => setShowSetup(true)}
       />
+      </Reveal>
 
+      <Reveal order={1}>
       {badges.length > 0 && (
         <Card>
           <SectionLabel>🏅 Insignias</SectionLabel>
@@ -244,14 +248,18 @@ export default function MyProfileScreen() {
           </View>
         </Card>
       )}
+      </Reveal>
 
+      <Reveal order={2}>
       {(soloQ || flex) && (
         <View style={styles.rankedRow}>
           {soloQ && <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />}
           {flex  && <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />}
         </View>
       )}
+      </Reveal>
 
+      <Reveal order={3}>
       <Card>
         <SectionLabel>📊 Estadísticas generales</SectionLabel>
         <View style={styles.statsGrid}>
@@ -263,7 +271,9 @@ export default function MyProfileScreen() {
           ))}
         </View>
       </Card>
+      </Reveal>
 
+      <Reveal order={4}>
       {me.length >= 3 && (
         <Card>
           <SectionLabel>📈 KDA últimas {Math.min(me.length, 10)} partidas</SectionLabel>
@@ -290,9 +300,13 @@ export default function MyProfileScreen() {
           />
         </Card>
       )}
+      </Reveal>
 
+      <Reveal order={5}>
       <SegmentedTabs tabs={TABS} value={activeTab} onChange={setActiveTab} game={GAME} />
+      </Reveal>
 
+      <Reveal order={6}>
       {activeTab === "campeones" && (
         <Card>
           {champStats.slice(0, 7).map((c, i) => (
@@ -332,6 +346,7 @@ export default function MyProfileScreen() {
           })}
         </View>
       )}
+      </Reveal>
     </ScrollView>
   );
 }

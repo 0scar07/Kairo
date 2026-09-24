@@ -11,6 +11,7 @@ export const APP_TAGLINE = "Cada partida cuenta.";
 // Claves de AsyncStorage (las antiguas se migran en src/utils/storage.js)
 export const FAVORITES_KEY  = "kairo_favorites";
 export const MY_PROFILE_KEY = "kairo_my_profile";
+export const ACTIVE_GAME_KEY = "kairo_active_game";
 export const LEGACY_KEYS = {
   [FAVORITES_KEY]:  ["loltracker_favorites"],
   [MY_PROFILE_KEY]: ["ggtracker_my_profile"],

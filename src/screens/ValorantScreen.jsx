@@ -9,6 +9,7 @@ import { FAVORITES_KEY } from "../constants/config";
 import { profileIconUrl } from "../api/ddragon";
 import { errorMessage, kdaRatio as calcKda, winrate } from "../utils/lol";
 import { SectionLabel, ProfileHeader, OverallCard } from "../components/ui";
+import Reveal from "../components/Reveal";
 import {
   colors, radii, sizes, spacing, fontSizes, type, tracking, kdaColor, winrateColor, glow, useAccent,
 } from "../theme";
@@ -166,6 +167,7 @@ export default function ValorantScreen({ route }) {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
+      <Reveal order={0}>
       <ProfileHeader
         game={GAME}
         avatar={
@@ -180,7 +182,9 @@ export default function ValorantScreen({ route }) {
         action={isFav ? "⭐" : "☆"}
         onAction={toggleFavorite}
       />
+      </Reveal>
 
+      <Reveal order={1}>
       {overall && (
         <OverallCard
           label={`Resumen — últimas ${overall.games} partidas`}
@@ -192,7 +196,9 @@ export default function ValorantScreen({ route }) {
           bar={{ value: overall.wr, color: winrateColor(overall.wr, accent) }}
         />
       )}
+      </Reveal>
 
+      <Reveal order={2}>
       <SectionLabel>Últimas partidas</SectionLabel>
       {matches?.length > 0
         ? matches.map((m, i) => (
@@ -200,6 +206,7 @@ export default function ValorantScreen({ route }) {
           ))
         : <Text style={styles.empty}>No se encontraron partidas</Text>
       }
+      </Reveal>
     </ScrollView>
   );
 }
