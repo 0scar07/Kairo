@@ -9,8 +9,19 @@ export function normalizeFavorite(f) {
   return { ...rest, gameId: f.gameId || game || "lol", region: f.region || DEFAULT_REGION };
 }
 
-export const isFavoriteIn = (list, gameId, puuid) =>
-  list.some(f => f.gameId === gameId && f.puuid === puuid);
+const lower = s => String(s || "").toLowerCase();
+
+/**
+ * ¿Es el mismo jugador? Riot cifra el PUUID por aplicación: si cambia la API key, el PUUID guardado
+ * deja de coincidir. Por eso también se compara por Riot ID + región.
+ */
+export const sameFavorite = (a, b) =>
+  a.gameId === b.gameId && (
+    a.puuid === b.puuid ||
+    (a.region === b.region && lower(a.gameName) === lower(b.gameName) && lower(a.tagLine) === lower(b.tagLine))
+  );
+
+export const isFavoriteIn = (list, player) => list.some(f => sameFavorite(f, player));
 
 // Lee los favoritos y, si venían en el formato antiguo, los migra y los vuelve a guardar
 export async function loadFavorites() {
@@ -27,17 +38,23 @@ export const saveFavorites = list => AsyncStorage.setItem(FAVORITES_KEY, JSON.st
 // Añade o quita un favorito; devuelve la lista nueva y si quedó marcado
 export async function toggleFavorite(fav) {
   const list = await loadFavorites();
-  const exists = isFavoriteIn(list, fav.gameId, fav.puuid);
-  const next = exists
-    ? list.filter(f => !(f.gameId === fav.gameId && f.puuid === fav.puuid))
-    : [...list, fav];
+  const exists = isFavoriteIn(list, fav);
+  const next = exists ? list.filter(f => !sameFavorite(f, fav)) : [...list, fav];
   await saveFavorites(next);
   return { favorites: next, isFav: !exists };
 }
 
-export async function removeFavorite(gameId, puuid) {
-  const list = await loadFavorites();
-  const next = list.filter(f => !(f.gameId === gameId && f.puuid === puuid));
+export async function removeFavorite(fav) {
+  const next = (await loadFavorites()).filter(f => !sameFavorite(f, fav));
   await saveFavorites(next);
+  return next;
+}
+
+// Actualiza un favorito ya guardado con los datos actuales (PUUID nuevo, ícono, rango). No añade nada.
+export async function refreshFavorite(fav) {
+  const list = await loadFavorites();
+  if (!isFavoriteIn(list, fav)) return list;
+  const next = list.map(f => (sameFavorite(f, fav) ? { ...f, ...fav } : f));
+  if (JSON.stringify(next) !== JSON.stringify(list)) await saveFavorites(next);
   return next;
 }

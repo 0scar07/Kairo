@@ -58,7 +58,7 @@ export default function HomeScreen({ navigation }) {
   async function onRemoveFavorite(fav) {
     setFavorites(prev => prev.filter(f => !(f.gameId === fav.gameId && f.puuid === fav.puuid)));
     try {
-      await removeFavorite(fav.gameId, fav.puuid);
+      await removeFavorite(fav);
     } catch (e) {
       Alert.alert("Error", "No se pudo guardar los cambios: " + errorMessage(e));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));

@@ -263,7 +263,7 @@ El repo incluye una [página del producto](docs/index.html) y una [política de 
 | Síntoma | Causa y solución |
 |---------|------------------|
 | "Sin conexión con el servidor" en Inicio | El backend no está corriendo o el celular no lo alcanza. Usa la IP de tu PC en `EXPO_PUBLIC_API_URL`, misma red Wi-Fi, y permite el puerto 3000 en el firewall de Windows |
-| "El servidor no tiene acceso a Riot" | La key es inválida o expiró (las de desarrollo duran 24 h). Regénerala y reinicia el backend |
+| "Riot rechazó la consulta: la key no es válida o no tiene acceso a esta API" | La key expiró (las de desarrollo duran 24 h) **o tu producto no tiene habilitada esa API** (por ejemplo TFT). Revisa las APIs de tu app en el Developer Portal; el log del servidor indica cuál falló |
 | "Riot limitó las solicitudes" | Superaste el límite de la key. Espera unos segundos: cada perfil hace ~14 peticiones |
 | Rango vacío o "Sin clasificar" | El jugador no tiene partidas clasificatorias en ese modo/región. Revisa que la región sea la correcta |
 | "Something went wrong" en Expo Go | Expo Go tiene una sesión iniciada y el servidor pide firmar el manifiesto. Arranca con `npm run phone` (usa `--offline`) o cierra la sesión en Expo Go |

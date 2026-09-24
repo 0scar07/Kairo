@@ -21,7 +21,10 @@ Es lo más importante. Una **key de desarrollo caduca cada 24 horas**: si la pon
 1. Entra a <https://developer.riotgames.com> con tu cuenta de Riot.
 2. Ve a **Apps → Register Product** y elige el tipo que corresponda (Personal para empezar).
 3. Describe el proyecto ("app móvil de estadísticas de LoL y TFT") y espera la aprobación. Riot decide los requisitos y plazos: revisa las condiciones en el portal.
-4. Cuando la aprueben, copia esa key. **Es la que pondrás en el hosting.**
+4. Cuando la aprueben, abre tu app en el portal y **revisa qué APIs tiene habilitadas** (LoL, TFT…): la aprobación puede cubrir solo algunas. Una API no habilitada responde 403 aunque la key sea válida.
+5. Copia la key. **Es la que pondrás en el hosting.** Nunca la pegues en un chat: si se expone, regenérala en el portal.
+
+> **Ojo:** el PUUID de un jugador cambia al cambiar de key (Riot lo cifra por aplicación). Es normal; la app lo tolera.
 
 Mientras esperas, puedes desplegar con una key de desarrollo para comprobar que todo funciona; solo recuerda que caducará.
 

@@ -131,5 +131,7 @@ Todos los colores, tamaños, espaciados y tipografías salen de `src/theme/` (no
 
 - **Valorant no está implementado**: su API de partidas requiere una *production key* aprobada por Riot.
 - **El rango se pide por PUUID** (`league-v4/entries/by-puuid`): Riot ya no devuelve `id` en `summoner-v4`.
+- **El PUUID depende de la API key.** Riot lo cifra por aplicación: si cambias de key, todos los PUUID cambian. Por eso los favoritos se comparan por `gameId` + Riot ID + región (no solo por PUUID) y se actualizan al abrir el perfil.
+- **Cada API se habilita por producto.** Una key puede tener LoL y no TFT: Riot responde 403 y el backend lo traduce a un mensaje claro y registra qué API concreta falló (sin PUUID).
 - **Los datos de TFT vienen de Data Dragon** por versión y se guardan compactos en AsyncStorage. Data Dragon solo trae los sets vigentes: las unidades de sets antiguos usan un placeholder con su nombre.
 - **El detalle de partida se expande con animación** midiendo su altura real (`Expandable`), sin alturas fijas.

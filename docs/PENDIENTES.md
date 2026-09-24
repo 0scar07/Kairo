@@ -4,6 +4,8 @@
 - [ ] **Regenerar las keys de Riot** que alguna vez estuvieron en el código o en el historial de git (una key que estuvo en un commit público sigue visible aunque se borre después) y, si quieres, limpiar el historial.
 - [ ] **Desplegar el backend**: ya está listo (`render.yaml`, `Dockerfile`, límite de peticiones, CORS). Sigue [DESPLIEGUE.md](DESPLIEGUE.md). Con una key de desarrollo solo sirve para pruebas (caduca a las 24 h): pide una *Personal* o *Production API Key* a Riot.
 - [ ] Registrar el producto en el portal de Riot y pedir la key ([RIOT-FORMULARIO.md](RIOT-FORMULARIO.md)); activar GitHub Pages (Settings → Pages → `main` / `docs`).
+- [ ] **Habilitar las APIs de TFT** en el producto de Riot (hoy la key responde 403 en `tft-summoner`, `tft-league` y `tft-match`); mientras tanto, TFT muestra un error en la app.
+- [ ] Cola de salida hacia Riot que respete 20 peticiones/s y 100 cada 2 min (hoy solo hay límite por IP hacia nuestro servidor).
 - [ ] Revisar el aviso legal, buscar el nombre "Kairo" en Play Store / App Store y en el registro de marcas.
 - [ ] `eas init` de nuevo: el `projectId` de EAS sigue ligado al slug antiguo (`ggtracker`). El paquete Android sigue siendo `com.camavingaaa.ggtracker`; cámbialo si quieres identidad nueva.
 - [x] Límite de peticiones y CORS configurable en el backend.

@@ -6,7 +6,7 @@ import { getGame } from "../games";
 import { TIER_ICONS } from "../constants/config";
 import { errorMessage, tierLabel } from "../utils/format";
 import Icon from "./Icon";
-import { isFavoriteIn, loadFavorites, toggleFavorite } from "../utils/favorites";
+import { isFavoriteIn, loadFavorites, refreshFavorite, toggleFavorite } from "../utils/favorites";
 import { success } from "../utils/haptics";
 import { colors, sizes, spacing, useAccent } from "../theme";
 
@@ -29,8 +29,14 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
   const profile = game.getProfile(data);
 
   useEffect(() => {
+    const me = { ...game.toFavorite(data), gameId, region };
     loadFavorites()
-      .then(list => setIsFav(isFavoriteIn(list, gameId, account.puuid)))
+      .then(list => {
+        const saved = isFavoriteIn(list, me);
+        setIsFav(saved);
+        // Si ya es favorito, se actualiza con los datos de hoy (PUUID nuevo si cambió la key, ícono, rango)
+        if (saved) return refreshFavorite(me);
+      })
       .catch(e => console.warn("No se pudieron leer los favoritos:", e.message));
   }, [gameId, account.puuid]);
 

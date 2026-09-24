@@ -2,6 +2,7 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const config = require("./config");
 const { HttpError } = require("./riot");
+const { maskRoute } = require("./mask");
 
 // Cabeceras de seguridad básicas
 function securityHeaders(_req, res, next) {
@@ -19,9 +20,7 @@ function requestLogger(req, res, next) {
   const start = Date.now();
   res.on("finish", () => {
     if (req.path === "/health") return;
-    const route = req.originalUrl.split("?")[0]
-      .replace(/\/account\/[^/]+\/[^/]+/, "/account/:name/:tag")
-      .replace(/[\w-]{30,}/g, ":id");
+    const route = maskRoute(req.originalUrl);
     console.log(`${req.method} ${route} ${res.statusCode} ${Date.now() - start}ms`);
   });
   next();

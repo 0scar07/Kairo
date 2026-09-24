@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { TtlCache } = require("./cache");
+const { maskRoute } = require("./mask");
 
 // Error con estado HTTP y mensaje en español listo para mostrar en la app
 class HttpError extends Error {
@@ -37,11 +38,13 @@ function toHttpError(e, notFoundMessage) {
   if (e instanceof HttpError) return e;
 
   const status = e.response?.status;
+  // Ruta de Riot que falló, sin PUUID (sirve para saber qué API concreta rechazó la petición)
+  const endpoint = e.config?.url ? maskRoute(new URL(e.config.url).pathname) : "(desconocida)";
   if (status === 404) return new HttpError(404, notFoundMessage || "No se encontró lo que buscabas");
   if (status === 400) return new HttpError(400, "Solicitud inválida");
   if (status === 401 || status === 403) {
-    console.error("⚠ Riot rechazó la key (401/403): revisa RIOT_API_KEY en server/.env; las keys de desarrollo caducan cada 24 h");
-    return new HttpError(503, "El servidor no tiene acceso a Riot (la key es inválida o expiró)", { code: "KEY_INVALID" });
+    console.error(`⚠ Riot respondió ${status} en ${endpoint}: la key es inválida o expiró, o el producto no tiene habilitada esta API (Developer Portal > tu app > APIs)`);
+    return new HttpError(503, "Riot rechazó la consulta: la key no es válida o no tiene acceso a esta API todavía", { code: "KEY_INVALID" });
   }
   if (status === 429) {
     const retryAfter = parseInt(e.response.headers?.["retry-after"], 10) || 5;
@@ -71,7 +74,7 @@ const handle = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).cat
 function errorHandler(err, req, res, _next) {
   const e = err instanceof HttpError ? err : new HttpError(500, "Error interno del servidor");
   if (!(err instanceof HttpError)) console.error("Error no controlado:", err);
-  else if (e.status >= 500) console.warn(`${req.method} ${req.originalUrl} -> ${e.status}: ${e.message}`);
+  else if (e.status >= 500) console.warn(`${req.method} ${maskRoute(req.originalUrl)} -> ${e.status}: ${e.message}`);
   if (e.retryAfter) res.set("Retry-After", String(e.retryAfter));
   res.status(e.status).json({ error: e.message, code: e.code, retryAfter: e.retryAfter });
 }
