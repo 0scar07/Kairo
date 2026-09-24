@@ -19,7 +19,7 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
 
 <br />
 
-<img src="docs/screenshots/hero.png" alt="Kairo: pantalla de carga, inicio, perfil de LoL y perfil de TFT" width="100%" />
+<img src="docs/screenshots/hero.png" alt="Kairo: pantalla de carga, inicio con rotación gratuita, perfil de LoL con maestría y partidas" width="100%" />
 
 <sub>Capturas renderizadas en un navegador móvil contra el backend real. En un celular los brillos y la háptica se ven distintos.</sub>
 

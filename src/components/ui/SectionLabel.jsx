@@ -10,7 +10,7 @@ export default function SectionLabel({ children, style, icon, iconColor = colors
   if (!icon) return <Text style={[styles.label, style]}>{text}</Text>;
   return (
     <View style={[styles.row, style]}>
-      <Icon name={icon} size={fontSizes.base} color={iconColor} />
+      <Icon name={icon} size={fontSizes.base} color={iconColor} filled={icon === "star"} />
       <Text style={styles.text}>{text}</Text>
     </View>
   );
