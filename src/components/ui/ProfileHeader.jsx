@@ -6,7 +6,7 @@ import { colors, radii, sizes, spacing, type, fontSizes, glow, useAccent, withAl
 
 // Cabecera de perfil: avatar grande con resplandor del color del rango + nombre#tag + insignia + acción
 export default function ProfileHeader({
-  avatar, name, tag, badge, subtitle, game, glowColor, action, onAction, avatarSize,
+  avatar, name, tag, badge, badgeIcon, subtitle, game, glowColor, action, onAction, avatarSize,
 }) {
   const accent = useAccent(game);
   const tint = glowColor || accent;
@@ -19,6 +19,7 @@ export default function ProfileHeader({
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         {badge ? (
           <View style={[styles.badge, { backgroundColor: withAlpha(tint, 0.14), borderColor: withAlpha(tint, 0.4) }]}>
+            {badgeIcon}
             <Text style={[styles.badgeText, { color: tint }]}>{badge}</Text>
           </View>
         ) : null}
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
   tag:       { ...type.small, color: colors.textMuted },
   subtitle:  { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
   badge:     {
-    marginTop: spacing.sm, alignSelf: "flex-start", borderWidth: sizes.hairline,
+    marginTop: spacing.sm, alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: spacing.xs, borderWidth: sizes.hairline,
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radii.pill,
   },
   badgeText: { ...type.smallStrong },

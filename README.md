@@ -46,6 +46,7 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
 - 🚀 **Pantalla de carga animada** con progreso real de arranque y aparición escalonada de las secciones.
 - 🫧 **Skeletons**, estados vacíos amables y errores con botón de reintentar.
 - 📳 **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
+- 🏅 **Emblemas de rango oficiales** (Iron → Challenger) en el perfil, las tarjetas de ranked y Favoritos.
 - 📊 **LoL extra:** maestría de campeones (top 3 con nivel y puntos), rotación gratuita de la semana y aviso de mantenimiento del servidor de tu región.
 - 🧭 **Juegos según tu key:** el backend detecta qué APIs habilita tu key de Riot; lo que no esté habilitado aparece como "PRONTO" en vez de dar errores.
 - 🎯 **Valorant**: próximamente (su API de partidas requiere una *production key* aprobada por Riot).

@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, RefreshControl } from "react-native";
 import Reveal from "./Reveal";
 import { ErrorBanner, ProfileHeader } from "./ui";
 import { getGame } from "../games";
-import { TIER_ICONS } from "../constants/config";
+import RankEmblem from "./RankEmblem";
 import { errorMessage, tierLabel } from "../utils/format";
 import Icon from "./Icon";
 import { isFavoriteIn, loadFavorites, refreshFavorite, toggleFavorite } from "../utils/favorites";
@@ -62,7 +62,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
   }
 
   const ranked = profile.ranked;
-  const badge = ranked ? `${TIER_ICONS[ranked.tier] || ""} ${tierLabel(ranked.tier, ranked.rank)}`.trim() : null;
+  const badge = ranked ? tierLabel(ranked.tier, ranked.rank) : null;
 
   return (
     <ScrollView
@@ -80,6 +80,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
           tag={profile.tag}
           subtitle={profile.subtitle}
           badge={badge}
+          badgeIcon={ranked ? <RankEmblem tier={ranked.tier} size={sizes.item} /> : null}
           glowColor={colors.tier[ranked?.tier]}
           action={headerAction ? headerAction.icon : (
             <Icon name="star" size={sizes.avatarSm} color={isFav ? colors.gold : colors.textMuted} filled={isFav} />

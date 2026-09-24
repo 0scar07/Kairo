@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { PressableScale } from "./ui";
 import { getGame } from "../games";
 import { profileIconUrl } from "../api/ddragon";
-import { TIER_ICONS } from "../constants/config";
+import RankEmblem from "./RankEmblem";
 import { tierLabel } from "../utils/format";
 import { getRegion } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, withAlpha } from "../theme";
@@ -39,8 +39,9 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
       <Text style={styles.tag} numberOfLines={1}>#{fav.tagLine} · {getRegion(fav.region).label}</Text>
 
       <View style={[styles.rank, { backgroundColor: withAlpha(tint, 0.14) }]}>
+        {fav.tier ? <RankEmblem tier={fav.tier} size={sizes.item} /> : null}
         <Text style={[styles.rankText, { color: tierColor || colors.textMuted }]} numberOfLines={1}>
-          {fav.tier ? `${TIER_ICONS[fav.tier] || ""} ${tierLabel(fav.tier, fav.rank)}`.trim() : "Sin rango"}
+          {fav.tier ? tierLabel(fav.tier, fav.rank) : "Sin rango"}
         </Text>
       </View>
     </PressableScale>
@@ -60,6 +61,6 @@ const styles = StyleSheet.create({
   removeText:      { ...type.caption, color: colors.textFaint },
   name:            { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   tag:             { ...type.caption, color: colors.textMuted },
-  rank:            { marginTop: spacing.sm, alignSelf: "flex-start", paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radii.pill },
+  rank:            { marginTop: spacing.sm, alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: spacing.xs, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radii.pill },
   rankText:        { ...type.captionStrong },
 });

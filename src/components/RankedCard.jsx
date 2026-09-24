@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, ProgressBar, SectionLabel } from "./ui";
-import { TIER_ICONS } from "../constants/config";
+import RankEmblem from "./RankEmblem";
 import { winrate, tierLabel } from "../utils/format";
 import { colors, spacing, sizes, fontSizes, type, tracking, winrateColor, useAccent, withAlpha } from "../theme";
 
@@ -29,7 +29,7 @@ export default function RankedCard({ entry, label, game = "lol" }) {
     <Card style={[styles.card, { borderColor: withAlpha(color, 0.4), backgroundColor: withAlpha(color, 0.06) }]}>
       <SectionLabel>{label}</SectionLabel>
       <View style={styles.top}>
-        <Text style={styles.tierIcon}>{TIER_ICONS[tier] || "🏆"}</Text>
+        <RankEmblem tier={tier} size={sizes.avatarXl - spacing.lg} />
         <Text style={styles.lp} numberOfLines={1}>{leaguePoints}<Text style={styles.lpUnit}> LP</Text></Text>
       </View>
       <Text style={[styles.tierText, { color }]} numberOfLines={1} adjustsFontSizeToFit>{tierLabel(tier, rank)}</Text>
@@ -45,7 +45,6 @@ export default function RankedCard({ entry, label, game = "lol" }) {
 const styles = StyleSheet.create({
   card:         { flex: 1, marginBottom: 0 },
   top:          { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm },
-  tierIcon:     { fontSize: fontSizes.hero },
   tierText:     { ...type.heading, fontSize: fontSizes.base, letterSpacing: tracking.tight, marginTop: spacing.xs, marginBottom: spacing.md },
   lp:           { ...type.statLarge, fontSize: fontSizes.xl, color: colors.text, flexShrink: 1 },
   lpUnit:       { ...type.captionStrong, color: colors.textMuted },

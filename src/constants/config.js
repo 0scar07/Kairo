@@ -19,9 +19,3 @@ export const LEGACY_KEYS = {
   [FAVORITES_KEY]:  ["loltracker_favorites"],
   [MY_PROFILE_KEY]: ["ggtracker_my_profile"],
 };
-
-export const TIER_ICONS = {
-  IRON: "⚫", BRONZE: "🟤", SILVER: "⚪", GOLD: "🟡",
-  PLATINUM: "🔵", EMERALD: "🟢", DIAMOND: "💎",
-  MASTER: "🟣", GRANDMASTER: "🔴", CHALLENGER: "⭐",
-};
