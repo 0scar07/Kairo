@@ -1,35 +1,82 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StatusBar } from "expo-status-bar";
-import HomeScreen   from "./src/screens/HomeScreen";
-import ProfileScreen from "./src/screens/ProfileScreen";
+import { Text } from "react-native";
+import HomeScreen      from "./src/screens/HomeScreen";
+import ProfileScreen   from "./src/screens/ProfileScreen";
+import ValorantScreen  from "./src/screens/ValorantScreen";
+import TFTScreen       from "./src/screens/TFTScreen";
+import MyProfileScreen from "./src/screens/MyProfileScreen";
 
 const Stack = createNativeStackNavigator();
+const Tab   = createBottomTabNavigator();
+
+const stackOptions = {
+  headerStyle:      { backgroundColor: "#0a0e17" },
+  headerTintColor:  "#c89b3c",
+  headerTitleStyle: { fontWeight: "800", letterSpacing: 1 },
+  contentStyle:     { backgroundColor: "#070b12" },
+};
+
+function SearchStack() {
+  return (
+    <Stack.Navigator screenOptions={stackOptions}>
+      <Stack.Screen name="Home"     component={HomeScreen}     options={{ headerShown: false }} />
+      <Stack.Screen name="Profile"  component={ProfileScreen}  options={{ title: "League of Legends" }} />
+      <Stack.Screen name="Valorant" component={ValorantScreen} options={{ title: "Valorant" }} />
+      <Stack.Screen name="TFT"      component={TFTScreen}      options={{ title: "TFT" }} />
+    </Stack.Navigator>
+  );
+}
+
+function MyProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={stackOptions}>
+      <Stack.Screen
+        name="MyProfile"
+        component={MyProfileScreen}
+        options={{ title: "Mi Perfil" }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <NavigationContainer>
       <StatusBar style="light" />
-      <Stack.Navigator
+      <Tab.Navigator
         screenOptions={{
-          headerStyle:     { backgroundColor: "#0a0e17" },
-          headerTintColor: "#c89b3c",
-          headerTitleStyle:{ fontWeight: "800", letterSpacing: 1 },
-          contentStyle:    { backgroundColor: "#070b12" },
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: "#0a0e17",
+            borderTopColor: "#1e2a3a",
+            borderTopWidth: 1,
+            height: 60,
+            paddingBottom: 8,
+          },
+          tabBarActiveTintColor:   "#c89b3c",
+          tabBarInactiveTintColor: "#334455",
+          tabBarLabelStyle: { fontSize: 11, fontWeight: "700", letterSpacing: 1 },
         }}
       >
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: "LoLTracker", headerShown: false }}
+        <Tab.Screen
+          name="Buscar"
+          component={SearchStack}
+          options={{
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🔍</Text>,
+          }}
         />
-        <Stack.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{ title: "Perfil del Invocador" }}
+        <Tab.Screen
+          name="Yo"
+          component={MyProfileStack}
+          options={{
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>⚔️</Text>,
+          }}
         />
-      </Stack.Navigator>
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }

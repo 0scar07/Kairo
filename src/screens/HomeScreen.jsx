@@ -1,23 +1,56 @@
 import React, { useState, useEffect } from "react";
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, KeyboardAvoidingView, Platform,
-  Alert, ScrollView, Image,
+  StyleSheet, Platform, Alert, ScrollView, Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchPlayer } from "../api/riot";
+import { searchValorantPlayer } from "../api/valorant";
+import { searchTFTPlayer } from "../api/tft";
 import { DD } from "../constants/config";
 
 const FAVORITES_KEY = "loltracker_favorites";
 
-export default function HomeScreen({ navigation }) {
-  const [input,     setInput]     = useState("");
-  const [loading,   setLoading]   = useState(false);
-  const [favorites, setFavorites] = useState([]);
+const GAMES = [
+  {
+    key:         "lol",
+    name:        "League of Legends",
+    short:       "LoL",
+    icon:        "⚔️",
+    color:       "#c89b3c",
+    placeholder: "Nombre#TAG  (ej: Faker#KR1)",
+    screen:      "Profile",
+    search:      searchPlayer,
+  },
+  {
+    key:         "valorant",
+    name:        "Valorant",
+    short:       "VAL",
+    icon:        "🎯",
+    color:       "#ff4655",
+    placeholder: "Nombre#TAG  (ej: TenZ#000)",
+    screen:      "Valorant",
+    search:      searchValorantPlayer,
+  },
+  {
+    key:         "tft",
+    name:        "Teamfight Tactics",
+    short:       "TFT",
+    icon:        "♟️",
+    color:       "#0bc4e3",
+    placeholder: "Nombre#TAG  (ej: Mortdog#TFT)",
+    screen:      "TFT",
+    search:      searchTFTPlayer,
+  },
+];
 
-  useEffect(() => {
-    loadFavorites();
-  }, []);
+export default function HomeScreen({ navigation }) {
+  const [input,      setInput]      = useState("");
+  const [loading,    setLoading]    = useState(false);
+  const [favorites,  setFavorites]  = useState([]);
+  const [activeGame, setActiveGame] = useState(GAMES[0]);
+
+  useEffect(() => { loadFavorites(); }, []);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", loadFavorites);
@@ -32,17 +65,18 @@ export default function HomeScreen({ navigation }) {
   }
 
   async function handleSearch(gameName, tagLine) {
-    const name = gameName || input.trim().split("#")[0];
-    const tag  = tagLine  || input.trim().split("#")[1];
+    const parts = (gameName || input.trim()).split("#");
+    const name  = gameName || parts[0];
+    const tag   = tagLine  || parts[1];
 
     if (!name || !tag) {
-      Alert.alert("Formato incorrecto", "Usa el formato: Nombre#TAG\nEjemplo: Faker#KR1");
+      Alert.alert("Formato incorrecto", `Usa el formato: Nombre#TAG\nEjemplo: ${activeGame.placeholder}`);
       return;
     }
     setLoading(true);
     try {
-      const data = await searchPlayer(name, tag);
-      navigation.navigate("Profile", { data, onFavoriteChange: loadFavorites });
+      const data = await activeGame.search(name, tag);
+      navigation.navigate(activeGame.screen, { data });
     } catch (e) {
       Alert.alert("Error", e.response?.data?.error || "Jugador no encontrado");
     }
@@ -55,20 +89,44 @@ export default function HomeScreen({ navigation }) {
     await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
   }
 
+  const gameFavs = favorites.filter(f => f.game === activeGame.key);
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.inner}>
+
         {/* Logo */}
         <View style={styles.logo}>
-          <Text style={styles.logoIcon}>⚔️</Text>
+          <Text style={styles.logoIcon}>🎮</Text>
           <Text style={styles.logoText}>
-            LoL<Text style={{ color: "#c89b3c" }}>Tracker</Text>
+            GG<Text style={{ color: activeGame.color }}>Tracker</Text>
           </Text>
-          <Text style={styles.logoSub}>STATS & RANKED</Text>
+          <Text style={styles.logoSub}>MULTI-GAME STATS</Text>
         </View>
+
+        {/* Selector de juego */}
+        <View style={styles.gameSelector}>
+          {GAMES.map(g => (
+            <TouchableOpacity
+              key={g.key}
+              style={[styles.gameBtn, activeGame.key === g.key && {
+                backgroundColor: `${g.color}20`,
+                borderColor: g.color,
+              }]}
+              onPress={() => { setActiveGame(g); setInput(""); }}
+            >
+              <Text style={styles.gameIcon}>{g.icon}</Text>
+              <Text style={[styles.gameShort, activeGame.key === g.key && { color: g.color }]}>
+                {g.short}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Nombre del juego seleccionado */}
+        <Text style={[styles.gameName, { color: activeGame.color }]}>
+          {activeGame.name}
+        </Text>
 
         {/* Search */}
         <View style={styles.searchBox}>
@@ -76,14 +134,14 @@ export default function HomeScreen({ navigation }) {
             value={input}
             onChangeText={setInput}
             onSubmitEditing={() => handleSearch()}
-            placeholder="Nombre#TAG  (ej: Faker#KR1)"
+            placeholder={activeGame.placeholder}
             placeholderTextColor="#334455"
-            style={styles.input}
+            style={[styles.input, { borderColor: loading ? activeGame.color : "#1e2a3a" }]}
             autoCapitalize="none"
             autoCorrect={false}
           />
           <TouchableOpacity
-            style={[styles.btn, loading && { opacity: 0.6 }]}
+            style={[styles.btn, { backgroundColor: activeGame.color }, loading && { opacity: 0.6 }]}
             onPress={() => handleSearch()}
             disabled={loading}
           >
@@ -92,26 +150,34 @@ export default function HomeScreen({ navigation }) {
         </View>
 
         {/* Favoritos */}
-        {favorites.length > 0 && (
+        {gameFavs.length > 0 && (
           <View style={styles.favSection}>
-            <Text style={styles.favLabel}>⭐ FAVORITOS</Text>
-            {favorites.map(fav => (
+            <Text style={styles.favLabel}>⭐ FAVORITOS — {activeGame.short}</Text>
+            {gameFavs.map(fav => (
               <View key={fav.puuid} style={styles.favRow}>
                 <TouchableOpacity
                   style={styles.favInfo}
                   onPress={() => handleSearch(fav.gameName, fav.tagLine)}
                 >
-                  <Image
-                    source={{ uri: `${DD}/img/profileicon/${fav.iconId}.png` }}
-                    style={styles.favIcon}
-                  />
+                  {fav.iconId ? (
+                    <Image
+                      source={{ uri: `${DD}/img/profileicon/${fav.iconId}.png` }}
+                      style={[styles.favIcon, { borderColor: activeGame.color }]}
+                    />
+                  ) : (
+                    <View style={[styles.favIconPlaceholder, { borderColor: activeGame.color }]}>
+                      <Text style={{ fontSize: 18 }}>{activeGame.icon}</Text>
+                    </View>
+                  )}
                   <View>
                     <Text style={styles.favName}>{fav.gameName}</Text>
                     <Text style={styles.favTag}>#{fav.tagLine}</Text>
                   </View>
                   {fav.tier && (
                     <View style={styles.favTierBadge}>
-                      <Text style={styles.favTierText}>{fav.tier} {fav.rank}</Text>
+                      <Text style={[styles.favTierText, { color: activeGame.color }]}>
+                        {fav.tier} {fav.rank}
+                      </Text>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -123,56 +189,72 @@ export default function HomeScreen({ navigation }) {
           </View>
         )}
 
-        {favorites.length === 0 && (
+        {gameFavs.length === 0 && (
           <Text style={styles.hint}>
-            Busca un invocador con formato{"\n"}
-            <Text style={{ color: "#c89b3c" }}>Nombre#TAG</Text>
+            Busca un jugador con formato{"\n"}
+            <Text style={{ color: activeGame.color }}>Nombre#TAG</Text>
             {"\n\n"}Guarda tus favoritos para acceder{"\n"}rápido desde aquí
           </Text>
         )}
+
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: "#070b12" },
-  inner:        { padding: 24, paddingTop: 60 },
-  logo:         { alignItems: "center", marginBottom: 40 },
-  logoIcon:     { fontSize: 52, marginBottom: 12 },
-  logoText:     { fontSize: 28, fontWeight: "900", color: "#dce8f5", letterSpacing: 2 },
-  logoSub:      { fontSize: 11, color: "#445566", letterSpacing: 3, marginTop: 4 },
-  searchBox:    { flexDirection: "row", gap: 10, marginBottom: 24 },
-  input:        {
+  container:          { flex: 1, backgroundColor: "#070b12" },
+  inner:              { padding: 24, paddingTop: 60 },
+  logo:               { alignItems: "center", marginBottom: 32 },
+  logoIcon:           { fontSize: 48, marginBottom: 10 },
+  logoText:           { fontSize: 28, fontWeight: "900", color: "#dce8f5", letterSpacing: 2 },
+  logoSub:            { fontSize: 11, color: "#445566", letterSpacing: 3, marginTop: 4 },
+  gameSelector:       {
+    flexDirection: "row", gap: 8,
+    marginBottom: 12, justifyContent: "center",
+  },
+  gameBtn:            {
+    flex: 1, alignItems: "center", paddingVertical: 10,
+    backgroundColor: "#0f1923", borderWidth: 1,
+    borderColor: "#1e2a3a", borderRadius: 10,
+  },
+  gameIcon:           { fontSize: 22, marginBottom: 4 },
+  gameShort:          { color: "#445566", fontWeight: "800", fontSize: 11, letterSpacing: 1 },
+  gameName:           { textAlign: "center", fontWeight: "700", fontSize: 13, marginBottom: 16 },
+  searchBox:          { flexDirection: "row", gap: 10, marginBottom: 24 },
+  input:              {
     flex: 1, backgroundColor: "#0f1923",
-    borderWidth: 1, borderColor: "#1e2a3a",
-    borderRadius: 10, padding: 14,
+    borderWidth: 1, borderRadius: 10, padding: 14,
     color: "#dce8f5", fontSize: 14,
   },
-  btn:          {
-    backgroundColor: "#c89b3c", borderRadius: 10,
-    padding: 14, justifyContent: "center", alignItems: "center", width: 50,
+  btn:                {
+    borderRadius: 10, padding: 14,
+    justifyContent: "center", alignItems: "center", width: 50,
   },
-  btnText:      { fontSize: 18 },
-  hint:         { color: "#334455", fontSize: 13, textAlign: "center", lineHeight: 22 },
-  favSection:   { marginTop: 8 },
-  favLabel:     { color: "#445566", fontSize: 10, letterSpacing: 1, marginBottom: 10 },
-  favRow:       {
+  btnText:            { fontSize: 18 },
+  hint:               { color: "#334455", fontSize: 13, textAlign: "center", lineHeight: 22 },
+  favSection:         { marginTop: 8 },
+  favLabel:           { color: "#445566", fontSize: 10, letterSpacing: 1, marginBottom: 10 },
+  favRow:             {
     flexDirection: "row", alignItems: "center",
-    backgroundColor: "#0f1923",
-    borderWidth: 1, borderColor: "#1e2a3a",
-    borderRadius: 10, marginBottom: 8,
-    overflow: "hidden",
+    backgroundColor: "#0f1923", borderWidth: 1,
+    borderColor: "#1e2a3a", borderRadius: 10,
+    marginBottom: 8, overflow: "hidden",
   },
-  favInfo:      { flex: 1, flexDirection: "row", alignItems: "center", gap: 12, padding: 12 },
-  favIcon:      { width: 36, height: 36, borderRadius: 18, borderWidth: 2, borderColor: "#c89b3c" },
-  favName:      { color: "#dce8f5", fontWeight: "700", fontSize: 14 },
-  favTag:       { color: "#556677", fontSize: 12 },
-  favTierBadge: {
+  favInfo:            { flex: 1, flexDirection: "row", alignItems: "center", gap: 12, padding: 12 },
+  favIcon:            { width: 36, height: 36, borderRadius: 18, borderWidth: 2 },
+  favIconPlaceholder: {
+    width: 36, height: 36, borderRadius: 18,
+    borderWidth: 2, backgroundColor: "#1e2a3a",
+    justifyContent: "center", alignItems: "center",
+  },
+  favName:            { color: "#dce8f5", fontWeight: "700", fontSize: 14 },
+  favTag:             { color: "#556677", fontSize: 12 },
+  favTierBadge:       {
     backgroundColor: "#0a0e17", paddingHorizontal: 8,
     paddingVertical: 3, borderRadius: 12,
   },
-  favTierText:  { color: "#c89b3c", fontSize: 11, fontWeight: "700" },
-  favRemove:    { padding: 16 },
-  favRemoveText:{ color: "#334455", fontSize: 14 },
+  favTierText:        { fontWeight: "700", fontSize: 11 },
+  favRemove:          { padding: 16 },
+  favRemoveText:      { color: "#334455", fontSize: 14 },
 });
