@@ -28,6 +28,12 @@
     "backgroundColor": "#070C0F",
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "be7b143d-54cf-4f31-9e50-62eccfb267bc"
+      }
+    },
+    "owner": "camavingaaa"
   }
 }
