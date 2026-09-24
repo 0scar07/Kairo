@@ -1,6 +1,6 @@
 import React from "react";
+import { Image } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import Icon from "./Icon";
 
 // Logos de los juegos como SVG (LoL y Valorant: Simple Icons, CC0; TFT: ícono del selector de juego del cliente
 // vía Community Dragon). Son de una sola tinta, así que toman el color que se les pase.
@@ -27,12 +27,19 @@ const LOGOS = {
   }
 };
 
-// Juegos sin logo en vectores: un ícono genérico que los represente
-const ICON_LOGOS = { brawlstars: "skull", clashroyale: "crown", clashofclans: "castle" };
+// Juegos de Supercell: el ícono de la app del juego (a color, así que no toman `color`; `muted` los atenúa)
+const IMAGE_LOGOS = {
+  brawlstars:   require("../../assets/games/brawlstars.png"),
+  clashroyale:  require("../../assets/games/clashroyale.png"),
+  clashofclans: require("../../assets/games/clashofclans.png"),
+};
 
-export default function GameLogo({ game, size, color, style }) {
+export default function GameLogo({ game, size, color, style, muted }) {
+  if (IMAGE_LOGOS[game]) {
+    return <Image source={IMAGE_LOGOS[game]} style={[{ width: size, height: size, borderRadius: size * 0.22, opacity: muted ? 0.45 : 1 }, style]} />;
+  }
   const logo = LOGOS[game];
-  if (!logo) return ICON_LOGOS[game] ? <Icon name={ICON_LOGOS[game]} size={size} color={color} style={style} /> : null;
+  if (!logo) return null;
   return (
     <Svg width={size} height={size} viewBox={logo.viewBox} style={style}>
       {logo.paths.map((d, i) => <Path key={i} d={d} fill={color} />)}

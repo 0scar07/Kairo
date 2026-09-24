@@ -158,7 +158,7 @@ export default function HomeScreen({ navigation }) {
               if (!gameEnabled(g.id)) {
                 return (
                   <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
-                    <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} />
+                    <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} muted />
                     <Text style={styles.gameShort}>{g.short}</Text>
                     <Text style={styles.soon}>PRONTO</Text>
                   </View>
@@ -171,14 +171,14 @@ export default function HomeScreen({ navigation }) {
                   onPress={() => { if (!active) { select(); setGameId(g.id); } }}
                   style={[styles.gameBtn, active && { backgroundColor: withAlpha(g.accent, 0.14), borderColor: g.accent }]}
                 >
-                  <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={active ? g.accent : colors.textMuted} />
+                  <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={active ? g.accent : colors.textMuted} muted={!active} />
                   <Text style={[styles.gameShort, active && { color: g.accent }]}>{g.short}</Text>
                 </PressableScale>
               );
             })}
             {UPCOMING_GAMES.map(g => (
               <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
-                <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} />
+                <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} muted />
                 <Text style={styles.gameShort}>{g.short}</Text>
                 <Text style={styles.soon}>PRONTO</Text>
               </View>

@@ -54,7 +54,7 @@ export default function FavoritesScreen({ navigation }) {
           <View style={styles.filters}>
             <Chip label="Todos" active={filter === "all"} onPress={() => setFilter("all")} />
             {availableGames.map(g => (
-              <Chip key={g.id} label={g.short} icon={<GameLogo game={g.id} size={sizes.avatarXs} color={filter === g.id ? g.accent : colors.textMuted} />} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
+              <Chip key={g.id} label={g.short} icon={<GameLogo game={g.id} size={sizes.avatarXs} color={filter === g.id ? g.accent : colors.textMuted} muted={filter !== g.id} />} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
             ))}
           </View>
         </Reveal>
