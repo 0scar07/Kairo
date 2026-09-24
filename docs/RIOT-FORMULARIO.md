@@ -11,7 +11,7 @@ Guía para registrar Kairo en <https://developer.riotgames.com> y pedir una key 
 | **Nombre del producto** | `Kairo` |
 | **Descripción del producto** | El texto de abajo (en inglés: es el idioma del portal y de quienes lo revisan) |
 | **Grupo de productos** | Déjalo en tu grupo por defecto (no hace falta crear otro) |
-| **URL del producto** | La página pública: `https://0scar07.github.io/Tracker/` (actívala primero; ver "Página pública") |
+| **URL del producto** | La página pública: `https://0scar07.github.io/Kairo/` (actívala primero; ver "Página pública") |
 
 ## Descripción del producto (copiar y pegar)
 
@@ -29,7 +29,7 @@ How the key is protected: the mobile app never contains the API key. Every reque
 
 What we do NOT do: we do not use Riot Sign On, collect credentials or personal data, sell or share data, show ads or gambling, or offer any real-time or in-game information; only public data from finished matches is shown. Player names and PUUIDs are masked in our server logs. We do not use Riot logos, and the app and website carry Riot's legal disclaimer.
 
-Status: the app is in active development and being tested with a small group of users; it will be released for free on Google Play. Source code: https://github.com/0scar07/Tracker. Privacy policy: https://0scar07.github.io/Tracker/privacy.html
+Status: the app is in active development and being tested with a small group of users; it will be released for free on Google Play. Source code: https://github.com/0scar07/Kairo. Privacy policy: https://0scar07.github.io/Kairo/privacy.html
 ```
 
 > Antes de enviarlo revisa que cada frase siga siendo cierta. Si cambias algo de la app (por ejemplo, añades anuncios), cambia el texto.
@@ -51,9 +51,9 @@ El repo incluye una página en [`docs/index.html`](index.html) y la política de
 
 1. En GitHub: tu repositorio → **Settings → Pages**.
 2. En **Build and deployment**: *Source* = **Deploy from a branch**, *Branch* = `main`, carpeta **`/docs`** → **Save**.
-3. Espera 1-2 minutos y abre `https://0scar07.github.io/Tracker/`.
+3. Espera 1-2 minutos y abre `https://0scar07.github.io/Kairo/`.
 
-Requiere que el repositorio sea **público** (o un plan que permita Pages en privados). Si renombras el repositorio, cambia el nombre en las URLs de este archivo.
+Requiere que el repositorio sea **público** (o un plan que permita Pages en privados). Si vuelves a renombrar el repositorio, cambia el nombre en las URLs de este archivo y de las páginas.
 
 ## Lista de comprobación antes de enviar
 
