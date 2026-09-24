@@ -29,13 +29,21 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 ## ✨ Características
 
+### Riot Games
+
 | | League of Legends | Teamfight Tactics |
 |---|---|---|
-| **Rango** | Solo/Dúo y Flex, con LP, winrate y color del tier | Ranked, Double Up y Hyper Roll |
-| **Historial** | Resultado, campeón, cola, KDA, CS y daño | Posición final 1–8, cola y duración |
+| **Rango** | Solo/Dúo y Flex con **emblema oficial**, LP, winrate y color del tier | Ranked, Double Up y Hyper Roll |
+| **Historial** | Resultado, campeón, cola, KDA, CS y daño; carga más partidas y filtra por resultado y campeón | Posición final 1–8, cola y duración |
 | **Detalle** | Los 10 jugadores con objetos, **hechizos y runas** | Los 8 jugadores con **rasgos y unidades con estrellas** |
-| **Resumen** | Winrate, KDA promedio, racha y campeón más jugado | Posición promedio, top 4 y victorias |
-| **Extras** | Filtros por resultado y campeón, estadísticas por campeón | Gráfico de posiciones recientes |
+| **Resumen** | Winrate, KDA promedio, racha y campeón más jugado; estadísticas por campeón | Posición promedio, top 4, victorias y gráfico de posiciones |
+| **Maestría y rotación** | Top 3 de campeones con nivel y puntos, rotación gratuita de la semana y aviso de mantenimiento de tu región | (no aplica) |
+| **En vivo** | **Partida en vivo**: aviso en el perfil y pantalla con los dos equipos, campeón, hechizos, runas, rango de cada jugador, baneos y cronómetro | (la API aún no está habilitada) |
+| **Mi perfil** | Tu Riot ID con insignias y gráfico de KDA | Tu Riot ID |
+
+TFT y LoL comparten la búsqueda por **Riot ID** con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada. **Valorant** llegará cuando Riot apruebe una *production key* (su API de partidas la exige).
+
+### Supercell
 
 | | Brawl Stars | Clash Royale | Clash of Clans |
 |---|---|---|---|
@@ -43,23 +51,22 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 | **Progreso** | Victorias 3v3, solo y dúo; brawlers con poder, rango y trofeos | Victorias, derrotas, winrate, 3 coronas y Senda de leyendas | Guerra, donaciones, héroes y base del constructor |
 | **Partidas** | Últimas 25 batallas con brawler, modo, mapa y trofeos | Últimas 30 batallas con marcador y trofeos; mazo actual con nivel y elixir | (la API no expone registro de batallas) |
 
-**En toda la app**
+Se buscan por **`#TAG`** y no tienen regiones.
 
-- 🔎 **Búsqueda por Riot ID** (LoL y TFT) con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada, o por **`#TAG`** en los juegos de Supercell.
-- ⭐ **Favoritos** con tarjetas (ícono, región y rango con el color del tier) y **búsquedas recientes**.
-- 👤 **Mi perfil** por juego, con insignias y gráfico de KDA en LoL.
-- 🎨 **Acento por juego** (dorado LoL, cian TFT, amarillo Brawl Stars, azul Clash Royale, verde Clash of Clans) que cambia con una transición suave y se recuerda.
-- 🚀 **Pantalla de carga animada** con progreso real de arranque y aparición escalonada de las secciones.
-- 🫧 **Skeletons**, estados vacíos amables y errores con botón de reintentar.
-- 📳 **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
-- ✨ **Sin emojis:** toda la interfaz usa íconos vectoriales propios (SVG) que se ven nítidos y toman el color del juego.
-- 🕹️ **Multijuego:** LoL y TFT (API de Riot) más **Brawl Stars, Clash Royale y Clash of Clans** (API de Supercell). Los de Supercell se buscan por `#TAG` y no tienen regiones. Cada juego se activa solo si el servidor tiene su key.
-- 🎮 **Logos e íconos oficiales de cada juego** (LoL, TFT, Valorant; Brawl Stars, Clash Royale y Clash of Clans) en el selector, recientes y favoritos.
-- 🏅 **Emblemas de rango oficiales** (Iron → Challenger) en el perfil, las tarjetas de ranked y Favoritos.
-- 📊 **LoL extra:** maestría de campeones (top 3 con nivel y puntos), rotación gratuita de la semana y aviso de mantenimiento del servidor de tu región.
-- 🔴 **Partida en vivo (LoL):** si el jugador está jugando aparece un aviso en su perfil; al tocarlo se ven los dos equipos con campeón, hechizos, runas, rango de cada uno, baneos y cronómetro (Spectator-V5).
-- 🧭 **Juegos según tu key:** el backend detecta qué APIs habilita tu key de Riot; lo que no esté habilitado aparece como "PRONTO" en vez de dar errores.
-- 🎯 **Valorant**: próximamente (su API de partidas requiere una *production key* aprobada por Riot).
+### En toda la app
+
+- **Multijuego:** cinco juegos con un módulo cada uno; las pantallas genéricas no conocen ninguno. Cada juego se activa solo si el servidor tiene su key, y lo que no esté disponible aparece como "PRONTO" en vez de dar errores.
+- **Favoritos** con tarjetas (ícono, rango o trofeos con el color del juego) y **búsquedas recientes**; funcionan igual en los cinco juegos.
+- **Identidad visual:** acento propio por juego con transición suave, logos e íconos oficiales de cada juego y **cero emojis** (íconos vectoriales propios en SVG que toman el color del juego).
+- **Pantalla de carga animada** con progreso real de arranque, aparición escalonada de las secciones, skeletons, estados vacíos amables y errores con botón de reintentar.
+- **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
+
+### Backend
+
+- **La API key nunca va en la app:** las keys de Riot y Supercell viven en el servidor (`server/.env` o variables del hosting).
+- **Caché** con deduplicación de peticiones (partidas terminadas 1 h), **cola de salida hacia Riot** que respeta el cupo de la key, límite de peticiones por IP y errores traducidos al español.
+- **Detección de juegos habilitados:** un sondeo periódico consulta qué APIs permite tu key y las publica en `/health`.
+- **Listo para la nube:** Dockerfile, `render.yaml`, cierre limpio y pruebas automáticas (`npm test`) con CI en GitHub Actions.
 
 ## 📸 Capturas
 
