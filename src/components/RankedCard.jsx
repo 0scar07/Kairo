@@ -1,64 +1,40 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { TIER_COLORS, TIER_ICONS } from "../constants/config";
+import { Card, ProgressBar, SectionLabel } from "./ui";
+import { TIER_ICONS } from "../constants/config";
 import { winrate } from "../utils/lol";
+import { colors, spacing, fontSizes, type, tracking, winrateColor, useAccent } from "../theme";
 
-export default function RankedCard({ entry, label }) {
+// Tarjeta de rango. `game` define el color de acento (LP, barra media).
+export default function RankedCard({ entry, label, game = "lol" }) {
+  const accent = useAccent(game);
   if (!entry) return null;
   const { tier, rank, leaguePoints, wins, losses } = entry;
   const wr    = winrate(wins, losses);
-  const color = TIER_COLORS[tier] || "#888";
+  const color = colors.tier[tier] || colors.textMuted;
+  const wrColor = winrateColor(wr, accent);
 
   return (
-    <View style={[styles.card, { borderLeftColor: color }]}>
-      <Text style={styles.queueLabel}>{label}</Text>
+    <Card accent={color} style={styles.card}>
+      <SectionLabel>{label}</SectionLabel>
       <Text style={styles.tierIcon}>{TIER_ICONS[tier] || "🏆"}</Text>
       <Text style={[styles.tierText, { color }]}>{tier} {rank}</Text>
-      <Text style={styles.lpText}>{leaguePoints} LP</Text>
+      <Text style={[styles.lpText, { color: accent }]}>{leaguePoints} LP</Text>
       <Text style={styles.record}>
-        {wins}W / {losses}L{"  "}
-        <Text style={{ color: wr >= 55 ? "#4fc97a" : wr >= 50 ? "#c89b3c" : "#e05555", fontWeight: "700" }}>
-          {wr}%
-        </Text>
+        {wins}V / {losses}D{"  "}
+        <Text style={[styles.wr, { color: wrColor }]}>{wr}%</Text>
       </Text>
-      {/* Barra de winrate */}
-      <View style={styles.barBg}>
-        <View style={[styles.barFill, {
-          width: `${wr}%`,
-          backgroundColor: wr >= 55 ? "#4fc97a" : wr >= 50 ? "#c89b3c" : "#e05555",
-        }]} />
-      </View>
-    </View>
+      <ProgressBar value={wr} color={wrColor} glowing style={styles.bar} />
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    backgroundColor: "#0f1923",
-    borderRadius: 10,
-    padding: 14,
-    borderLeftWidth: 3,
-    borderTopWidth: 1,
-    borderRightWidth: 1,
-    borderBottomWidth: 1,
-    borderTopColor: "#1e2a3a",
-    borderRightColor: "#1e2a3a",
-    borderBottomColor: "#1e2a3a",
-  },
-  queueLabel: {
-    color: "#445566",
-    fontSize: 10,
-    letterSpacing: 1,
-    marginBottom: 6,
-  },
-  tierIcon: { fontSize: 22, marginBottom: 4 },
-  tierText: { fontWeight: "800", fontSize: 15, letterSpacing: 1 },
-  lpText:   { color: "#c89b3c", fontWeight: "700", fontSize: 13 },
-  record:   { color: "#8899aa", fontSize: 11, marginTop: 6 },
-  barBg: {
-    marginTop: 8, height: 4, borderRadius: 2,
-    backgroundColor: "#1e2a3a", overflow: "hidden",
-  },
-  barFill: { height: "100%", borderRadius: 2 },
+  card:     { flex: 1, marginBottom: 0 },
+  tierIcon: { fontSize: fontSizes.xxl, marginBottom: spacing.xs },
+  tierText: { ...type.heading, letterSpacing: tracking.wide },
+  lpText:   { ...type.bodyStrong },
+  record:   { ...type.caption, color: colors.textSecondary, marginTop: spacing.sm },
+  wr:       { ...type.captionStrong },
+  bar:      { marginTop: spacing.sm },
 });

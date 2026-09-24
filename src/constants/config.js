@@ -16,13 +16,6 @@ export const LEGACY_KEYS = {
   [MY_PROFILE_KEY]: ["ggtracker_my_profile"],
 };
 
-export const TIER_COLORS = {
-  IRON: "#8a8a8a", BRONZE: "#cd7f32", SILVER: "#a8a9ad",
-  GOLD: "#FFD700", PLATINUM: "#00d4aa", EMERALD: "#50C878",
-  DIAMOND: "#b9f2ff", MASTER: "#9b59b6", GRANDMASTER: "#e74c3c",
-  CHALLENGER: "#f1c40f",
-};
-
 export const TIER_ICONS = {
   IRON: "⚫", BRONZE: "🟤", SILVER: "⚪", GOLD: "🟡",
   PLATINUM: "🔵", EMERALD: "🟢", DIAMOND: "💎",

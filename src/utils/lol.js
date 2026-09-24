@@ -13,6 +13,10 @@ export function winrate(wins, losses) {
   return total ? Math.round((wins / total) * 100) : 0;
 }
 
+// KDA como texto: "Perfect" si no hay muertes
+export const kdaRatio = (kills, deaths, assists) =>
+  deaths === 0 ? "Perfect" : ((kills + assists) / deaths).toFixed(2);
+
 const QUEUES = {
   400: "Normal", 430: "Normal", 490: "Normal", 480: "Swiftplay",
   420: "Solo/Dúo", 440: "Flex",
@@ -34,4 +38,74 @@ export function errorMessage(e, fallback = "Ocurrió un error inesperado") {
   if (e?.response?.data?.error) return e.response.data.error;
   if (e?.code === "ERR_NETWORK" || e?.message === "Network Error") return "Sin conexión con el servidor";
   return e?.message || fallback;
+}
+
+// ─── Estadísticas de LoL a partir de las partidas ────────────────────────────
+export const findMe = (match, puuid) =>
+  match.info?.participants?.find(p => p.puuid === puuid);
+
+export function getChampionStats(matches, puuid) {
+  const stats = {};
+  matches.forEach(m => {
+    const me = findMe(m, puuid);
+    if (!me) return;
+    const c = me.championName;
+    if (!stats[c]) stats[c] = { games: 0, wins: 0, kills: 0, deaths: 0, assists: 0, damage: 0 };
+    stats[c].games++;
+    if (me.win) stats[c].wins++;
+    stats[c].kills   += me.kills;
+    stats[c].deaths  += me.deaths;
+    stats[c].assists += me.assists;
+    stats[c].damage  += me.totalDamageDealtToChampions;
+  });
+  return Object.entries(stats)
+    .map(([name, s]) => ({
+      name,
+      games:   s.games,
+      wr:      Math.round((s.wins / s.games) * 100),
+      kda:     kdaRatio(s.kills, s.deaths, s.assists),
+      kills:   (s.kills   / s.games).toFixed(1),
+      deaths:  (s.deaths  / s.games).toFixed(1),
+      assists: (s.assists / s.games).toFixed(1),
+      avgDmg:  Math.round(s.damage / s.games),
+    }))
+    .sort((a, b) => b.games - a.games);
+}
+
+export function getOverallStats(matches, puuid) {
+  if (!matches?.length) return null;
+  let wins = 0, kills = 0, deaths = 0, assists = 0, games = 0;
+  matches.forEach(m => {
+    const me = findMe(m, puuid);
+    if (!me) return;
+    games++;
+    if (me.win) wins++;
+    kills   += me.kills;
+    deaths  += me.deaths;
+    assists += me.assists;
+  });
+  if (!games) return null;
+  return {
+    games, wr: Math.round((wins / games) * 100),
+    wins, losses: games - wins,
+    kda:        kdaRatio(kills, deaths, assists),
+    avgKills:   (kills   / games).toFixed(1),
+    avgDeaths:  (deaths  / games).toFixed(1),
+    avgAssists: (assists / games).toFixed(1),
+  };
+}
+
+export function getStreak(matches, puuid) {
+  if (!matches?.length) return null;
+  const first = findMe(matches[0], puuid);
+  if (!first) return null;
+  const isWin = first.win;
+  let count = 0;
+  for (const m of matches) {
+    const me = findMe(m, puuid);
+    if (!me || me.win !== isWin) break;
+    count++;
+  }
+  if (count < 2) return null;
+  return { isWin, count };
 }

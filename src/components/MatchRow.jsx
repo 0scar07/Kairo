@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { championIcon } from "../api/ddragon";
-import { csOf, queueLabel } from "../utils/lol";
+import { csOf, queueLabel, kdaRatio as calcKda } from "../utils/lol";
+import { colors, radii, sizes, spacing, fontSizes, type, tracking, kdaColor, useAccent } from "../theme";
 
 function timeSince(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -16,31 +17,34 @@ function formatDuration(s) {
 }
 
 export default function MatchRow({ match, myPuuid, onPress, expanded }) {
+  const accent = useAccent("lol");
   if (!match?.info) return null;
   const me = match.info.participants.find(p => p.puuid === myPuuid);
   if (!me) return null;
 
-  const win      = me.win;
-  const kda      = `${me.kills}/${me.deaths}/${me.assists}`;
-  const kdaRatio = me.deaths === 0
-    ? "Perfect"
-    : ((me.kills + me.assists) / me.deaths).toFixed(2);
+  const win         = me.win;
+  const resultColor = win ? colors.win : colors.loss;
+  const kda         = `${me.kills}/${me.deaths}/${me.assists}`;
+  const kdaRatio    = calcKda(me.kills, me.deaths, me.assists);
   const dmg = Math.round(me.totalDamageDealtToChampions / 1000);
   const ago = timeSince(match.info.gameCreation);
   const dur = formatDuration(match.info.gameDuration);
-  const champImg = championIcon(me.championName);
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.row, { borderLeftColor: win ? "#4fc97a" : "#e05555",
-        backgroundColor: expanded ? (win ? "#0d2a1a" : "#2a0d0d") : (win ? "#0a1f14" : "#1f0a0a") }]}
+      style={[styles.row, {
+        borderLeftColor: resultColor,
+        backgroundColor: expanded
+          ? (win ? colors.winBgStrong : colors.lossBgStrong)
+          : (win ? colors.winBg : colors.lossBg),
+      }]}
       activeOpacity={0.7}
     >
-      <Image source={{ uri: champImg }} style={styles.champImg} />
+      <Image source={{ uri: championIcon(me.championName) }} style={styles.champImg} />
       <View style={styles.info}>
         <View style={styles.topRow}>
-          <Text style={[styles.result, { color: win ? "#4fc97a" : "#e05555" }]}>
+          <Text style={[styles.result, { color: resultColor }]}>
             {win ? "VICTORIA" : "DERROTA"}
           </Text>
           <Text style={styles.meta}>{dur} · {ago}</Text>
@@ -50,13 +54,10 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
       </View>
       <View style={styles.kdaBlock}>
         <Text style={styles.kdaText}>{kda}</Text>
-        <Text style={[styles.kdaRatio, {
-          color: kdaRatio === "Perfect" ? "#f1c40f"
-               : parseFloat(kdaRatio) >= 3 ? "#4fc97a" : "#8899aa",
-        }]}>{kdaRatio} KDA</Text>
+        <Text style={[styles.kdaRatio, { color: kdaColor(kdaRatio) }]}>{kdaRatio} KDA</Text>
       </View>
       <View style={styles.dmgBlock}>
-        <Text style={styles.dmgText}>{dmg}k dmg</Text>
+        <Text style={[styles.dmgText, { color: accent }]}>{dmg}k dmg</Text>
         <Text style={styles.csText}>{csOf(me)} CS</Text>
       </View>
     </TouchableOpacity>
@@ -66,20 +67,20 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row", alignItems: "center",
-    gap: 12, padding: 10, paddingHorizontal: 14,
-    borderLeftWidth: 3, borderRadius: 8, marginBottom: 4,
+    gap: spacing.md, padding: spacing.md, paddingHorizontal: spacing.lg,
+    borderLeftWidth: sizes.borderAccent, borderRadius: radii.md, marginBottom: spacing.xs,
   },
-  champImg: { width: 40, height: 40, borderRadius: 6 },
+  champImg: { width: sizes.avatarLg, height: sizes.avatarLg, borderRadius: radii.sm, backgroundColor: colors.surfaceHigh },
   info:     { flex: 1 },
-  topRow:   { flexDirection: "row", alignItems: "center", gap: 8 },
-  result:   { fontWeight: "800", fontSize: 12, letterSpacing: 1 },
-  meta:     { color: "#556677", fontSize: 11 },
-  champName:{ color: "#dce8f5", fontWeight: "700", fontSize: 13, marginTop: 2 },
-  queue:    { color: "#556677", fontSize: 10, marginTop: 1 },
+  topRow:   { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  result:   { ...type.label, fontSize: fontSizes.sm, letterSpacing: tracking.wide },
+  meta:     { ...type.caption, color: colors.textMuted },
+  champName:{ ...type.bodyStrong, color: colors.text, marginTop: spacing.xxs },
+  queue:    { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
   kdaBlock: { alignItems: "flex-end" },
-  kdaText:  { color: "#dce8f5", fontWeight: "700", fontSize: 13 },
-  kdaRatio: { fontSize: 11 },
-  dmgBlock: { alignItems: "flex-end", minWidth: 55 },
-  dmgText:  { color: "#c89b3c", fontSize: 12, fontWeight: "600" },
-  csText:   { color: "#556677", fontSize: 11 },
+  kdaText:  { ...type.bodyStrong, color: colors.text },
+  kdaRatio: { ...type.caption },
+  dmgBlock: { alignItems: "flex-end", minWidth: spacing.xxxl + spacing.sm },
+  dmgText:  { ...type.smallStrong },
+  csText:   { ...type.caption, color: colors.textMuted },
 });

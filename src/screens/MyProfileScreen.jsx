@@ -1,152 +1,74 @@
 import React, { useState, useEffect } from "react";
 import {
-  View, Text, ScrollView, StyleSheet,
-  RefreshControl, Image, TouchableOpacity, Alert,
-  TextInput, Modal, Dimensions,
+  View, Text, ScrollView, StyleSheet, RefreshControl, Image,
+  TouchableOpacity, Alert, TextInput, Modal, Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LineChart } from "react-native-chart-kit";
+import RankedCard from "../components/RankedCard";
+import ChampionStatsRow from "../components/ChampionStatsRow";
+import { Card, SectionLabel, SegmentedTabs, ProfileHeader } from "../components/ui";
 import { searchPlayer } from "../api/riot";
-import { TIER_COLORS, TIER_ICONS, MY_PROFILE_KEY } from "../constants/config";
 import { championIcon, profileIconUrl } from "../api/ddragon";
-import { errorMessage, queueLabel, winrate } from "../utils/lol";
+import { MY_PROFILE_KEY, TIER_ICONS } from "../constants/config";
+import { errorMessage, findMe, getChampionStats, queueLabel, winrate } from "../utils/lol";
+import {
+  colors, accents, radii, sizes, spacing, fontSizes, lineHeights, type, kdaColor, winrateColor, useAccent, withAlpha, glow,
+} from "../theme";
 
-const SCREEN_WIDTH   = Dimensions.get("window").width - 32;
+const GAME = "lol";
+const CHART_WIDTH = Dimensions.get("window").width - spacing.xl - spacing.xxl - spacing.lg;
 
-function getChampionStats(matches, puuid) {
-  const stats = {};
-  matches.forEach(m => {
-    const me = m.info?.participants?.find(p => p.puuid === puuid);
-    if (!me) return;
-    const c = me.championName;
-    if (!stats[c]) stats[c] = { games: 0, wins: 0, kills: 0, deaths: 0, assists: 0, damage: 0 };
-    stats[c].games++;
-    if (me.win) stats[c].wins++;
-    stats[c].kills   += me.kills;
-    stats[c].deaths  += me.deaths;
-    stats[c].assists += me.assists;
-    stats[c].damage  += me.totalDamageDealtToChampions;
-  });
-  return Object.entries(stats)
-    .map(([name, s]) => ({
-      name,
-      games:   s.games,
-      wr:      Math.round((s.wins / s.games) * 100),
-      kda:     s.deaths === 0 ? "Perfect" : ((s.kills + s.assists) / s.deaths).toFixed(2),
-      kills:   (s.kills   / s.games).toFixed(1),
-      deaths:  (s.deaths  / s.games).toFixed(1),
-      assists: (s.assists / s.games).toFixed(1),
-      avgDmg:  Math.round(s.damage / s.games),
-    }))
-    .sort((a, b) => b.games - a.games);
-}
+const TABS = [
+  { key: "campeones", label: "🏆 CAMPEONES" },
+  { key: "historial", label: "🎮 HISTORIAL" },
+];
 
-function getBadges(matches, puuid, champStats) {
+function getBadges(me, champStats) {
   const badges = [];
-  const me = matches.map(m => m.info?.participants?.find(p => p.puuid === puuid)).filter(Boolean);
   if (!me.length) return badges;
   const avgKda     = me.reduce((a, p) => a + (p.deaths === 0 ? 5 : (p.kills + p.assists) / p.deaths), 0) / me.length;
   const avgDmg     = me.reduce((a, p) => a + p.totalDamageDealtToChampions, 0) / me.length;
-  const wins       = me.filter(p => p.win).length;
-  const wr         = (wins / me.length) * 100;
+  const wr         = (me.filter(p => p.win).length / me.length) * 100;
   const pentakills = me.reduce((a, p) => a + (p.pentaKills || 0), 0);
   const topChamp   = champStats[0];
-  if (avgKda >= 4)        badges.push({ icon: "⚡", label: "KDA Machine",   color: "#f1c40f" });
-  if (avgDmg >= 25000)    badges.push({ icon: "💥", label: "Damage Dealer",  color: "#e05555" });
-  if (wr >= 60)           badges.push({ icon: "🏆", label: "Win Streak God", color: "#4fc97a" });
-  if (pentakills > 0)     badges.push({ icon: "👑", label: "Pentakill",       color: "#c89b3c" });
-  if (topChamp?.wr >= 65) badges.push({ icon: "🎯", label: "One Trick",       color: "#0bc4e3" });
-  if (me.length >= 20)    badges.push({ icon: "🔥", label: "Grinder",         color: "#ff6b35" });
+  if (avgKda >= 4)        badges.push({ icon: "⚡", label: "KDA Machine",    color: colors.gold });
+  if (avgDmg >= 25000)    badges.push({ icon: "💥", label: "Damage Dealer",  color: colors.loss });
+  if (wr >= 60)           badges.push({ icon: "🏆", label: "Win Streak God", color: colors.win });
+  if (pentakills > 0)     badges.push({ icon: "👑", label: "Pentakill",      color: accents.lol });
+  if (topChamp?.wr >= 65) badges.push({ icon: "🎯", label: "One Trick",      color: accents.tft });
+  if (me.length >= 20)    badges.push({ icon: "🔥", label: "Grinder",        color: colors.orange });
   return badges;
 }
 
 function Badge({ badge }) {
   return (
-    <View style={[badgeStyles.container, { borderColor: badge.color }]}>
-      <Text style={badgeStyles.icon}>{badge.icon}</Text>
-      <Text style={[badgeStyles.label, { color: badge.color }]}>{badge.label}</Text>
+    <View style={[styles.badge, { borderColor: badge.color }]}>
+      <Text style={styles.badgeIcon}>{badge.icon}</Text>
+      <Text style={[styles.badgeLabel, { color: badge.color }]}>{badge.label}</Text>
     </View>
   );
 }
-
-const badgeStyles = StyleSheet.create({
-  container: {
-    flexDirection: "row", alignItems: "center", gap: 6,
-    paddingHorizontal: 10, paddingVertical: 6,
-    borderRadius: 20, borderWidth: 1,
-    backgroundColor: "#0a0e17", marginRight: 8, marginBottom: 8,
-  },
-  icon:  { fontSize: 14 },
-  label: { fontSize: 11, fontWeight: "700" },
-});
-
-function ChampRow({ champ, rank }) {
-  const rankColors = ["#FFD700", "#C0C0C0", "#cd7f32"];
-  return (
-    <View style={champStyles.row}>
-      <Text style={[champStyles.rank, { color: rankColors[rank] || "#445566" }]}>#{rank + 1}</Text>
-      <Image
-        source={{ uri: championIcon(champ.name) }}
-        style={champStyles.img}
-      />
-      <View style={{ flex: 1 }}>
-        <Text style={champStyles.name}>{champ.name}</Text>
-        <Text style={champStyles.games}>{champ.games} partidas · {Math.round(champ.avgDmg / 1000)}k dmg prom</Text>
-      </View>
-      <View style={champStyles.kdaBlock}>
-        <Text style={champStyles.kdaText}>{champ.kills}/{champ.deaths}/{champ.assists}</Text>
-        <Text style={[champStyles.kdaRatio, {
-          color: champ.kda === "Perfect" ? "#f1c40f" : parseFloat(champ.kda) >= 3 ? "#4fc97a" : "#8899aa",
-        }]}>{champ.kda} KDA</Text>
-      </View>
-      <View style={champStyles.wrBlock}>
-        <Text style={[champStyles.wr, {
-          color: champ.wr >= 55 ? "#4fc97a" : champ.wr >= 50 ? "#c89b3c" : "#e05555",
-        }]}>{champ.wr}%</Text>
-        <View style={champStyles.barBg}>
-          <View style={[champStyles.barFill, {
-            width: `${champ.wr}%`,
-            backgroundColor: champ.wr >= 55 ? "#4fc97a" : champ.wr >= 50 ? "#c89b3c" : "#e05555",
-          }]} />
-        </View>
-      </View>
-    </View>
-  );
-}
-
-const champStyles = StyleSheet.create({
-  row:      { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#1e2a3a" },
-  rank:     { fontWeight: "900", fontSize: 14, minWidth: 24 },
-  img:      { width: 40, height: 40, borderRadius: 8 },
-  name:     { color: "#dce8f5", fontWeight: "700", fontSize: 13 },
-  games:    { color: "#556677", fontSize: 11, marginTop: 2 },
-  kdaBlock: { alignItems: "flex-end" },
-  kdaText:  { color: "#dce8f5", fontSize: 12, fontWeight: "600" },
-  kdaRatio: { fontSize: 11 },
-  wrBlock:  { alignItems: "flex-end", minWidth: 45 },
-  wr:       { fontWeight: "800", fontSize: 14 },
-  barBg:    { width: 40, height: 3, backgroundColor: "#1e2a3a", borderRadius: 2, marginTop: 3 },
-  barFill:  { height: "100%", borderRadius: 2 },
-});
 
 function SetupModal({ visible, onSave }) {
+  const accent = useAccent(GAME);
   const [name, setName] = useState("");
   const [tag,  setTag]  = useState("");
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <View style={modalStyles.overlay}>
-        <View style={modalStyles.container}>
-          <Text style={modalStyles.title}>⚔️ Mi Perfil</Text>
-          <Text style={modalStyles.subtitle}>
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <Text style={styles.modalTitle}>⚔️ Mi Perfil</Text>
+          <Text style={styles.modalSubtitle}>
             Ingresa tu Riot ID para configurar tu perfil personal
           </Text>
           <TextInput
             value={name}
             onChangeText={setName}
             placeholder="Nombre (ej: Faker)"
-            placeholderTextColor="#334455"
-            style={modalStyles.input}
+            placeholderTextColor={colors.textFaint}
+            style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}
           />
@@ -154,13 +76,13 @@ function SetupModal({ visible, onSave }) {
             value={tag}
             onChangeText={setTag}
             placeholder="TAG (ej: KR1)"
-            placeholderTextColor="#334455"
-            style={modalStyles.input}
+            placeholderTextColor={colors.textFaint}
+            style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}
           />
           <TouchableOpacity
-            style={modalStyles.btn}
+            style={[styles.modalBtn, { backgroundColor: accent }, glow(accent, spacing.md, 0.4)]}
             onPress={() => {
               if (!name || !tag) {
                 Alert.alert("Error", "Ingresa tu nombre y TAG");
@@ -169,13 +91,10 @@ function SetupModal({ visible, onSave }) {
               onSave(name, tag);
             }}
           >
-            <Text style={modalStyles.btnText}>Guardar perfil</Text>
+            <Text style={styles.modalBtnText}>Guardar perfil</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={modalStyles.cancelBtn}
-            onPress={() => onSave(null, null)}
-          >
-            <Text style={modalStyles.cancelText}>Cancelar</Text>
+          <TouchableOpacity style={styles.cancelBtn} onPress={() => onSave(null, null)}>
+            <Text style={styles.cancelText}>Cancelar</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -183,24 +102,13 @@ function SetupModal({ visible, onSave }) {
   );
 }
 
-const modalStyles = StyleSheet.create({
-  overlay:    { flex: 1, backgroundColor: "#000000aa", justifyContent: "center", alignItems: "center", padding: 24 },
-  container:  { backgroundColor: "#0f1923", borderRadius: 16, padding: 24, width: "100%", borderWidth: 1, borderColor: "#1e2a3a" },
-  title:      { color: "#dce8f5", fontWeight: "900", fontSize: 22, marginBottom: 8 },
-  subtitle:   { color: "#556677", fontSize: 13, marginBottom: 20, lineHeight: 20 },
-  input:      { backgroundColor: "#0a0e17", borderWidth: 1, borderColor: "#1e2a3a", borderRadius: 10, padding: 14, color: "#dce8f5", fontSize: 14, marginBottom: 12 },
-  btn:        { backgroundColor: "#c89b3c", borderRadius: 10, padding: 14, alignItems: "center", marginTop: 4 },
-  btnText:    { color: "#0a0e17", fontWeight: "800", fontSize: 15 },
-  cancelBtn:  { marginTop: 10, padding: 14, alignItems: "center" },
-  cancelText: { color: "#445566", fontSize: 14 },
-});
-
 export default function MyProfileScreen() {
+  const accent = useAccent(GAME);
   const [data,       setData]       = useState(null);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showSetup,  setShowSetup]  = useState(false);
-  const [activeTab,  setActiveTab]  = useState("stats");
+  const [activeTab,  setActiveTab]  = useState("campeones");
 
   useEffect(() => { loadProfile(); }, []);
 
@@ -250,15 +158,15 @@ export default function MyProfileScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>⚔️ Cargando perfil...</Text>
+      <View style={styles.center}>
+        <Text style={[styles.loadingText, { color: accent }]}>⚔️ Cargando perfil...</Text>
       </View>
     );
   }
 
   if (!data) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.center}>
         <SetupModal visible={showSetup} onSave={(n, t) => {
           setShowSetup(false);
           if (n && t) fetchProfile(n, t);
@@ -271,14 +179,12 @@ export default function MyProfileScreen() {
   const soloQ      = ranked?.find(r => r.queueType === "RANKED_SOLO_5x5");
   const flex       = ranked?.find(r => r.queueType === "RANKED_FLEX_SR");
   const champStats = getChampionStats(matches || [], account.puuid);
-  const badges     = getBadges(matches || [], account.puuid, champStats);
 
-  const me         = (matches || []).map(m => m.info?.participants?.find(p => p.puuid === account.puuid)).filter(Boolean);
+  const me         = (matches || []).map(m => findMe(m, account.puuid)).filter(Boolean);
+  const badges     = getBadges(me, champStats);
   const wins       = me.filter(p => p.win).length;
-  const wr         = me.length ? Math.round((wins / me.length) * 100) : 0;
-  const avgKills   = me.length ? (me.reduce((a, p) => a + p.kills,   0) / me.length).toFixed(1) : 0;
-  const avgDeaths  = me.length ? (me.reduce((a, p) => a + p.deaths,  0) / me.length).toFixed(1) : 0;
-  const avgAssists = me.length ? (me.reduce((a, p) => a + p.assists, 0) / me.length).toFixed(1) : 0;
+  const wr         = winrate(wins, me.length - wins);
+  const avg        = key => (me.length ? (me.reduce((a, p) => a + p[key], 0) / me.length).toFixed(1) : 0);
   const avgDmg     = me.length ? Math.round(me.reduce((a, p) => a + p.totalDamageDealtToChampions, 0) / me.length / 1000) : 0;
   const bestKda    = me.reduce((best, p) => {
     const kda = p.deaths === 0 ? 99 : (p.kills + p.assists) / p.deaths;
@@ -288,200 +194,139 @@ export default function MyProfileScreen() {
   const chartData = {
     labels: me.slice(-10).map(() => ""),
     datasets: [{
-      data: me.slice(-10).map(p => p.deaths === 0 ? 5 : parseFloat(((p.kills + p.assists) / p.deaths).toFixed(1))),
-      color: (opacity = 1) => `rgba(200, 155, 60, ${opacity})`,
+      data: me.slice(-10).map(p => (p.deaths === 0 ? 5 : parseFloat(((p.kills + p.assists) / p.deaths).toFixed(1)))),
+      color: (opacity = 1) => withAlpha(accent, opacity),
       strokeWidth: 2,
     }],
   };
 
+  const statBoxes = [
+    { label: "Winrate",    value: `${wr}%`,                                     color: winrateColor(wr, accent) },
+    { label: "KDA Prom.",  value: `${avg("kills")}/${avg("deaths")}/${avg("assists")}`, color: colors.text },
+    { label: "Mejor KDA",  value: bestKda,                                      color: colors.gold },
+    { label: "Daño Prom.", value: `${avgDmg}k`,                                 color: colors.loss },
+    { label: "Victorias",  value: wins,                                         color: colors.win },
+    { label: "Partidas",   value: me.length,                                    color: colors.text },
+  ];
+
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#c89b3c" />
-      }
+      contentContainerStyle={styles.content}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
       <SetupModal visible={showSetup} onSave={(n, t) => {
         setShowSetup(false);
         if (n && t) fetchProfile(n, t);
       }} />
 
-      {/* Header */}
-      <View style={styles.profileHeader}>
-        <Image
-          source={{ uri: profileIconUrl(summoner.profileIconId) }}
-          style={styles.profileImg}
-        />
-        <View style={{ flex: 1, marginLeft: 14 }}>
-          <Text style={styles.gameName}>{account.gameName}</Text>
-          <Text style={styles.tagLine}>#{account.tagLine}</Text>
-          <Text style={styles.level}>Nivel {summoner.summonerLevel}</Text>
-          {soloQ && (
-            <View style={[styles.tierBadge, { borderColor: TIER_COLORS[soloQ.tier] }]}>
-              <Text style={[styles.tierText, { color: TIER_COLORS[soloQ.tier] }]}>
-                {TIER_ICONS[soloQ.tier]} {soloQ.tier} {soloQ.rank} · {soloQ.leaguePoints} LP
-              </Text>
-            </View>
-          )}
-        </View>
-        <TouchableOpacity onPress={() => setShowSetup(true)} style={styles.editBtn}>
-          <Text style={styles.editText}>✏️</Text>
-        </TouchableOpacity>
-      </View>
+      <ProfileHeader
+        game={GAME}
+        avatar={
+          <Image
+            source={{ uri: profileIconUrl(summoner.profileIconId) }}
+            style={[styles.profileImg, { borderColor: accent }, glow(accent, spacing.md, 0.35)]}
+          />
+        }
+        name={account.gameName}
+        tag={account.tagLine}
+        subtitle={`Nivel ${summoner.summonerLevel}`}
+        badge={soloQ ? `${TIER_ICONS[soloQ.tier] || ""} ${soloQ.tier} ${soloQ.rank} · ${soloQ.leaguePoints} LP` : null}
+        action="✏️"
+        onAction={() => setShowSetup(true)}
+      />
 
-      {/* Insignias */}
       {badges.length > 0 && (
-        <View style={styles.card}>
-          <Text style={styles.sectionLabel}>🏅 INSIGNIAS</Text>
+        <Card>
+          <SectionLabel>🏅 Insignias</SectionLabel>
           <View style={styles.badgesRow}>
-            {badges.map((b, i) => <Badge key={i} badge={b} />)}
+            {badges.map(b => <Badge key={b.label} badge={b} />)}
           </View>
-        </View>
+        </Card>
       )}
 
-      {/* Ranked */}
       {(soloQ || flex) && (
         <View style={styles.rankedRow}>
-          {soloQ && (
-            <View style={[styles.rankedCard, { borderLeftColor: TIER_COLORS[soloQ.tier] || "#888" }]}>
-              <Text style={styles.sectionLabel}>SOLO / DUO</Text>
-              <Text style={{ fontSize: 28 }}>{TIER_ICONS[soloQ.tier]}</Text>
-              <Text style={[styles.tierBig, { color: TIER_COLORS[soloQ.tier] }]}>{soloQ.tier} {soloQ.rank}</Text>
-              <Text style={styles.lpText}>{soloQ.leaguePoints} LP</Text>
-              <Text style={styles.recordText}>{soloQ.wins}V / {soloQ.losses}D</Text>
-              <View style={styles.barBg}>
-                <View style={[styles.barFill, {
-                  width: `${winrate(soloQ.wins, soloQ.losses)}%`,
-                  backgroundColor: TIER_COLORS[soloQ.tier],
-                }]} />
-              </View>
-            </View>
-          )}
-          {flex && (
-            <View style={[styles.rankedCard, { borderLeftColor: TIER_COLORS[flex.tier] || "#888" }]}>
-              <Text style={styles.sectionLabel}>FLEX 5v5</Text>
-              <Text style={{ fontSize: 28 }}>{TIER_ICONS[flex.tier]}</Text>
-              <Text style={[styles.tierBig, { color: TIER_COLORS[flex.tier] }]}>{flex.tier} {flex.rank}</Text>
-              <Text style={styles.lpText}>{flex.leaguePoints} LP</Text>
-              <Text style={styles.recordText}>{flex.wins}V / {flex.losses}D</Text>
-              <View style={styles.barBg}>
-                <View style={[styles.barFill, {
-                  width: `${winrate(flex.wins, flex.losses)}%`,
-                  backgroundColor: TIER_COLORS[flex.tier],
-                }]} />
-              </View>
-            </View>
-          )}
+          {soloQ && <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />}
+          {flex  && <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />}
         </View>
       )}
 
-      {/* Stats generales */}
-      <View style={styles.card}>
-        <Text style={styles.sectionLabel}>📊 ESTADÍSTICAS GENERALES</Text>
+      <Card>
+        <SectionLabel>📊 Estadísticas generales</SectionLabel>
         <View style={styles.statsGrid}>
-          <View style={styles.statBox}>
-            <Text style={[styles.statNum, { color: wr >= 55 ? "#4fc97a" : wr >= 50 ? "#c89b3c" : "#e05555" }]}>{wr}%</Text>
-            <Text style={styles.statLabel}>Winrate</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNum}>{avgKills}/{avgDeaths}/{avgAssists}</Text>
-            <Text style={styles.statLabel}>KDA Prom.</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={[styles.statNum, { color: "#f1c40f" }]}>{bestKda}</Text>
-            <Text style={styles.statLabel}>Mejor KDA</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={[styles.statNum, { color: "#e05555" }]}>{avgDmg}k</Text>
-            <Text style={styles.statLabel}>Daño Prom.</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={[styles.statNum, { color: "#4fc97a" }]}>{wins}</Text>
-            <Text style={styles.statLabel}>Victorias</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statNum}>{me.length}</Text>
-            <Text style={styles.statLabel}>Partidas</Text>
-          </View>
+          {statBoxes.map(s => (
+            <View key={s.label} style={styles.statBox}>
+              <Text style={[styles.statNum, { color: s.color }]}>{s.value}</Text>
+              <Text style={styles.statLabel}>{s.label.toUpperCase()}</Text>
+            </View>
+          ))}
         </View>
-      </View>
+      </Card>
 
-      {/* Gráfica KDA */}
       {me.length >= 3 && (
-        <View style={styles.card}>
-          <Text style={styles.sectionLabel}>📈 KDA ÚLTIMAS {Math.min(me.length, 10)} PARTIDAS</Text>
+        <Card>
+          <SectionLabel>📈 KDA últimas {Math.min(me.length, 10)} partidas</SectionLabel>
           <LineChart
             data={chartData}
-            width={SCREEN_WIDTH - 28}
-            height={120}
+            width={CHART_WIDTH}
+            height={sizes.chart}
             chartConfig={{
-              backgroundColor: "#0f1923",
-              backgroundGradientFrom: "#0f1923",
-              backgroundGradientTo: "#0f1923",
+              backgroundColor: colors.surface,
+              backgroundGradientFrom: colors.surface,
+              backgroundGradientTo: colors.surface,
               decimalPlaces: 1,
-              color: (opacity = 1) => `rgba(200, 155, 60, ${opacity})`,
-              labelColor: () => "#445566",
+              color: (opacity = 1) => withAlpha(accent, opacity),
+              labelColor: () => colors.textMuted,
               propsForDots: { r: "4" },
             }}
             bezier
-            style={{ borderRadius: 8 }}
-            withHorizontalLabels={true}
+            style={{ borderRadius: radii.md }}
+            withHorizontalLabels
             withVerticalLabels={false}
-            withDots={true}
+            withDots
             withInnerLines={false}
             withOuterLines={false}
           />
-        </View>
+        </Card>
       )}
 
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        {["campeones", "historial"].map(tab => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.tab, activeTab === tab && styles.tabActive]}
-            onPress={() => setActiveTab(tab)}
-          >
-            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-              {tab === "campeones" ? "🏆 CAMPEONES" : "🎮 HISTORIAL"}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <SegmentedTabs tabs={TABS} value={activeTab} onChange={setActiveTab} game={GAME} />
 
-      {/* Tab Campeones */}
       {activeTab === "campeones" && (
-        <View style={styles.card}>
+        <Card>
           {champStats.slice(0, 7).map((c, i) => (
-            <ChampRow key={c.name} champ={c} rank={i} />
+            <ChampionStatsRow
+              key={c.name}
+              champ={c}
+              rank={i}
+              game={GAME}
+              detail={`${c.games} partidas · ${Math.round(c.avgDmg / 1000)}k dmg prom`}
+            />
           ))}
-        </View>
+        </Card>
       )}
 
-      {/* Tab Historial */}
       {activeTab === "historial" && (
         <View>
           {(matches || []).map(m => {
-            const p = m.info?.participants?.find(x => x.puuid === account.puuid);
+            const p = findMe(m, account.puuid);
             if (!p) return null;
+            const resultColor = p.win ? colors.win : colors.loss;
             return (
               <View key={m.metadata.matchId} style={[styles.histRow, {
-                borderLeftColor: p.win ? "#4fc97a" : "#e05555",
-                backgroundColor: p.win ? "#0a1f14" : "#1f0a0a",
+                borderLeftColor: resultColor,
+                backgroundColor: p.win ? colors.winBg : colors.lossBg,
               }]}>
-                <Image
-                  source={{ uri: championIcon(p.championName) }}
-                  style={styles.histChamp}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.histResult, { color: p.win ? "#4fc97a" : "#e05555" }]}>
+                <Image source={{ uri: championIcon(p.championName) }} style={styles.histChamp} />
+                <View style={styles.histInfo}>
+                  <Text style={[styles.histResult, { color: resultColor }]}>
                     {p.win ? "VICTORIA" : "DERROTA"}
                   </Text>
                   <Text style={styles.histChampName}>{p.championName} · {queueLabel(m.info.queueId)}</Text>
                 </View>
                 <Text style={styles.histKda}>{p.kills}/{p.deaths}/{p.assists}</Text>
-                <Text style={styles.histDmg}>{Math.round(p.totalDamageDealtToChampions / 1000)}k dmg</Text>
+                <Text style={[styles.histDmg, { color: accent }]}>{Math.round(p.totalDamageDealtToChampions / 1000)}k dmg</Text>
               </View>
             );
           })}
@@ -492,41 +337,55 @@ export default function MyProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container:        { flex: 1, backgroundColor: "#070b12" },
-  loadingContainer: { flex: 1, backgroundColor: "#070b12", justifyContent: "center", alignItems: "center" },
-  loadingText:      { color: "#c89b3c", fontSize: 16, fontWeight: "700" },
-  profileHeader:    { flexDirection: "row", alignItems: "center", backgroundColor: "#0f1923", borderWidth: 1, borderColor: "#1e2a3a", borderRadius: 12, padding: 16, marginBottom: 14 },
-  profileImg:       { width: 80, height: 80, borderRadius: 40, borderWidth: 3, borderColor: "#c89b3c" },
-  gameName:         { color: "#dce8f5", fontWeight: "900", fontSize: 20 },
-  tagLine:          { color: "#556677", fontSize: 13 },
-  level:            { color: "#445566", fontSize: 11, marginTop: 2 },
-  tierBadge:        { marginTop: 6, alignSelf: "flex-start", backgroundColor: "#0a0e17", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
-  tierText:         { fontWeight: "700", fontSize: 12 },
-  editBtn:          { padding: 8 },
-  editText:         { fontSize: 20 },
-  card:             { backgroundColor: "#0f1923", borderWidth: 1, borderColor: "#1e2a3a", borderRadius: 12, padding: 14, marginBottom: 14 },
-  sectionLabel:     { fontSize: 10, color: "#445566", letterSpacing: 1, marginBottom: 10 },
-  badgesRow:        { flexDirection: "row", flexWrap: "wrap" },
-  rankedRow:        { flexDirection: "row", gap: 10, marginBottom: 14 },
-  rankedCard:       { flex: 1, backgroundColor: "#0f1923", borderWidth: 1, borderColor: "#1e2a3a", borderLeftWidth: 3, borderRadius: 12, padding: 14 },
-  tierBig:          { fontWeight: "900", fontSize: 16, letterSpacing: 1, marginTop: 4 },
-  lpText:           { color: "#c89b3c", fontWeight: "700", fontSize: 13 },
-  recordText:       { color: "#8899aa", fontSize: 11, marginTop: 4 },
-  barBg:            { height: 4, backgroundColor: "#1e2a3a", borderRadius: 2, marginTop: 8 },
-  barFill:          { height: "100%", borderRadius: 2 },
-  statsGrid:        { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  statBox:          { flex: 1, minWidth: "28%", alignItems: "center", backgroundColor: "#0a0e17", borderRadius: 10, padding: 12, borderWidth: 1, borderColor: "#1e2a3a" },
-  statNum:          { color: "#dce8f5", fontWeight: "900", fontSize: 16 },
-  statLabel:        { color: "#445566", fontSize: 10, letterSpacing: 1, marginTop: 4 },
-  tabs:             { flexDirection: "row", marginBottom: 14, backgroundColor: "#0f1923", borderRadius: 8, padding: 4 },
-  tab:              { flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 6 },
-  tabActive:        { backgroundColor: "#1e2a3a" },
-  tabText:          { color: "#445566", fontWeight: "700", fontSize: 12, letterSpacing: 1 },
-  tabTextActive:    { color: "#c89b3c" },
-  histRow:          { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderLeftWidth: 3, borderRadius: 8, marginBottom: 4 },
-  histChamp:        { width: 40, height: 40, borderRadius: 6 },
-  histResult:       { fontWeight: "800", fontSize: 11, letterSpacing: 1 },
-  histChampName:    { color: "#dce8f5", fontSize: 13, fontWeight: "700", marginTop: 2 },
-  histKda:          { color: "#dce8f5", fontWeight: "700", fontSize: 13 },
-  histDmg:          { color: "#c89b3c", fontSize: 11, minWidth: 55, textAlign: "right" },
+  container:     { flex: 1, backgroundColor: colors.bg },
+  content:       { padding: spacing.lg, paddingBottom: spacing.xxxl },
+  center:        { flex: 1, backgroundColor: colors.bg, justifyContent: "center", alignItems: "center" },
+  loadingText:   { ...type.heading },
+  profileImg:    {
+    width: sizes.avatarHero, height: sizes.avatarHero, borderRadius: sizes.avatarHero / 2,
+    borderWidth: sizes.borderAccent, backgroundColor: colors.surfaceHigh,
+  },
+  badgesRow:     { flexDirection: "row", flexWrap: "wrap" },
+  badge:         {
+    flexDirection: "row", alignItems: "center", gap: spacing.sm,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    borderRadius: radii.pill, borderWidth: sizes.hairline,
+    backgroundColor: colors.bg, marginRight: spacing.sm, marginBottom: spacing.sm,
+  },
+  badgeIcon:     { fontSize: fontSizes.base },
+  badgeLabel:    { ...type.smallStrong },
+  rankedRow:     { flexDirection: "row", gap: spacing.md, marginBottom: spacing.lg },
+  statsGrid:     { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },
+  statBox:       {
+    flex: 1, minWidth: "28%", alignItems: "center",
+    backgroundColor: colors.bg, borderRadius: radii.md, padding: spacing.md,
+    borderWidth: sizes.hairline, borderColor: colors.border,
+  },
+  statNum:       { ...type.heading, letterSpacing: 0 },
+  statLabel:     { ...type.label, color: colors.textMuted, marginTop: spacing.xs },
+  histRow:       {
+    flexDirection: "row", alignItems: "center", gap: spacing.md, padding: spacing.md,
+    borderLeftWidth: sizes.borderAccent, borderRadius: radii.md, marginBottom: spacing.xs,
+  },
+  histChamp:     { width: sizes.avatarLg, height: sizes.avatarLg, borderRadius: radii.sm, backgroundColor: colors.surfaceHigh },
+  histInfo:      { flex: 1 },
+  histResult:    { ...type.label },
+  histChampName: { ...type.bodyStrong, color: colors.text, marginTop: spacing.xxs },
+  histKda:       { ...type.bodyStrong, color: colors.text },
+  histDmg:       { ...type.caption, minWidth: spacing.xxxl + spacing.sm, textAlign: "right" },
+  overlay:       { flex: 1, backgroundColor: colors.overlay, justifyContent: "center", alignItems: "center", padding: spacing.xl },
+  modal:         {
+    backgroundColor: colors.surface, borderRadius: radii.xl, padding: spacing.xl,
+    width: "100%", borderWidth: sizes.hairline, borderColor: colors.border,
+  },
+  modalTitle:    { ...type.title, fontSize: fontSizes.xxl, color: colors.text, marginBottom: spacing.sm },
+  modalSubtitle: { ...type.body, color: colors.textMuted, marginBottom: spacing.xl, lineHeight: lineHeights.body },
+  input:         {
+    ...type.body, backgroundColor: colors.bg, borderWidth: sizes.hairline, borderColor: colors.border,
+    borderRadius: radii.md, padding: spacing.lg, color: colors.text, marginBottom: spacing.md,
+  },
+  modalBtn:      { borderRadius: radii.md, padding: spacing.lg, alignItems: "center", marginTop: spacing.xs },
+  modalBtnText:  { ...type.heading, color: colors.onAccent },
+  cancelBtn:     { marginTop: spacing.md, padding: spacing.lg, alignItems: "center" },
+  cancelText:    { ...type.body, color: colors.textMuted },
 });
