@@ -12,7 +12,7 @@ let champIds = {}; // nombre normalizado -> ID de Data Dragon
 const norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 async function storageGet(key) {
-  try { return await AsyncStorage.getItem(key); } catch (e) { return null; }
+  try { return await AsyncStorage.getItem(key); } catch (e) { console.warn("AsyncStorage:", e.message); return null; }
 }
 async function storageSet(key, value) {
   try { await AsyncStorage.setItem(key, value); } catch (e) { console.warn("AsyncStorage:", e.message); }
@@ -36,7 +36,7 @@ async function loadChampions() {
   let list = null;
   const cached = await storageGet(cacheKey);
   if (cached) {
-    try { list = JSON.parse(cached); } catch (e) { list = null; }
+    try { list = JSON.parse(cached); } catch (e) { console.warn("Caché de campeones ilegible:", e.message); list = null; }
   }
   if (!list) {
     try {

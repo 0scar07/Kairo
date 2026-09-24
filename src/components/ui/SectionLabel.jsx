@@ -3,7 +3,9 @@ import { Text, StyleSheet } from "react-native";
 import { colors, spacing, type, tracking } from "../../theme";
 
 export default function SectionLabel({ children, style }) {
-  return <Text style={[styles.label, style]}>{String(children).toUpperCase()}</Text>;
+  // Los hijos pueden ser varios (texto + variables): se unen sin separadores
+  const text = React.Children.toArray(children).join("");
+  return <Text style={[styles.label, style]}>{text.toUpperCase()}</Text>;
 }
 
 const styles = StyleSheet.create({

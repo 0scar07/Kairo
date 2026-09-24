@@ -34,7 +34,7 @@ export default function FavoritesScreen({ navigation }) {
       await removeFavorite(fav.gameId, fav.puuid);
     } catch (e) {
       Alert.alert("Error", "No se pudo guardar los cambios: " + errorMessage(e));
-      loadFavorites().then(setFavorites).catch(() => {});
+      loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
     }
   }
 

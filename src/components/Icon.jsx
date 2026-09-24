@@ -1,5 +1,5 @@
 import React from "react";
-import Svg, { Path, Circle } from "react-native-svg";
+import Svg, { Path, Circle, Polygon } from "react-native-svg";
 import { colors, sizes } from "../theme";
 
 // Íconos de trazo (estilo Feather) dibujados con SVG para que se vean nítidos con cualquier color
@@ -12,11 +12,15 @@ const PATHS = {
   chevron:  ["M9 18l6-6-6-6"],
 };
 
-export default function Icon({ name, size = sizes.item, color = colors.text, strokeWidth = sizes.borderThick }) {
+const STAR = "12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26";
+
+// filled: rellena la forma (solo estrella)
+export default function Icon({ name, size = sizes.item, color = colors.text, strokeWidth = sizes.borderThick, filled }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
       {name === "search" && <Circle cx="11" cy="11" r="8" />}
-      {PATHS[name].map(d => <Path key={d} d={d} />)}
+      {name === "star" && <Polygon points={STAR} fill={filled ? color : "none"} />}
+      {(PATHS[name] || []).map(d => <Path key={d} d={d} />)}
     </Svg>
   );
 }

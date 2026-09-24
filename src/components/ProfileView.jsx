@@ -4,10 +4,11 @@ import Reveal from "./Reveal";
 import { ErrorBanner, ProfileHeader } from "./ui";
 import { getGame } from "../games";
 import { TIER_ICONS } from "../constants/config";
-import { errorMessage } from "../utils/format";
+import { errorMessage, tierLabel } from "../utils/format";
+import Icon from "./Icon";
 import { isFavoriteIn, loadFavorites, toggleFavorite } from "../utils/favorites";
 import { success } from "../utils/haptics";
-import { colors, spacing, useAccent } from "../theme";
+import { colors, sizes, spacing, useAccent } from "../theme";
 
 /**
  * Perfil genérico: cabecera, favorito, refresco y errores. El contenido propio de cada juego
@@ -55,7 +56,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
   }
 
   const ranked = profile.ranked;
-  const badge = ranked ? `${TIER_ICONS[ranked.tier] || ""} ${ranked.tier} ${ranked.rank} · ${ranked.leaguePoints} LP`.trim() : null;
+  const badge = ranked ? `${TIER_ICONS[ranked.tier] || ""} ${tierLabel(ranked.tier, ranked.rank)}`.trim() : null;
 
   return (
     <ScrollView
@@ -74,7 +75,9 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
           subtitle={profile.subtitle}
           badge={badge}
           glowColor={colors.tier[ranked?.tier]}
-          action={headerAction ? headerAction.icon : (isFav ? "⭐" : "☆")}
+          action={headerAction ? headerAction.icon : (
+            <Icon name="star" size={sizes.avatarSm} color={isFav ? colors.gold : colors.textMuted} filled={isFav} />
+          )}
           onAction={headerAction ? headerAction.onPress : onToggleFavorite}
         />
       </Reveal>

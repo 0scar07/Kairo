@@ -4,6 +4,7 @@ import { PressableScale } from "./ui";
 import { getGame } from "../games";
 import { profileIconUrl } from "../api/ddragon";
 import { TIER_ICONS } from "../constants/config";
+import { tierLabel } from "../utils/format";
 import { getRegion } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, withAlpha } from "../theme";
 
@@ -39,7 +40,7 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
 
       <View style={[styles.rank, { backgroundColor: withAlpha(tint, 0.14) }]}>
         <Text style={[styles.rankText, { color: tierColor || colors.textMuted }]} numberOfLines={1}>
-          {fav.tier ? `${TIER_ICONS[fav.tier] || ""} ${fav.tier} ${fav.rank || ""}`.trim() : "Sin rango"}
+          {fav.tier ? `${TIER_ICONS[fav.tier] || ""} ${tierLabel(fav.tier, fav.rank)}`.trim() : "Sin rango"}
         </Text>
       </View>
     </PressableScale>

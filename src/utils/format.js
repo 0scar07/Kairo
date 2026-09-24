@@ -1,3 +1,10 @@
+// Master, Grandmaster y Challenger no tienen división (I-IV)
+export const APEX_TIERS = ["MASTER", "GRANDMASTER", "CHALLENGER"];
+export const tierLabel = (tier, rank) => (APEX_TIERS.includes(tier) ? tier : `${tier} ${rank || ""}`.trim());
+
+// 1 partida / 2 partidas
+export const plural = (n, singular, plural = `${singular}s`) => `${n} ${n === 1 ? singular : plural}`;
+
 // Porcentaje de victorias sin dividir entre cero
 export function winrate(wins, losses) {
   const total = (wins || 0) + (losses || 0);

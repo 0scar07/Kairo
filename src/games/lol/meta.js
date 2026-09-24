@@ -5,6 +5,6 @@ export default {
   short: "LoL",
   icon: "⚔️",
   accent: "#C89B3C",
-  placeholder: "Nombre#TAG  (ej: Hide on bush#KR1)",
+  placeholder: "Nombre#TAG",
   available: true,
 };

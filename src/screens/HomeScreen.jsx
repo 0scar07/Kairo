@@ -15,7 +15,7 @@ import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
 import { useBootData } from "../boot/BootContext";
 import {
-  colors, radii, sizes, spacing, fontSizes, type, tracking, glow, withAlpha, useActiveGame,
+  colors, radii, sizes, spacing, fontSizes, type, tracking, glow, textGlow, withAlpha, useActiveGame,
 } from "../theme";
 
 // Espera a que la pantalla de carga se desvanezca antes de empezar la aparición escalonada
@@ -61,7 +61,7 @@ export default function HomeScreen({ navigation }) {
       await removeFavorite(fav.gameId, fav.puuid);
     } catch (e) {
       Alert.alert("Error", "No se pudo guardar los cambios: " + errorMessage(e));
-      loadFavorites().then(setFavorites).catch(() => {});
+      loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
     }
   }
 
@@ -92,7 +92,7 @@ export default function HomeScreen({ navigation }) {
 
         {/* Encabezado */}
         <Reveal order={0} baseDelay={HANDOFF_MS} style={styles.header}>
-          <Text style={[styles.logoText, { color: accent }, glow(accent, spacing.lg, 0.4)]}>{APP_NAME.toUpperCase()}</Text>
+          <Text style={[styles.logoText, { color: accent }, textGlow(accent, spacing.lg)]}>{APP_NAME.toUpperCase()}</Text>
           <Text style={styles.logoSub}>{APP_TAGLINE.toUpperCase()}</Text>
         </Reveal>
 
@@ -234,9 +234,9 @@ const styles = StyleSheet.create({
   searchRow:     { flexDirection: "row", gap: spacing.sm, alignItems: "stretch" },
   input:         {
     ...type.body, flex: 1, backgroundColor: colors.bg, borderWidth: sizes.hairline, borderColor: colors.border,
-    borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.md, color: colors.text,
+    borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.md, color: colors.text, minWidth: 0,
   },
-  go:            { width: sizes.button, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
+  go:            { width: sizes.button, flexShrink: 0, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
   gameSelector:  { flexDirection: "row", gap: spacing.sm, marginBottom: spacing.xl },
   gameBtn:       {
     flex: 1, alignItems: "center", paddingVertical: spacing.md,

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { ProgressBar } from "../../../components/ui";
 import { championIcon } from "../../../api/ddragon";
+import { plural } from "../../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../../../theme";
 
 // Fila de estadísticas por campeón. `rank` (0,1,2…) muestra el puesto; `detail` reemplaza el subtítulo.
@@ -16,7 +17,7 @@ export default function ChampionStatsRow({ champ, rank, detail, game = "lol" }) 
       <Image source={{ uri: championIcon(champ.name) }} style={styles.img} />
       <View style={styles.info}>
         <Text style={styles.name}>{champ.name}</Text>
-        <Text style={styles.games}>{detail || `${champ.games} partidas`}</Text>
+        <Text style={styles.games}>{detail || plural(champ.games, "partida")}</Text>
       </View>
       <View style={styles.kdaBlock}>
         <Text style={styles.kdaText}>{champ.kills}/{champ.deaths}/{champ.assists}</Text>

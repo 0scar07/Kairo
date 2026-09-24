@@ -54,6 +54,13 @@ export function withAlpha(hex, alpha) {
   return `${hex}${a}`;
 }
 
+// Resplandor para texto (las sombras de vista dibujan un recuadro alrededor del texto)
+export const textGlow = (color, radius = 14) => ({
+  textShadowColor: color,
+  textShadowRadius: radius,
+  textShadowOffset: { width: 0, height: 0 },
+});
+
 // Mezcla dos colores "#RRGGBB" (t de 0 a 1)
 export function mixHex(a, b, t) {
   const ch = (hex, i) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);

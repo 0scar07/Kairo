@@ -19,7 +19,7 @@ import { BootProvider } from "./src/boot/BootContext";
 import { colors, fonts, tracking, GameProvider, useAccent } from "./src/theme";
 
 // El splash nativo se queda visible hasta que la pantalla de carga animada esté montada
-SplashScreen.preventAutoHideAsync().catch(() => {});
+SplashScreen.preventAutoHideAsync().catch(e => console.warn("No se pudo retener el splash nativo:", e.message));
 
 const Stack = createNativeStackNavigator();
 const Tab   = createBottomTabNavigator();

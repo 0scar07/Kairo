@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, ProgressBar, SectionLabel } from "./ui";
 import { TIER_ICONS } from "../constants/config";
-import { winrate } from "../utils/format";
+import { winrate, tierLabel } from "../utils/format";
 import { colors, spacing, sizes, fontSizes, type, tracking, winrateColor, useAccent, withAlpha } from "../theme";
 
 // Tarjeta de rango teñida con el color del tier. Sin `entry` muestra "Sin clasificar".
@@ -24,18 +24,15 @@ export default function RankedCard({ entry, label, game = "lol" }) {
   const wr      = winrate(wins, losses);
   const color   = colors.tier[tier] || colors.textMuted;
   const wrColor = winrateColor(wr, accent);
-  const apex    = ["MASTER", "GRANDMASTER", "CHALLENGER"].includes(tier);   // no tienen división
 
   return (
     <Card style={[styles.card, { borderColor: withAlpha(color, 0.4), backgroundColor: withAlpha(color, 0.06) }]}>
       <SectionLabel>{label}</SectionLabel>
       <View style={styles.top}>
         <Text style={styles.tierIcon}>{TIER_ICONS[tier] || "🏆"}</Text>
-        <View style={styles.tierInfo}>
-          <Text style={[styles.tierText, { color }]} numberOfLines={1}>{tier}{apex ? "" : ` ${rank}`}</Text>
-          <Text style={styles.lp}>{leaguePoints} LP</Text>
-        </View>
+        <Text style={styles.lp} numberOfLines={1}>{leaguePoints}<Text style={styles.lpUnit}> LP</Text></Text>
       </View>
+      <Text style={[styles.tierText, { color }]} numberOfLines={1} adjustsFontSizeToFit>{tierLabel(tier, rank)}</Text>
       <View style={styles.recordRow}>
         <Text style={styles.record}>{wins}V · {losses}D</Text>
         <Text style={[styles.wr, { color: wrColor }]}>{wr}%</Text>
@@ -47,11 +44,11 @@ export default function RankedCard({ entry, label, game = "lol" }) {
 
 const styles = StyleSheet.create({
   card:         { flex: 1, marginBottom: 0 },
-  top:          { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.md },
+  top:          { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm },
   tierIcon:     { fontSize: fontSizes.hero },
-  tierInfo:     { flex: 1 },
-  tierText:     { ...type.heading, letterSpacing: tracking.wide },
-  lp:           { ...type.statLarge, fontSize: fontSizes.xl, color: colors.text },
+  tierText:     { ...type.heading, fontSize: fontSizes.base, letterSpacing: tracking.tight, marginTop: spacing.xs, marginBottom: spacing.md },
+  lp:           { ...type.statLarge, fontSize: fontSizes.xl, color: colors.text, flexShrink: 1 },
+  lpUnit:       { ...type.captionStrong, color: colors.textMuted },
   recordRow:    { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
   record:       { ...type.caption, color: colors.textSecondary },
   wr:           { ...type.stat, fontSize: fontSizes.lg },

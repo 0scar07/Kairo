@@ -25,7 +25,7 @@ export default function ProfileHeader({
       </View>
       {action ? (
         <PressableScale onPress={onAction} haptic scaleTo={0.85} style={styles.action} accessibilityLabel="Favorito">
-          <Text style={styles.actionText}>{action}</Text>
+          {typeof action === "string" ? <Text style={styles.actionText}>{action}</Text> : action}
         </PressableScale>
       ) : null}
     </Card>

@@ -51,8 +51,8 @@ export default function LoadingScreen({ progress, textsReady, finished, onHidden
   function onLayout() {
     if (started.current) return;
     started.current = true;
-    try { SplashScreen.setOptions({ duration: 300, fade: true }); } catch (e) { /* opciones no disponibles */ }
-    SplashScreen.hideAsync().catch(() => {});
+    try { SplashScreen.setOptions({ duration: 300, fade: true }); } catch (e) { console.warn("Splash: opciones de transición no disponibles:", e.message); }
+    SplashScreen.hideAsync().catch(e => console.warn("No se pudo ocultar el splash nativo:", e.message));
 
     logoOpacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.cubic) });
     // Escala 0.85 → 1 con un leve rebote
