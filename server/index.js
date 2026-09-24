@@ -1,7 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const config = require("./lib/config");
-const { HttpError, errorHandler, cache } = require("./lib/riot");
+const { HttpError, errorHandler, cache, limiter: riotLimiter } = require("./lib/riot");
+const access = require("./lib/access");
 const { REGIONS, DEFAULT_REGION } = require("./lib/regions");
 const { securityHeaders, requestLogger, corsMiddleware, limiter } = require("./lib/middleware");
 const lolRouter = require("./routes/lol");
@@ -36,6 +37,9 @@ app.get("/health", (_req, res) => res.json({
   ok: true,
   uptime: Math.round(process.uptime()),
   cacheEntries: cache.size,
+  riotQueue: riotLimiter.stats(),
+  // Qué juegos puede consultar la key (Riot habilita cada API por producto); la app oculta los que no
+  games: access.games(),
   regions: Object.keys(REGIONS),
   defaultRegion: DEFAULT_REGION,
 }));
@@ -62,6 +66,7 @@ app.use(errorHandler);
 
 const server = app.listen(config.port, () => {
   console.log(`✅ Backend corriendo en el puerto ${config.port} (${config.isProduction ? "producción" : "desarrollo"})`);
+  access.start();
   console.log(`   límite: ${config.rateLimitPerMin} peticiones/min por IP · CORS: ${config.corsOrigins.join(", ") || "abierto"}`);
 });
 

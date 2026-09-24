@@ -3,6 +3,7 @@ const { HttpError, TTL, riotGet, handle } = require("../lib/riot");
 const {
   DEFAULT_REGION, isRegion, platformHost, routingHost, accountHost, regionFromMatchId,
 } = require("../lib/regions");
+const access = require("../lib/access");
 
 const PUUID_RE    = /^[\w-]{20,100}$/;
 const MATCH_ID_RE = /^[A-Za-z0-9]+_\d+$/;
@@ -27,9 +28,11 @@ function pageOf(req) {
 /**
  * Crea el router de un juego. LoL y TFT tienen la misma forma y solo cambian las rutas de Riot:
  *   paths.summoner(puuid), paths.ranked(puuid), paths.matchIds(puuid, start, count), paths.match(id)
+ * Cada respuesta correcta marca el juego como disponible (ver lib/access.js).
  */
-function createGameRouter(paths) {
+function createGameRouter(gameId, paths) {
   const router = Router();
+  const ok = data => { access.markWorking(gameId); return data; };
 
   // La cuenta Riot es común a todos los juegos
   router.get("/account/:gameName/:tagLine", handle(async (req, res) => {
@@ -40,18 +43,18 @@ function createGameRouter(paths) {
 
   router.get("/summoner/:puuid", handle(async (req, res) => {
     const url = `${platformHost(regionOf(req))}${paths.summoner(puuidOf(req))}`;
-    res.json(await riotGet(url, { ttl: TTL.summoner, notFound: "Este jugador no tiene perfil en este juego" }));
+    res.json(ok(await riotGet(url, { ttl: TTL.summoner, notFound: "Este jugador no tiene perfil en este juego" })));
   }));
 
   router.get("/ranked/:puuid", handle(async (req, res) => {
     const url = `${platformHost(regionOf(req))}${paths.ranked(puuidOf(req))}`;
-    res.json(await riotGet(url, { ttl: TTL.ranked }));
+    res.json(ok(await riotGet(url, { ttl: TTL.ranked })));
   }));
 
   router.get("/matches/:puuid", handle(async (req, res) => {
     const { start, count } = pageOf(req);
     const url = `${routingHost(regionOf(req))}${paths.matchIds(puuidOf(req), start, count)}`;
-    res.json(await riotGet(url, { ttl: TTL.matchIds }));
+    res.json(ok(await riotGet(url, { ttl: TTL.matchIds })));
   }));
 
   router.get("/match/:matchId", handle(async (req, res) => {
@@ -60,10 +63,10 @@ function createGameRouter(paths) {
     // El prefijo del ID indica el clúster correcto aunque la región del cliente sea otra
     const region = regionFromMatchId(matchId) || regionOf(req);
     const url = `${routingHost(region)}${paths.match(matchId)}`;
-    res.json(await riotGet(url, { ttl: TTL.match, notFound: "Partida no encontrada" }));
+    res.json(ok(await riotGet(url, { ttl: TTL.match, notFound: "Partida no encontrada" })));
   }));
 
   return router;
 }
 
-module.exports = { createGameRouter };
+module.exports = { createGameRouter, regionOf, puuidOf };

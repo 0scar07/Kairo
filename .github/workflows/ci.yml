@@ -37,3 +37,5 @@ jobs:
       - run: npm ci
       - name: Sintaxis de todos los archivos
         run: for f in index.js lib/*.js routes/*.js; do node --check "$f"; done
+      - name: Pruebas (cola hacia Riot)
+        run: npm test

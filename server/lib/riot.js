@@ -1,15 +1,11 @@
 const axios = require("axios");
 const { TtlCache } = require("./cache");
 const { maskRoute } = require("./mask");
+const { HttpError } = require("./errors");
+const { RiotLimiter, parseLimits, DEFAULT_WINDOWS } = require("./limiter");
 
-// Error con estado HTTP y mensaje en español listo para mostrar en la app
-class HttpError extends Error {
-  constructor(status, message, extra = {}) {
-    super(message);
-    this.status = status;
-    Object.assign(this, extra);
-  }
-}
+// Cola de salida hacia Riot: respeta el cupo de la key (RIOT_RATE_LIMITS="18:1,95:120" = 18/s y 95 cada 120 s)
+const limiter = new RiotLimiter({ windows: parseLimits(process.env.RIOT_RATE_LIMITS, DEFAULT_WINDOWS) });
 
 const cache = new TtlCache({ max: 400 });
 
@@ -61,8 +57,10 @@ function toHttpError(e, notFoundMessage) {
  */
 async function riotGet(url, { ttl = 0, notFound } = {}) {
   try {
-    return await cache.wrap(url, ttl, () => client().get(url).then(r => r.data));
+    return await cache.wrap(url, ttl, () => limiter.schedule(() => client().get(url)).then(r => r.data));
   } catch (e) {
+    // Si Riot dice 429 se frenan todas las salidas durante el Retry-After
+    if (e.response?.status === 429) limiter.pause((parseInt(e.response.headers?.["retry-after"], 10) || 5) * 1000);
     throw toHttpError(e, notFound);
   }
 }
@@ -79,4 +77,4 @@ function errorHandler(err, req, res, _next) {
   res.status(e.status).json({ error: e.message, code: e.code, retryAfter: e.retryAfter });
 }
 
-module.exports = { HttpError, TTL, riotGet, handle, errorHandler, cache };
+module.exports = { HttpError, TTL, riotGet, handle, errorHandler, cache, limiter };
