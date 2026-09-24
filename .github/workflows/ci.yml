@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  app:
+    name: App (verificación y bundle)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Imports y tokens del tema
+        run: npm run verify
+      - name: El bundle de Android compila
+        run: npx expo export --platform android --output-dir "$RUNNER_TEMP/export"
+
+  server:
+    name: Backend (sintaxis)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - name: Sintaxis de todos los archivos
+        run: for f in index.js lib/*.js routes/*.js; do node --check "$f"; done

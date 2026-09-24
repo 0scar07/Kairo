@@ -1,49 +1,119 @@
-# Kairo
+<div align="center">
 
-*Cada partida cuenta.*
+<img src="assets/icon.png" alt="Kairo" width="128" />
 
-App móvil (React Native + Expo SDK 54) para consultar estadísticas de jugadores con la API de Riot Games.
+# KAIRO
 
-| Juego | Estado |
-|-------|--------|
-| League of Legends | ✅ Perfil, rango Solo/Dúo y Flex, historial con detalle (objetos, hechizos, runas), campeones, racha |
-| Teamfight Tactics | ✅ Rango (Ranked, Double Up, Hyper Roll), historial con posición 1–8, rasgos y unidades con estrellas |
-| Valorant | ⏳ Próximamente: su API de partidas requiere una *production key* aprobada por Riot |
+**Cada partida cuenta.**
 
-Además: favoritos y búsquedas recientes, selector de región, "Mi perfil" por juego, barra de navegación flotante, animaciones y háptica.
+Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil premium, hecha con React Native y Expo.
 
-> **La API key de Riot nunca va en la app.** Vive solo en `server/.env` y todas las llamadas a Riot pasan por el backend.
+![Expo SDK](https://img.shields.io/badge/Expo-SDK%2054-000020?logo=expo&logoColor=white)
+![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?logo=react&logoColor=black)
+![Node](https://img.shields.io/badge/Node-20%2B-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
+![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
+![Estado](https://img.shields.io/badge/estado-en%20desarrollo-C89B3C)
 
-## Puesta en marcha
+[Capturas](#-capturas) · [Características](#-características) · [Puesta en marcha](#-puesta-en-marcha) · [Arquitectura](#-arquitectura) · [Roadmap](#-roadmap)
 
-Necesitas Node 20+ y una key de <https://developer.riotgames.com> (las de desarrollo caducan cada 24 h: regénerala y actualiza `server/.env`).
+<br />
 
-### 1. Backend (`server/`)
+<img src="docs/screenshots/hero.png" alt="Kairo: pantalla de carga, inicio, perfil de LoL y perfil de TFT" width="100%" />
+
+<sub>Capturas renderizadas en un navegador móvil contra el backend real. En un celular los brillos y la háptica se ven distintos.</sub>
+
+</div>
+
+---
+
+## ✨ Características
+
+| | League of Legends | Teamfight Tactics |
+|---|---|---|
+| **Rango** | Solo/Dúo y Flex, con LP, winrate y color del tier | Ranked, Double Up y Hyper Roll |
+| **Historial** | Resultado, campeón, cola, KDA, CS y daño | Posición final 1–8, cola y duración |
+| **Detalle** | Los 10 jugadores con objetos, **hechizos y runas** | Los 8 jugadores con **rasgos y unidades con estrellas** |
+| **Resumen** | Winrate, KDA promedio, racha y campeón más jugado | Posición promedio, top 4 y victorias |
+| **Extras** | Filtros por resultado y campeón, estadísticas por campeón | Gráfico de posiciones recientes |
+
+**En toda la app**
+
+- 🔎 **Búsqueda por Riot ID** con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada.
+- ⭐ **Favoritos** con tarjetas (ícono, región y rango con el color del tier) y **búsquedas recientes**.
+- 👤 **Mi perfil** por juego, con insignias y gráfico de KDA en LoL.
+- 🎨 **Acento por juego** (dorado LoL, cian TFT) que cambia con una transición suave y se recuerda.
+- 🚀 **Pantalla de carga animada** con progreso real de arranque y aparición escalonada de las secciones.
+- 🫧 **Skeletons**, estados vacíos amables y errores con botón de reintentar.
+- 📳 **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
+- 🎯 **Valorant**: próximamente (su API de partidas requiere una *production key* aprobada por Riot).
+
+## 📸 Capturas
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/splash.png" width="200" /><br /><sub><b>Carga animada</b></sub></td>
+    <td align="center"><img src="docs/screenshots/home-lol.png" width="200" /><br /><sub><b>Inicio</b></sub></td>
+    <td align="center"><img src="docs/screenshots/region.png" width="200" /><br /><sub><b>Región</b></sub></td>
+    <td align="center"><img src="docs/screenshots/skeleton.png" width="200" /><br /><sub><b>Cargando</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/profile-lol.png" width="200" /><br /><sub><b>Perfil de LoL</b></sub></td>
+    <td align="center"><img src="docs/screenshots/matches-lol.png" width="200" /><br /><sub><b>Partidas</b></sub></td>
+    <td align="center"><img src="docs/screenshots/match-detail-lol.png" width="200" /><br /><sub><b>Detalle con runas</b></sub></td>
+    <td align="center"><img src="docs/screenshots/champions-lol.png" width="200" /><br /><sub><b>Campeones</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/home-tft.png" width="200" /><br /><sub><b>Inicio en TFT</b></sub></td>
+    <td align="center"><img src="docs/screenshots/profile-tft.png" width="200" /><br /><sub><b>Perfil de TFT</b></sub></td>
+    <td align="center"><img src="docs/screenshots/matches-tft.png" width="200" /><br /><sub><b>Posiciones y unidades</b></sub></td>
+    <td align="center"><img src="docs/screenshots/match-detail-tft.png" width="200" /><br /><sub><b>Los 8 jugadores</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/favorite.png" width="200" /><br /><sub><b>Favorito marcado</b></sub></td>
+    <td align="center"><img src="docs/screenshots/favorites.png" width="200" /><br /><sub><b>Favoritos</b></sub></td>
+    <td align="center"><img src="docs/screenshots/home-recents.png" width="200" /><br /><sub><b>Recientes</b></sub></td>
+    <td align="center"><img src="docs/screenshots/settings.png" width="200" /><br /><sub><b>Ajustes</b></sub></td>
+  </tr>
+</table>
+
+## 🧱 Stack
+
+| Capa | Tecnología |
+|------|------------|
+| App | React Native 0.81 · Expo SDK 54 · React Navigation 7 |
+| Animación | Reanimated 4 · SVG (`react-native-svg`) · `expo-haptics` |
+| Diseño | Sistema propio de *tokens* (`src/theme`) · Sora + Inter (`@expo-google-fonts`) |
+| Datos | Backend Express 5 · API de Riot · Data Dragon (íconos, campeones, runas, TFT) |
+| Almacenamiento | AsyncStorage (favoritos, recientes, preferencias) |
+
+## 🏗️ Arquitectura
+
+```mermaid
+flowchart LR
+    App["📱 App Kairo<br/>(Expo)"] -- "?region=kr" --> API["🖥️ Backend Express<br/>caché + errores"]
+    API -- "X-Riot-Token" --> Riot[["Riot Games API"]]
+    App -- "íconos y datos estáticos" --> DD[["Data Dragon"]]
+```
+
+- La **API key de Riot nunca va en la app**: vive solo en `server/.env`.
+- El backend **cachea** (partidas terminadas 1 h) y traduce los errores de Riot a mensajes en español.
+- Las pantallas genéricas **no conocen ningún juego**: leen todo de `src/games/`.
+
+Más detalle, diagramas de secuencia y decisiones en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
+
+## 🚀 Puesta en marcha
+
+Necesitas **Node 20+** y una key de <https://developer.riotgames.com> (las de desarrollo caducan cada 24 h).
+
+### 1. Backend
 
 ```bash
 cd server
 npm install
-cp .env.example .env     # y pon tu RIOT_API_KEY
-npm start                # http://localhost:3000
+cp .env.example .env        # y pon tu RIOT_API_KEY
+npm start                   # http://localhost:3000  ·  comprueba /health
 ```
-
-Variables de `server/.env`:
-
-| Variable | Descripción |
-|----------|-------------|
-| `RIOT_API_KEY` | Tu key de Riot (obligatoria: si falta, el servidor no arranca) |
-| `PORT` | Puerto (por defecto 3000) |
-| `DEFAULT_REGION` | Región si la app no envía `?region=` (por defecto `la1`) |
-
-Rutas (todas aceptan `?region=la1|la2|na1|br1|euw1|eun1|tr1|kr|jp1|oc1…`):
-
-- `GET /health`
-- `GET /{lol|tft}/account/:gameName/:tagLine`
-- `GET /{lol|tft}/summoner/:puuid`, `/ranked/:puuid`
-- `GET /{lol|tft}/matches/:puuid?start=0&count=10` (máx. 20) y `/match/:matchId`
-
-Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, `/match`) siguen funcionando como alias de `/lol/…` y avisan en consola.
-El backend cachea en memoria (partidas terminadas 1 h, cuenta 10 min, rango 2 min) y traduce los errores de Riot a mensajes en español (key inválida, límite de peticiones, jugador inexistente…).
 
 ### 2. App
 
@@ -52,62 +122,138 @@ npm install
 npx expo start
 ```
 
-La app necesita saber dónde está el backend. En un dispositivo físico usa la IP de tu PC en la misma red Wi-Fi:
+En un dispositivo físico, apunta la app a la IP de tu PC (misma red Wi-Fi):
 
 ```bash
 EXPO_PUBLIC_API_URL=http://192.168.1.8:3000 npx expo start
 ```
 
-(o cambia el valor por defecto de `API_BASE` en `src/constants/config.js`).
+### 3. Probar en el celular
 
-## Probarla en el celular
-
-- **Expo Go** (lo más rápido): escanea el QR de `npx expo start`. Ojo: en Expo Go no se ve el splash nativo personalizado.
+- **Expo Go** *(lo más rápido)*: escanea el QR de `npx expo start`. En Expo Go no se ve el splash nativo personalizado.
 - **APK de prueba con EAS**:
   ```bash
   npm install -g eas-cli
   eas login
-  eas init            # el proyecto cambió de slug (ggtracker → kairo); vuelve a enlazarlo
+  eas init                                    # el proyecto cambió de slug: vuelve a enlazarlo
   eas build -p android --profile preview
   ```
-  Edita `EXPO_PUBLIC_API_URL` en el perfil `preview` de `eas.json`: el APK solo puede llegar a un backend accesible desde el celular (tu IP local o uno desplegado).
+  Edita `EXPO_PUBLIC_API_URL` en el perfil `preview` de [eas.json](eas.json): el APK solo llega a un backend accesible desde el celular.
 
-> **HTTP en el APK:** `app.json` habilita `usesCleartextTraffic` para poder hablar con un backend de pruebas por `http://`. Al publicar, usa un backend con HTTPS y quita esa opción.
+> **HTTP en el APK:** `app.json` habilita `usesCleartextTraffic` para hablar con un backend de pruebas por `http://`. Al publicar, usa HTTPS y quita esa opción.
 
-## Íconos
+## ⚙️ Configuración
 
-El ícono original está en `assets/brand/icon.svg`. Para regenerar los PNG (`icon`, `adaptive-icon`, `splash-icon`, `favicon`):
+`server/.env`
 
-```bash
-npm run icons
+| Variable | Descripción |
+|----------|-------------|
+| `RIOT_API_KEY` | Tu key de Riot. **Obligatoria**: si falta, el servidor no arranca |
+| `PORT` | Puerto del backend (por defecto `3000`) |
+| `DEFAULT_REGION` | Región si la app no envía `?region=` (por defecto `la1`) |
+
+App
+
+| Variable | Descripción |
+|----------|-------------|
+| `EXPO_PUBLIC_API_URL` | URL del backend (por defecto `http://192.168.1.8:3000`) |
+
+## 🔌 API del backend
+
+Todas las rutas aceptan `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1 · kr · jp1 · oc1 …`
+
+| Ruta | Descripción |
+|------|-------------|
+| `GET /health` | Estado y regiones disponibles |
+| `GET /{lol\|tft}/account/:gameName/:tagLine` | Cuenta Riot (PUUID) |
+| `GET /{lol\|tft}/summoner/:puuid` | Perfil de invocador (ícono, nivel) |
+| `GET /{lol\|tft}/ranked/:puuid` | Rangos del jugador |
+| `GET /{lol\|tft}/matches/:puuid?start=0&count=10` | IDs de partidas (máx. 20 por página) |
+| `GET /{lol\|tft}/match/:matchId` | Detalle de una partida |
+
+Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, `/match`) siguen funcionando como alias de `/lol/…`.
+
+## 🗂️ Estructura
+
 ```
-
-`splash-icon.png` se muestra a 260 dp: si cambias `imageWidth` en `app.json` (plugin `expo-splash-screen`), cambia también `sizes.splashLogo` en `src/theme/spacing.js`.
-
-## Estructura
-
-```
-server/                 backend Express (proxy a Riot)
-  lib/                  cliente de Riot, caché, regiones, errores
-  routes/               /lol y /tft (fábrica compartida)
+server/                  backend Express (proxy a Riot)
+  lib/                   cliente de Riot, caché, regiones, errores
+  routes/                /lol y /tft (fábrica compartida)
 src/
-  api/                  cliente del backend y Data Dragon
-  boot/                 tareas de arranque y progreso de la pantalla de carga
-  components/           componentes genéricos (perfil, favoritos, barra flotante…) y ui/
-  games/                un módulo por juego (lol/, tft/) + registro
-  screens/              Home, Favoritos, Ajustes, Perfil, Mi perfil, Carga
-  theme/                colores, tipografía, espaciado y acento por juego
-  utils/                favoritos, recientes, preferencias, formato
+  api/                   cliente del backend y Data Dragon
+  boot/                  tareas de arranque y progreso de la pantalla de carga
+  components/            componentes genéricos (perfil, favoritos, barra flotante…) y ui/
+  games/                 un módulo por juego (lol/, tft/) + registro
+  screens/               Inicio, Favoritos, Ajustes, Perfil, Mi perfil, Carga
+  theme/                 colores, tipografía, espaciado y acento por juego
+  utils/                 favoritos, recientes, preferencias, formato
+assets/brand/icon.svg    ícono original (npm run icons genera los PNG)
+docs/                    arquitectura, pendientes y capturas
+scripts/                 generador de íconos y verificaciones
 ```
 
-### Añadir un juego
+## 🎨 Diseño
 
-1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento, ícono…) e `index.js` (API, `getProfile`, `toFavorite`, `ProfileBody`).
+Base casi negra con un toque verdoso, superficies en capas y bordes sutiles. Cada juego aporta su acento.
+
+| Token | Color | Uso |
+|-------|-------|-----|
+| Kairo | ![#35E0A1](https://img.shields.io/badge/-%2335E0A1-35E0A1) | Marca, pantalla de carga |
+| LoL | ![#C89B3C](https://img.shields.io/badge/-%23C89B3C-C89B3C) | Acento de League of Legends |
+| TFT | ![#0BC4E3](https://img.shields.io/badge/-%230BC4E3-0BC4E3) | Acento de Teamfight Tactics |
+| Victoria | ![#4FC97A](https://img.shields.io/badge/-%234FC97A-4FC97A) | Resultado positivo |
+| Derrota | ![#E05555](https://img.shields.io/badge/-%23E05555-E05555) | Resultado negativo |
+
+Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** para texto. Todo sale de `src/theme/`; `npm run verify` comprueba que cada token exista.
+
+## 🛠️ Scripts
+
+| Comando | Qué hace |
+|---------|----------|
+| `npx expo start` | Levanta la app (Expo Go / emulador) |
+| `npm run verify` | Comprueba imports locales y tokens del tema |
+| `npm run icons` | Regenera `icon`, `adaptive-icon`, `splash-icon` y `favicon` desde el SVG |
+| `cd server && npm start` | Levanta el backend |
+
+`splash-icon.png` se muestra a 260 dp: si cambias `imageWidth` en `app.json`, cambia también `sizes.splashLogo` en `src/theme/spacing.js`.
+
+## ➕ Añadir un juego
+
+1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento, ícono…) e `index.js` (`api.search`, `getProfile`, `toFavorite`, `ProfileBody`).
 2. Regístralo en `src/games/registry.js` (metadatos) y `src/games/index.js` (módulo completo).
 3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`.
 
-Las pantallas genéricas no conocen ningún juego: leen todo del registro.
+## 🗺️ Roadmap
 
-## Aviso legal
+- [x] LoL y TFT completos, con favoritos, recientes y región
+- [x] Sistema de diseño, pantalla de carga animada y micro-interacciones
+- [x] Backend con caché y errores en español
+- [ ] Desplegar el backend y publicar con una *production key*
+- [ ] Valorant (requiere aprobación de Riot)
+- [ ] Modo sin conexión con el último perfil visto
+- [ ] Notificaciones cuando un favorito cambia de rango
+- [ ] Comparar dos jugadores
+
+La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
+
+## 🩺 Problemas frecuentes
+
+| Síntoma | Causa y solución |
+|---------|------------------|
+| "Sin conexión con el servidor" en Inicio | El backend no está corriendo o el celular no lo alcanza. Usa la IP de tu PC en `EXPO_PUBLIC_API_URL`, misma red Wi-Fi, y permite el puerto 3000 en el firewall de Windows |
+| "El servidor no tiene acceso a Riot" | La key es inválida o expiró (las de desarrollo duran 24 h). Regénerala y reinicia el backend |
+| "Riot limitó las solicitudes" | Superaste el límite de la key. Espera unos segundos: cada perfil hace ~14 peticiones |
+| Rango vacío o "Sin clasificar" | El jugador no tiene partidas clasificatorias en ese modo/región. Revisa que la región sea la correcta |
+| Íconos de TFT con iniciales | Data Dragon solo trae los sets vigentes; las partidas de sets antiguos usan un placeholder |
+
+## 🤝 Contribuir
+
+Lee [CONTRIBUTING.md](CONTRIBUTING.md). Para vulnerabilidades o keys expuestas, mira [SECURITY.md](SECURITY.md).
+
+## 📄 Licencia
+
+[MIT](LICENSE).
+
+## ⚖️ Aviso legal
 
 Kairo no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de sus propiedades. Riot Games y todas las propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.

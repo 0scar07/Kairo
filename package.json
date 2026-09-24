@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "icons": "node scripts/generate-icons.js"
+    "icons": "node scripts/generate-icons.js",
+    "verify": "node scripts/verify-imports.js && node scripts/verify-tokens.js",
+    "web": "expo start --web"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -38,5 +40,11 @@
     "@babel/core": "^7.20.0",
     "sharp": "^0.35.4"
   },
-  "private": true
+  "private": true,
+  "description": "Kairo: estadísticas de League of Legends y Teamfight Tactics con la API de Riot (React Native + Expo)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0scar07/Tracker.git"
+  }
 }

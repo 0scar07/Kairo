@@ -1,0 +1,5 @@
+# Normaliza los saltos de línea (el repo mezclaba LF y CRLF)
+* text=auto
+*.png binary
+*.jpg binary
+*.ttf binary

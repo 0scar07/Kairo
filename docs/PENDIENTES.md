@@ -1,7 +1,7 @@
 # Pendientes y mejoras
 
 ## Antes de publicar
-- [ ] **Regenerar las keys de Riot** que estuvieron en el repo (`RGAPI-9f64…` estuvo en `config.js` en GitHub; `RGAPI-45a0…` en `server.js`) y, si quieres, limpiar el historial de git.
+- [ ] **Regenerar las keys de Riot** que alguna vez estuvieron en el código o en el historial de git (una key que estuvo en un commit público sigue visible aunque se borre después) y, si quieres, limpiar el historial.
 - [ ] **Desplegar el backend** (Railway, Fly.io, Render…). Con una key de desarrollo solo sirve para pruebas; para publicar hay que pedir una *production key* a Riot.
 - [ ] Revisar el aviso legal, buscar el nombre "Kairo" en Play Store / App Store y en el registro de marcas.
 - [ ] `eas init` de nuevo: el `projectId` de EAS sigue ligado al slug antiguo (`ggtracker`). El paquete Android sigue siendo `com.camavingaaa.ggtracker`; cámbialo si quieres identidad nueva.
@@ -22,8 +22,10 @@
 ## Calidad
 - [ ] Probar en dispositivos reales (Android 12+ recorta el ícono del splash nativo) y ajustar tamaños/animaciones.
 - [ ] Tests automáticos: hoy solo hay comprobaciones puntuales. Añadir Jest para `utils/`, `games/*/utils` y las rutas del backend.
-- [ ] ESLint + Prettier con `eslint-plugin-react` (hoy no hay linter configurado).
+- [ ] ESLint + Prettier con `eslint-plugin-react` (hoy solo hay `npm run verify` para imports y tokens).
 - [ ] Accesibilidad: etiquetas en más botones, soporte de texto grande y de "reducir movimiento".
 - [ ] Tema claro (hoy solo oscuro).
 - [ ] Analítica y reporte de errores (Sentry).
-- [ ] Los saltos de línea del repo mezclan LF/CRLF: añadir `.gitattributes`.
+- [x] Saltos de línea normalizados con `.gitattributes`.
+- [ ] Comprobar que el workflow de CI (`.github/workflows/ci.yml`) pasa en GitHub: no pude ejecutarlo desde local.
+- [ ] Añadir capturas reales de un dispositivo (las actuales son renders en navegador).
