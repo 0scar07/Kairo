@@ -15,6 +15,8 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
   const game = getGame(fav.gameId);
   const tierColor = colors.tier[fav.tier];
   const tint = tierColor || game?.accent || colors.textMuted;
+  // Ícono: URL directa (Supercell) o ícono de invocador (Riot)
+  const iconUri = fav.iconUrl || (fav.iconId != null ? profileIconUrl(fav.iconId) : null);
 
   return (
     <PressableScale
@@ -23,8 +25,8 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
       style={[styles.card, { borderColor: withAlpha(tint, 0.4), backgroundColor: withAlpha(tint, 0.05) }, style]}
     >
       <View style={styles.top}>
-        {fav.iconId != null ? (
-          <Image source={{ uri: profileIconUrl(fav.iconId) }} style={[styles.icon, { borderColor: tint }]} />
+        {iconUri ? (
+          <Image source={{ uri: iconUri }} style={[styles.icon, { borderColor: tint }]} />
         ) : (
           <View style={[styles.icon, styles.iconPlaceholder, { borderColor: tint }]}>
             <GameLogo game={fav.gameId} size={sizes.item} color={tint} />
@@ -38,12 +40,12 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
       </View>
 
       <Text style={styles.name} numberOfLines={1}>{fav.gameName}</Text>
-      <Text style={styles.tag} numberOfLines={1}>#{fav.tagLine} · {getRegion(fav.region).label}</Text>
+      <Text style={styles.tag} numberOfLines={1}>#{fav.tagLine}{game?.hasRegion === false ? "" : ` · ${getRegion(fav.region).label}`}</Text>
 
       <View style={[styles.rank, { backgroundColor: withAlpha(tint, 0.14) }]}>
         {fav.tier ? <RankEmblem tier={fav.tier} size={sizes.item} /> : null}
         <Text style={[styles.rankText, { color: tierColor || colors.textMuted }]} numberOfLines={1}>
-          {fav.tier ? tierLabel(fav.tier, fav.rank) : "Sin rango"}
+          {fav.tier ? tierLabel(fav.tier, fav.rank) : fav.label || "Sin rango"}
         </Text>
       </View>
     </PressableScale>

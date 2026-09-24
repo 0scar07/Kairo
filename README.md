@@ -6,7 +6,7 @@
 
 **Cada partida cuenta.**
 
-Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil premium, hecha con React Native y Expo.
+Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, **Clash Royale** y **Clash of Clans** en una app móvil premium, hecha con React Native y Expo.
 
 ![Expo SDK](https://img.shields.io/badge/Expo-SDK%2054-000020?logo=expo&logoColor=white)
 ![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?logo=react&logoColor=black)
@@ -47,6 +47,7 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
 - 🫧 **Skeletons**, estados vacíos amables y errores con botón de reintentar.
 - 📳 **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
 - ✨ **Sin emojis:** toda la interfaz usa íconos vectoriales propios (SVG) que se ven nítidos y toman el color del juego.
+- 🕹️ **Multijuego:** LoL y TFT (API de Riot) más **Brawl Stars, Clash Royale y Clash of Clans** (API de Supercell). Los de Supercell se buscan por `#TAG` y no tienen regiones. Cada juego se activa solo si el servidor tiene su key.
 - 🎮 **Logos oficiales de cada juego** (LoL, TFT, Valorant) en el selector, recientes y favoritos.
 - 🏅 **Emblemas de rango oficiales** (Iron → Challenger) en el perfil, las tarjetas de ranked y Favoritos.
 - 📊 **LoL extra:** maestría de campeones (top 3 con nivel y puntos), rotación gratuita de la semana y aviso de mantenimiento del servidor de tu región.
@@ -183,6 +184,8 @@ Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad
 | `TRUST_PROXY` | Proxies delante del servidor (por defecto `1` en producción) |
 | `RIOT_RATE_LIMITS` | Cupo hacia Riot, `peticiones:segundos` (por defecto `18:1,95:120`) |
 | `PROBE_RIOT_ID` | Cuenta pública para detectar qué juegos habilita la key (`Nombre#TAG@region`) |
+| `BRAWLSTARS_API_KEY` · `CLASHROYALE_API_KEY` · `CLASHOFCLANS_API_KEY` | Keys de Supercell (opcionales: cada juego se activa al ponerla). Permite la IP `45.79.218.79` al crearlas |
+| `*_API_BASE` | Otra URL base para esos juegos (por defecto los proxies de RoyaleAPI, que dan una IP fija) |
 
 App
 
@@ -205,6 +208,13 @@ Todas las rutas aceptan `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1
 | `GET /lol/mastery/:puuid?count=3` | Maestría: top de campeones y puntaje total |
 | `GET /lol/rotation` | Rotación semanal gratuita (IDs de campeón) |
 | `GET /lol/status` | Mantenimientos e incidencias del servidor de la región |
+
+Supercell (sin región; el tag se acepta con o sin `#`):
+
+| Ruta | Descripción |
+|------|-------------|
+| `GET /{brawlstars, clashroyale, clashofclans}/player/:tag` | Perfil del jugador |
+| `GET /{brawlstars, clashroyale}/battles/:tag` | Últimas batallas (`{ items }`) |
 
 Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, `/match`) siguen funcionando como alias de `/lol/…`.
 

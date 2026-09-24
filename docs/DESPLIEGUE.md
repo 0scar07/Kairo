@@ -111,6 +111,18 @@ eas build -p android --profile production
 
 Con una URL `https://`, el APK **no** habilita el tráfico HTTP sin cifrar (`app.config.js` solo lo activa para URLs `http://`).
 
+## Keys de Supercell (Brawl Stars, Clash Royale, Clash of Clans)
+
+Son opcionales e independientes de la de Riot. Cada una se crea en su portal de desarrolladores (con tu cuenta de Supercell ID):
+
+- Brawl Stars: <https://developer.brawlstars.com>
+- Clash Royale: <https://developer.clashroyale.com>
+- Clash of Clans: <https://developer.clashofclans.com>
+
+La key de Supercell **se ata a las IP que le permitas** y Render gratis no tiene IP fija. Por eso el backend usa por defecto los proxies comunitarios de RoyaleAPI, que salen siempre desde la misma IP: al crear cada key, en *Allowed IP addresses* pon `45.79.218.79`. Después añade la key como variable de entorno en Render (`BRAWLSTARS_API_KEY`, `CLASHROYALE_API_KEY`, `CLASHOFCLANS_API_KEY`); nunca en el código ni en git. Con `/health` compruebas que `games` las muestre como `true`.
+
+Si prefieres no depender del proxy, usa un servidor con IP fija, permite esa IP y define `*_API_BASE` con la URL oficial (`https://api.brawlstars.com/v1`, `https://api.clashroyale.com/v1`, `https://api.clashofclans.com/v1`).
+
 ## Variables del backend
 
 | Variable | Por defecto | Para qué |
@@ -123,6 +135,8 @@ Con una URL `https://`, el APK **no** habilita el tráfico HTTP sin cifrar (`app
 | `TRUST_PROXY` | `1` en producción | Proxies delante del servidor, para ver la IP real del cliente |
 | `RIOT_RATE_LIMITS` | `18:1,95:120` | Cupo hacia Riot (`peticiones:segundos`); pon el de tu key un poco por debajo |
 | `PROBE_RIOT_ID` | `Hide on bush#KR1@kr` | Cuenta pública para detectar qué juegos habilita la key |
+| `BRAWLSTARS_API_KEY`, `CLASHROYALE_API_KEY`, `CLASHOFCLANS_API_KEY` | (vacías) | Keys de Supercell; cada juego se activa solo al ponerla |
+| `BRAWLSTARS_API_BASE`, `CLASHROYALE_API_BASE`, `CLASHOFCLANS_API_BASE` | proxies de RoyaleAPI | URL base de cada API (usa la oficial solo si tu servidor tiene IP fija) |
 
 ## Qué protege el backend
 

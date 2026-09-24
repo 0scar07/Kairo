@@ -15,3 +15,5 @@ export { default as ErrorState } from "./ErrorState";
 export { default as Expandable } from "./Expandable";
 export { default as ResultsStrip } from "./ResultsStrip";
 export { default as RowSkeleton } from "./RowSkeleton";
+export { default as StatGrid } from "./StatGrid";
+export { default as BattleRow } from "./BattleRow";

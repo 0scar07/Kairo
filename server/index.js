@@ -7,6 +7,7 @@ const { REGIONS, DEFAULT_REGION } = require("./lib/regions");
 const { securityHeaders, requestLogger, corsMiddleware, limiter } = require("./lib/middleware");
 const lolRouter = require("./routes/lol");
 const tftRouter = require("./routes/tft");
+const { createSupercellRouter } = require("./routes/supercell");
 
 if (!process.env.RIOT_API_KEY) {
   console.error("Falta RIOT_API_KEY (en server/.env o en las variables de entorno del hosting). Ver .env.example");
@@ -47,6 +48,10 @@ app.get("/health", (_req, res) => res.json({
 // Rutas por juego: /lol/... y /tft/...  (todas aceptan ?region=la1|la2|na1|br1|euw1|kr...)
 app.use("/lol", lolRouter);
 app.use("/tft", tftRouter);
+// Supercell: /brawlstars, /clashroyale y /clashofclans (se activan al configurar su key)
+app.use("/brawlstars", createSupercellRouter("brawlstars"));
+app.use("/clashroyale", createSupercellRouter("clashroyale"));
+app.use("/clashofclans", createSupercellRouter("clashofclans"));
 
 // Alias antiguos (/account, /summoner, /ranked, /matches, /match) = /lol/...
 // Se mantienen mientras alguna versión de la app los use; avisan una vez por ruta.

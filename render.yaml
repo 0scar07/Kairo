@@ -1,5 +1,5 @@
 # Blueprint de Render: crea el backend de Kairo desde este repositorio.
-# En Render: New > Blueprint > elige el repo. Solo te pedirá RIOT_API_KEY.
+# En Render: New > Blueprint > elige el repo. Te pedirá RIOT_API_KEY y, opcionalmente, las keys de Supercell.
 services:
   - type: web
     name: kairo-api
@@ -21,3 +21,10 @@ services:
         value: la1
       - key: RATE_LIMIT_PER_MIN
         value: "240"
+      # Supercell (opcionales: cada juego se activa al poner su key; permite la IP 45.79.218.79 al crearlas)
+      - key: BRAWLSTARS_API_KEY
+        sync: false
+      - key: CLASHROYALE_API_KEY
+        sync: false
+      - key: CLASHOFCLANS_API_KEY
+        sync: false

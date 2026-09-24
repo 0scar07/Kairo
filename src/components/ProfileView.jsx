@@ -62,7 +62,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
   }
 
   const ranked = profile.ranked;
-  const badge = ranked ? tierLabel(ranked.tier, ranked.rank) : null;
+  const badge = ranked ? tierLabel(ranked.tier, ranked.rank) : profile.badge || null;
 
   return (
     <ScrollView

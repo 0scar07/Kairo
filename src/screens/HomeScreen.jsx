@@ -5,6 +5,7 @@ import { GAMES, UPCOMING_GAMES, getGame } from "../games";
 import { APP_NAME, APP_TAGLINE } from "../constants/config";
 import { getRegion } from "../constants/regions";
 import { errorMessage } from "../utils/format";
+import { GLOBAL_REGION, tagOf } from "../utils/supercell";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
 import { loadRecents, clearRecents } from "../utils/recents";
 import { select } from "../utils/haptics";
@@ -54,6 +55,18 @@ export default function HomeScreen({ navigation }) {
 
   function handleSearch() {
     const text = input.trim();
+
+    // Juegos de Supercell: se busca solo por el tag (#2PP0) y no hay regiones
+    if (game.tagSearch) {
+      const tag = tagOf(text);
+      if (tag.length < 3) {
+        Alert.alert("Formato incorrecto", "Escribe el tag del jugador, por ejemplo #2PP0. Lo encuentras en su perfil dentro del juego.");
+        return;
+      }
+      openProfile({ gameId: game.id, gameName: "", tagLine: tag, region: GLOBAL_REGION });
+      return;
+    }
+
     const cut  = text.lastIndexOf("#");
     const name = (cut < 0 ? text : text.slice(0, cut)).trim();
     const tag  = cut < 0 ? "" : text.slice(cut + 1).trim();
@@ -111,7 +124,7 @@ export default function HomeScreen({ navigation }) {
           <Card style={[styles.searchCard, { borderColor: withAlpha(accent, 0.45) }, glow(accent, spacing.xl, 0.18)]}>
             <SectionLabel>Buscar en {game.name}</SectionLabel>
             <View style={styles.searchRow}>
-              <RegionButton value={region} onChange={setRegion} />
+              {game.hasRegion === false ? null : <RegionButton value={region} onChange={setRegion} />}
               <TextInput
                 value={input}
                 onChangeText={setInput}
@@ -128,7 +141,7 @@ export default function HomeScreen({ navigation }) {
                 onPress={handleSearch}
                 scaleTo={0.92}
                 style={[styles.go, { backgroundColor: accent }, glow(accent, spacing.md, 0.45)]}
-                accessibilityLabel={`Buscar en ${getRegion(region).name}`}
+                accessibilityLabel={game.hasRegion === false ? `Buscar en ${game.name}` : `Buscar en ${getRegion(region).name}`}
               >
                 <Icon name="search" size={sizes.item} color={colors.onAccent} />
               </PressableScale>
@@ -264,9 +277,9 @@ const styles = StyleSheet.create({
     borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.md, color: colors.text, minWidth: 0,
   },
   go:            { width: sizes.button, flexShrink: 0, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
-  gameSelector:  { flexDirection: "row", gap: spacing.sm, marginBottom: spacing.xl },
+  gameSelector:  { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginBottom: spacing.xl },
   gameBtn:       {
-    flex: 1, alignItems: "center", paddingVertical: spacing.md,
+    flexBasis: "30%", flexGrow: 1, alignItems: "center", paddingVertical: spacing.md,
     backgroundColor: colors.surface, borderWidth: sizes.hairline,
     borderColor: colors.border, borderRadius: radii.lg,
   },

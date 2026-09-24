@@ -120,6 +120,12 @@ La key tiene un cupo (por ejemplo 20 peticiones/s y 100 cada 2 min) compartido p
 - Si una petición espera más de 20 s, o la cola pasa de 300, se rechaza con 429 ("servidor ocupado").
 - Cupo configurable con `RIOT_RATE_LIMITS`; `npm test` en `server/` cubre el comportamiento.
 
+### Juegos de Supercell
+
+`lib/supercell.js` y `routes/supercell.js` sirven Brawl Stars, Clash Royale y Clash of Clans con la misma forma: `GET /{juego}/player/:tag` y, en los dos primeros, `GET /{juego}/battles/:tag` (siempre `{ items }`). El tag se normaliza (`#`, minúsculas, la letra O como cero) y se valida antes de llamar a Supercell. Los errores se traducen igual que los de Riot (404, 403 → `KEY_INVALID`, 429, 503 → `MAINTENANCE`). Un juego sin key responde `NOT_CONFIGURED` y `/health.games` lo marca como `false`.
+
+En la app, estos juegos declaran `tagSearch: true` y `hasRegion: false` en su `meta.js`: la búsqueda de Inicio pide solo el `#TAG` y no muestra el selector de región. Para que las pantallas genéricas sigan sin conocer ningún juego, `search()` devuelve `{ region: "global", account: { gameName, tagLine, puuid } }` con el tag como identificador.
+
 ### Qué juegos habilita la key
 
 Riot habilita cada API por producto: una key puede consultar LoL y no TFT (403). `lib/access.js` consulta cada 10 min una cuenta pública y publica el resultado en `/health` → `games`. La app lo lee al arrancar y muestra como "PRONTO" lo que no esté disponible. Solo se marca un juego como no disponible si la cuenta de prueba se resolvió (la key es válida) y aun así la API del juego dio 403.

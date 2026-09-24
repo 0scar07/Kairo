@@ -8,6 +8,7 @@ import { RegionChips } from "../components/RegionPicker";
 import { getGame } from "../games";
 import { DEFAULT_REGION } from "../constants/regions";
 import { errorMessage } from "../utils/format";
+import { GLOBAL_REGION } from "../utils/supercell";
 import { loadMyProfiles, saveMyProfile } from "../utils/prefs";
 import { useBootData } from "../boot/BootContext";
 import {
@@ -19,14 +20,15 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
   const [name, setName]     = useState("");
   const [tag, setTag]       = useState("");
   const [region, setRegion] = useState(initialRegion);
+  const tagOnly = Boolean(game.tagSearch);   // Supercell: solo el tag, sin nombre ni región
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.modalTitle}>Mi perfil de {game.short}</Text>
-          <Text style={styles.modalSubtitle}>Ingresa tu Riot ID para configurar tu perfil personal</Text>
-          <TextInput
+          <Text style={styles.modalSubtitle}>{tagOnly ? "Ingresa tu tag (ej: #2PP0) para configurar tu perfil personal" : "Ingresa tu Riot ID para configurar tu perfil personal"}</Text>
+          {!tagOnly && <TextInput
             value={name}
             onChangeText={setName}
             placeholder="Nombre (ej: Hide on bush)"
@@ -34,25 +36,25 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
             style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}
-          />
+          />}
           <TextInput
             value={tag}
             onChangeText={setTag}
-            placeholder="TAG (ej: KR1)"
+            placeholder={tagOnly ? "#TAG (ej: #2PP0)" : "TAG (ej: KR1)"}
             placeholderTextColor={colors.textFaint}
             style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}
           />
-          <RegionChips value={region} onChange={setRegion} game={game.id} />
+          {!tagOnly && <RegionChips value={region} onChange={setRegion} game={game.id} />}
           <TouchableOpacity
             style={[styles.btn, { backgroundColor: accent }, glow(accent, spacing.md, 0.4)]}
             onPress={() => {
-              if (!name.trim() || !tag.trim()) {
-                Alert.alert("Faltan datos", "Ingresa tu nombre y TAG");
+              if ((!tagOnly && !name.trim()) || !tag.trim()) {
+                Alert.alert("Faltan datos", tagOnly ? "Ingresa tu tag" : "Ingresa tu nombre y TAG");
                 return;
               }
-              onSave(name.trim(), tag.trim().replace(/^#/, ""), region);
+              onSave(name.trim(), tag.trim().replace(/^#/, ""), tagOnly ? GLOBAL_REGION : region);
             }}
           >
             <Text style={styles.btnText}>Guardar perfil</Text>

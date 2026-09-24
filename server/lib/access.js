@@ -1,6 +1,7 @@
 const { riotGet, TTL } = require("./riot");
 const { platformHost, accountHost, DEFAULT_REGION } = require("./regions");
 const PATHS = require("./paths");
+const supercell = require("./supercell");
 
 /**
  * ¿Qué juegos puede consultar la key de este servidor? Cada API se habilita por producto en el
@@ -56,6 +57,10 @@ function start(intervalMs = 10 * 60_000) {
   timer.unref?.();
 }
 
-const games = () => ({ ...state });
+// Los juegos de Supercell no se sondean: están disponibles si el servidor tiene su key configurada
+const games = () => ({
+  ...state,
+  ...Object.fromEntries(Object.keys(supercell.GAMES).map(id => [id, supercell.configured(id)])),
+});
 
 module.exports = { start, probe, games, markWorking, lastProbeAt: () => lastProbe };

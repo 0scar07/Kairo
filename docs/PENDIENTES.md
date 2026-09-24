@@ -20,6 +20,8 @@
 - [ ] Actualizar `expo` al último parche (`npx expo install expo@~54.0.37`).
 
 ## Funcionalidad
+- [ ] Probar los juegos de Supercell con datos reales (se construyeron con la documentación y con datos de prueba): verificar los campos y los íconos de Brawlify.
+- [ ] Supercell: clanes (`/clans/:tag`), campeones de Brawl Stars por poder de estrella/gadget, cartas y evoluciones de Clash Royale, tropas y hechizos de Clash of Clans.
 - [ ] **Valorant**, cuando Riot apruebe una production key (`val-match-v1`).
 - [ ] Endpoint agregado `/lol/profile/...` para reducir las ~14 peticiones por perfil.
 - [ ] Filtrar por cola (Solo/Dúo, Flex, ARAM…) en el historial de LoL.

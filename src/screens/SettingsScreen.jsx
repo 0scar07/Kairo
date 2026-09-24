@@ -54,7 +54,7 @@ export default function SettingsScreen({ navigation }) {
         <Card padded={false}>
           <Row
             label={`Mi perfil de ${game.short}`}
-            hint="Tu Riot ID, con estadísticas e insignias"
+            hint={game.tagSearch ? "Tu tag, con tus estadísticas" : "Tu Riot ID, con estadísticas e insignias"}
             onPress={() => navigation.navigate("MyProfile")}
             right={<Icon name="chevron" size={sizes.item - spacing.xs} color={colors.textMuted} />}
           />
@@ -99,6 +99,11 @@ export default function SettingsScreen({ navigation }) {
             {APP_NAME} no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie
             involucrado oficialmente en la producción o gestión de sus propiedades. Riot Games y todas las
             propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.
+          </Text>
+          <Text style={styles.legal}>
+            Este contenido no está afiliado, respaldado, patrocinado ni aprobado específicamente por Supercell y
+            Supercell no se hace responsable de él. Más información: la política de contenido de fans de Supercell
+            (supercell.com/fan-content-policy). Brawl Stars, Clash Royale y Clash of Clans son marcas de Supercell.
           </Text>
         </Card>
       </Reveal>
