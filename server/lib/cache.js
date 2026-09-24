@@ -6,6 +6,10 @@ class TtlCache {
     this.inflight = new Map();  // clave -> Promise
   }
 
+  get size() {
+    return this.store.size;
+  }
+
   get(key) {
     const hit = this.store.get(key);
     if (!hit) return undefined;

@@ -1,0 +1,23 @@
+# Blueprint de Render: crea el backend de Kairo desde este repositorio.
+# En Render: New > Blueprint > elige el repo. Solo te pedirá RIOT_API_KEY.
+services:
+  - type: web
+    name: kairo-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm ci
+    startCommand: node index.js
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: RIOT_API_KEY
+        sync: false            # la escribes en el panel de Render; nunca se guarda en git
+      - key: DEFAULT_REGION
+        value: la1
+      - key: RATE_LIMIT_PER_MIN
+        value: "240"

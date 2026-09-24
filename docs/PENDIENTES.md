@@ -2,10 +2,13 @@
 
 ## Antes de publicar
 - [ ] **Regenerar las keys de Riot** que alguna vez estuvieron en el código o en el historial de git (una key que estuvo en un commit público sigue visible aunque se borre después) y, si quieres, limpiar el historial.
-- [ ] **Desplegar el backend** (Railway, Fly.io, Render…). Con una key de desarrollo solo sirve para pruebas; para publicar hay que pedir una *production key* a Riot.
+- [ ] **Desplegar el backend**: ya está listo (`render.yaml`, `Dockerfile`, límite de peticiones, CORS). Sigue [DESPLIEGUE.md](DESPLIEGUE.md). Con una key de desarrollo solo sirve para pruebas (caduca a las 24 h): pide una *Personal* o *Production API Key* a Riot.
 - [ ] Revisar el aviso legal, buscar el nombre "Kairo" en Play Store / App Store y en el registro de marcas.
 - [ ] `eas init` de nuevo: el `projectId` de EAS sigue ligado al slug antiguo (`ggtracker`). El paquete Android sigue siendo `com.camavingaaa.ggtracker`; cámbialo si quieres identidad nueva.
-- [ ] Añadir límite de peticiones (rate limit) y CORS restringido al backend.
+- [x] Límite de peticiones y CORS configurable en el backend.
+- [ ] Probar el `Dockerfile` (no había Docker instalado) y el despliegue real en Render.
+- [ ] Base de datos solo si hace falta: favoritos sincronizados entre dispositivos (cuentas + Postgres/Supabase), caché persistente (Redis) o historial propio de LP.
+- [ ] Mostrar "el servidor está despertando…" cuando el plan gratuito de Render tarda en responder.
 - [ ] Actualizar `expo` al último parche (`npx expo install expo@~54.0.37`).
 
 ## Funcionalidad

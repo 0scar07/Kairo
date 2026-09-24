@@ -1,7 +1,7 @@
 {
-  "name": "lolbackend",
+  "name": "kairo-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend de Kairo: proxy con caché a la API de Riot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -14,6 +14,10 @@
     "axios": "^1.15.1",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

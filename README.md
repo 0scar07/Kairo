@@ -15,7 +15,7 @@ Estadísticas de **League of Legends** y **Teamfight Tactics** en una app móvil
 ![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
 ![Estado](https://img.shields.io/badge/estado-en%20desarrollo-C89B3C)
 
-[Capturas](#-capturas) · [Características](#-características) · [Puesta en marcha](#-puesta-en-marcha) · [Arquitectura](#-arquitectura) · [Roadmap](#-roadmap)
+[Capturas](#-capturas) · [Características](#-características) · [Puesta en marcha](#-puesta-en-marcha) · [Desplegar](#%EF%B8%8F-desplegar-en-la-nube) · [Arquitectura](#%EF%B8%8F-arquitectura) · [Roadmap](#%EF%B8%8F-roadmap)
 
 <br />
 
@@ -140,7 +140,21 @@ EXPO_PUBLIC_API_URL=http://192.168.1.8:3000 npx expo start
   ```
   Edita `EXPO_PUBLIC_API_URL` en el perfil `preview` de [eas.json](eas.json): el APK solo llega a un backend accesible desde el celular.
 
-> **HTTP en el APK:** `app.json` habilita `usesCleartextTraffic` para hablar con un backend de pruebas por `http://`. Al publicar, usa HTTPS y quita esa opción.
+> **HTTP en el APK:** `app.config.js` habilita el tráfico HTTP sin cifrar solo cuando `EXPO_PUBLIC_API_URL` empieza por `http://` (pruebas locales). Con un backend `https://` queda desactivado.
+
+## ☁️ Desplegar en la nube
+
+Para que la app funcione **sin tu PC encendida**, el backend tiene que estar en internet. No necesitas base de datos: los favoritos y preferencias se guardan en el propio celular.
+
+El repo incluye [`render.yaml`](render.yaml) y un [`Dockerfile`](server/Dockerfile) (Render, Railway, Fly.io…). Resumen con Render:
+
+1. **New → Blueprint** en <https://render.com>, elige este repositorio.
+2. Pega tu `RIOT_API_KEY` cuando la pida y pulsa **Apply**.
+3. Prueba `https://TU-URL.onrender.com/health` y pon esa URL en `EXPO_PUBLIC_API_URL`.
+
+> ⚠️ Las keys de desarrollo de Riot **caducan a las 24 h**: para un backend permanente necesitas una *Personal* o *Production API Key*.
+
+Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad): [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
 ## ⚙️ Configuración
 
@@ -151,6 +165,9 @@ EXPO_PUBLIC_API_URL=http://192.168.1.8:3000 npx expo start
 | `RIOT_API_KEY` | Tu key de Riot. **Obligatoria**: si falta, el servidor no arranca |
 | `PORT` | Puerto del backend (por defecto `3000`) |
 | `DEFAULT_REGION` | Región si la app no envía `?region=` (por defecto `la1`) |
+| `RATE_LIMIT_PER_MIN` | Peticiones por minuto y por IP (por defecto `240`) |
+| `CORS_ORIGINS` | Orígenes web permitidos, separados por comas (vacío = abierto) |
+| `TRUST_PROXY` | Proxies delante del servidor (por defecto `1` en producción) |
 
 App
 
@@ -176,8 +193,8 @@ Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, 
 ## 🗂️ Estructura
 
 ```
-server/                  backend Express (proxy a Riot)
-  lib/                   cliente de Riot, caché, regiones, errores
+server/                  backend Express (proxy a Riot) + Dockerfile
+  lib/                   cliente de Riot, caché, regiones, errores, config y middlewares
   routes/                /lol y /tft (fábrica compartida)
 src/
   api/                   cliente del backend y Data Dragon
@@ -188,7 +205,7 @@ src/
   theme/                 colores, tipografía, espaciado y acento por juego
   utils/                 favoritos, recientes, preferencias, formato
 assets/brand/icon.svg    ícono original (npm run icons genera los PNG)
-docs/                    arquitectura, pendientes y capturas
+docs/                    arquitectura, despliegue, pendientes y capturas
 scripts/                 generador de íconos y verificaciones
 ```
 
@@ -228,7 +245,8 @@ Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** pa
 - [x] LoL y TFT completos, con favoritos, recientes y región
 - [x] Sistema de diseño, pantalla de carga animada y micro-interacciones
 - [x] Backend con caché y errores en español
-- [ ] Desplegar el backend y publicar con una *production key*
+- [x] Backend listo para la nube (límite de peticiones, CORS, Docker, `render.yaml`)
+- [ ] Desplegar el backend y publicar con una *Production API Key*
 - [ ] Valorant (requiere aprobación de Riot)
 - [ ] Modo sin conexión con el último perfil visto
 - [ ] Notificaciones cuando un favorito cambia de rango

@@ -1,21 +1,35 @@
 require("dotenv").config();
 const express = require("express");
-const cors    = require("cors");
-const { HttpError, errorHandler } = require("./lib/riot");
+const config = require("./lib/config");
+const { HttpError, errorHandler, cache } = require("./lib/riot");
 const { REGIONS, DEFAULT_REGION } = require("./lib/regions");
+const { securityHeaders, requestLogger, corsMiddleware, limiter } = require("./lib/middleware");
 const lolRouter = require("./routes/lol");
 const tftRouter = require("./routes/tft");
 
 if (!process.env.RIOT_API_KEY) {
-  console.error("Falta RIOT_API_KEY en server/.env (ver .env.example)");
+  console.error("Falta RIOT_API_KEY (en server/.env o en las variables de entorno del hosting). Ver .env.example");
   process.exit(1);
 }
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.disable("x-powered-by");
+app.set("trust proxy", config.trustProxy);
 
-app.get("/health", (_req, res) => res.json({ ok: true, regions: Object.keys(REGIONS), defaultRegion: DEFAULT_REGION }));
+app.use(securityHeaders);
+app.use(requestLogger);
+app.use(corsMiddleware);
+app.use(express.json({ limit: "10kb" }));
+app.use(limiter);
+
+// Sin límite de peticiones: lo usan los hostings para comprobar que el servicio está vivo
+app.get("/health", (_req, res) => res.json({
+  ok: true,
+  uptime: Math.round(process.uptime()),
+  cacheEntries: cache.size,
+  regions: Object.keys(REGIONS),
+  defaultRegion: DEFAULT_REGION,
+}));
 
 // Rutas por juego: /lol/... y /tft/...  (todas aceptan ?region=la1|la2|na1|br1|euw1|kr...)
 app.use("/lol", lolRouter);
@@ -37,5 +51,16 @@ app.use((req, _res, next) => {
 app.use((_req, _res, next) => next(new HttpError(404, "Ruta no encontrada")));
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Backend corriendo en http://localhost:${PORT}`));
+const server = app.listen(config.port, () => {
+  console.log(`✅ Backend corriendo en el puerto ${config.port} (${config.isProduction ? "producción" : "desarrollo"})`);
+  console.log(`   límite: ${config.rateLimitPerMin} peticiones/min por IP · CORS: ${config.corsOrigins.join(", ") || "abierto"}`);
+});
+
+// Cierre limpio: los hostings envían SIGTERM al reiniciar o redesplegar
+function shutdown(signal) {
+  console.log(`${signal} recibido: cerrando…`);
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
