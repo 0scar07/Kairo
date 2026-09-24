@@ -117,7 +117,7 @@ Se buscan por **`#TAG`** y no tienen regiones.
 
 <sub>Las capturas de Brawl Stars, Clash Royale y Clash of Clans usan datos reales de la API de Supercell. Las de TFT son anteriores al rediseño de íconos.</sub>
 
-<sub>La partida en vivo es de una partida real de Flex; los nombres de los otros nueve jugadores se reemplazaron por "Jugador N" para no publicar cuentas ajenas.</sub>
+<sub>La partida en vivo es de una partida real de Flex, con los nombres tal como los muestra la app.</sub>
 
 <sub>* El aviso de mantenimiento se muestra solo cuando Riot reporta uno activo; en la captura se simuló uno para enseñar el diseño. Las demás son datos reales de la API.</sub>
 
