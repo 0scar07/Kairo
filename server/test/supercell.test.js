@@ -11,6 +11,7 @@ const upstream = http.createServer((req, res) => {
   if (req.url === "/v1/players/%232222") return send(404, { reason: "notFound" });
   if (req.url === "/v1/players/%23LLLL") return send(403, { reason: "accessDenied.invalidIp" });
   if (req.url === "/v1/players/%23JJJJ") return send(503, { reason: "inMaintenance" });
+  if (req.url.startsWith("/v1/rankings/global/players")) return send(200, { items: [{ tag: "#2PP", name: "Top" }] });
   if (req.url.endsWith("/battlelog")) return send(200, req.url.includes("%239999") ? [{ battleTime: "a" }] : { items: [{ battleTime: "b" }] });
   return send(200, { tag: "#2PP0", name: "Prueba" });
 });
@@ -85,6 +86,12 @@ test("sin key el juego responde NOT_CONFIGURED y no aparece disponible", async (
   const games = require("../lib/access").games();
   assert.strictEqual(games.clashofclans, false);
   assert.strictEqual(games.brawlstars, true);
+});
+
+test("/top devuelve { items } con el límite pedido", async () => {
+  const r = await get("/brawlstars/top?limit=3");
+  assert.deepStrictEqual(r.body, { items: [{ tag: "#2PP", name: "Top" }] });
+  assert.ok(seen.some(s => s.url === "/v1/rankings/global/players?limit=3"));
 });
 
 test("Clash of Clans no tiene ruta de batallas", async () => {

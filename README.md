@@ -215,6 +215,7 @@ Supercell (sin región; el tag se acepta con o sin `#`):
 |------|-------------|
 | `GET /{brawlstars, clashroyale, clashofclans}/player/:tag` | Perfil del jugador |
 | `GET /{brawlstars, clashroyale}/battles/:tag` | Últimas batallas (`{ items }`) |
+| `GET /{brawlstars, clashroyale, clashofclans}/top?limit=10` | Mejores jugadores del mundo (sirve para descubrir tags) |
 
 Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, `/match`) siguen funcionando como alias de `/lol/…`.
 

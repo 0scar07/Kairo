@@ -17,6 +17,7 @@ const GAMES = {
     baseEnv: "BRAWLSTARS_API_BASE",
     base: "https://bsproxy.royaleapi.dev/v1",
     battlelog: true,
+    top: "/rankings/global/players",
   },
   clashroyale: {
     name: "Clash Royale",
@@ -24,6 +25,7 @@ const GAMES = {
     baseEnv: "CLASHROYALE_API_BASE",
     base: "https://proxy.royaleapi.dev/v1",
     battlelog: true,
+    top: "/locations/global/pathoflegend/players",
   },
   clashofclans: {
     name: "Clash of Clans",
@@ -31,11 +33,12 @@ const GAMES = {
     baseEnv: "CLASHOFCLANS_API_BASE",
     base: "https://cocproxy.royaleapi.dev/v1",
     battlelog: false,
+    top: "/locations/global/rankings/players",
   },
 };
 
 // TTL (ms) por tipo de dato
-const TTL = { player: 60_000, battles: 30_000 };
+const TTL = { player: 60_000, battles: 30_000, top: 10 * 60_000 };
 
 const cache = new TtlCache({ max: 300 });
 
@@ -73,12 +76,12 @@ function toHttpError(id, e) {
   return new HttpError(502, `No se pudo contactar a ${name}`);
 }
 
-/** GET a `/players/%23TAG[/suffix]` con caché y errores normalizados. */
-async function playerGet(id, tag, suffix, ttl) {
+/** GET a una ruta de la API del juego con caché y errores normalizados. */
+async function apiGet(id, path, ttl) {
   if (!configured(id)) {
     throw new HttpError(503, `${GAMES[id].name} no está configurado en el servidor`, { code: "NOT_CONFIGURED" });
   }
-  const url = `${baseOf(id)}/players/%23${tag}${suffix}`;
+  const url = `${baseOf(id)}${path}`;
   try {
     return await cache.wrap(url, ttl, () =>
       axios.get(url, { timeout: 8000, headers: { Authorization: `Bearer ${process.env[GAMES[id].keyEnv]}` } }).then(r => r.data));
@@ -87,4 +90,7 @@ async function playerGet(id, tag, suffix, ttl) {
   }
 }
 
-module.exports = { GAMES, TTL, TAG_RE, normalizeTag, configured, playerGet, toHttpError, cache };
+/** `/players/%23TAG[/suffix]` */
+const playerGet = (id, tag, suffix, ttl) => apiGet(id, `/players/%23${tag}${suffix}`, ttl);
+
+module.exports = { GAMES, TTL, TAG_RE, normalizeTag, configured, apiGet, playerGet, toHttpError, cache };
