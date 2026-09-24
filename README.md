@@ -6,7 +6,7 @@
 
 **Cada partida cuenta.**
 
-Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, **Clash Royale** y **Clash of Clans** en una app móvil premium, hecha con React Native y Expo.
+Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale** y **Clash of Clans** en una app móvil premium, hecha con React Native y Expo.
 
 ![Expo SDK](https://img.shields.io/badge/Expo-SDK%2054-000020?logo=expo&logoColor=white)
 ![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?logo=react&logoColor=black)

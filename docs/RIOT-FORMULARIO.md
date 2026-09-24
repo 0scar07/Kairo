@@ -23,7 +23,7 @@ What it shows:
 - Teamfight Tactics: Ranked, Double Up and Hyper Roll rank, recent matches with final placement (1-8), active traits and units with star levels; average placement and top-4 rate.
 - Favorites and recent searches, stored only on the user's own device.
 
-APIs used: ACCOUNT-V1 (by Riot ID), SUMMONER-V4, LEAGUE-V4 (entries by PUUID), MATCH-V5, TFT-SUMMONER-V1, TFT-LEAGUE-V1 and TFT-MATCH-V1. Static images come from Data Dragon.
+APIs used: ACCOUNT-V1 (by Riot ID), SUMMONER-V4, LEAGUE-V4 (entries by PUUID), MATCH-V5, CHAMPION-MASTERY-V4, CHAMPION-V3 (free rotation), LOL-STATUS-V4, SPECTATOR-V5 (a player's current game) and, for TFT, TFT-SUMMONER-V1, TFT-LEAGUE-V1 and TFT-MATCH-V1. Static images come from Data Dragon.
 
 How the key is protected: the mobile app never contains the API key. Every request goes through our own backend (Node.js / Express), which holds the key server-side, validates region/PUUID/match-ID inputs, applies per-IP rate limiting, and caches public responses briefly (finished matches 1 hour, account 10 minutes, rank 2 minutes) to minimize calls to the Riot API. When Riot returns HTTP 429 we surface the Retry-After value to the client instead of retrying.
 
