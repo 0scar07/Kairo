@@ -22,6 +22,15 @@ app.use(corsMiddleware);
 app.use(express.json({ limit: "10kb" }));
 app.use(limiter);
 
+// La raíz no es una página web: solo identifica el servicio para quien abra la URL en el navegador
+app.get("/", (_req, res) => res.json({
+  name: "Kairo API",
+  status: "ok",
+  message: "Backend de Kairo (proxy a la API de Riot). No es una página web.",
+  health: "/health",
+  docs: "https://github.com/0scar07/Kairo",
+}));
+
 // Sin límite de peticiones: lo usan los hostings para comprobar que el servicio está vivo
 app.get("/health", (_req, res) => res.json({
   ok: true,
