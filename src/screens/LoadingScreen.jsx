@@ -113,17 +113,21 @@ export default function LoadingScreen({ progress, textsReady, finished, onHidden
         <Image source={require("../../assets/splash-icon.png")} style={styles.logo} />
       </Animated.View>
 
-      <View pointerEvents="none" style={[styles.textBlock, { top: centerY + sizes.splashLogo * 0.32 + spacing.xl }]}>
-        <Animated.Text style={[styles.name, nameStyle]}>{APP_NAME.toUpperCase()}</Animated.Text>
-        <Animated.Text style={[styles.tagline, taglineStyle]}>{APP_TAGLINE.toUpperCase()}</Animated.Text>
+      {/* Los textos se montan SOLO cuando las fuentes ya cargaron. En Android un texto medido con la fuente
+          por defecto no se vuelve a medir al llegar Sora/Inter y queda recortado ("KAIR", "CADA PARTIDA"). */}
+      {textsReady && (
+        <View pointerEvents="none" style={[styles.textBlock, { top: centerY + sizes.splashLogo * 0.32 + spacing.xl }]}>
+          <Animated.Text style={[styles.name, nameStyle]}>{APP_NAME.toUpperCase()}</Animated.Text>
+          <Animated.Text style={[styles.tagline, taglineStyle]}>{APP_TAGLINE.toUpperCase()}</Animated.Text>
 
-        <Animated.View style={[styles.barBlock, barStyle]}>
-          <View style={styles.track}>
-            <Animated.View style={[styles.fill, glow(ACCENT, spacing.sm, 0.9), fillStyle]} />
-          </View>
-          <Text style={styles.percent}>{pct} %</Text>
-        </Animated.View>
-      </View>
+          <Animated.View style={[styles.barBlock, barStyle]}>
+            <View style={styles.track}>
+              <Animated.View style={[styles.fill, glow(ACCENT, spacing.sm, 0.9), fillStyle]} />
+            </View>
+            <Text style={styles.percent}>{pct} %</Text>
+          </Animated.View>
+        </View>
+      )}
     </Animated.View>
   );
 }
