@@ -130,7 +130,7 @@ EXPO_PUBLIC_API_URL=http://192.168.1.8:3000 npx expo start
 
 ### 3. Probar en el celular
 
-- **Expo Go** *(lo más rápido)*: escanea el QR de `npx expo start`. En Expo Go no se ve el splash nativo personalizado.
+- **Expo Go** *(lo más rápido)*: escanea el QR de `npm run phone` (equivale a `npx expo start --offline`, que evita pedir sesión de Expo). En Expo Go no se ve el splash nativo personalizado.
 - **APK de prueba con EAS**:
   ```bash
   npm install -g eas-cli
@@ -254,6 +254,10 @@ Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** pa
 
 La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
 
+## 🌐 Página pública y key de Riot
+
+El repo incluye una [página del producto](docs/index.html) y una [política de privacidad](docs/privacy.html) listas para GitHub Pages, y el texto para registrar el producto en el portal de Riot: [docs/RIOT-FORMULARIO.md](docs/RIOT-FORMULARIO.md).
+
 ## 🩺 Problemas frecuentes
 
 | Síntoma | Causa y solución |
@@ -262,6 +266,7 @@ La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
 | "El servidor no tiene acceso a Riot" | La key es inválida o expiró (las de desarrollo duran 24 h). Regénerala y reinicia el backend |
 | "Riot limitó las solicitudes" | Superaste el límite de la key. Espera unos segundos: cada perfil hace ~14 peticiones |
 | Rango vacío o "Sin clasificar" | El jugador no tiene partidas clasificatorias en ese modo/región. Revisa que la región sea la correcta |
+| "Something went wrong" en Expo Go | Expo Go tiene una sesión iniciada y el servidor pide firmar el manifiesto. Arranca con `npm run phone` (usa `--offline`) o cierra la sesión en Expo Go |
 | Íconos de TFT con iniciales | Data Dragon solo trae los sets vigentes; las partidas de sets antiguos usan un placeholder |
 
 ## 🤝 Contribuir

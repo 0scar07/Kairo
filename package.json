@@ -8,7 +8,8 @@
     "ios": "expo start --ios",
     "icons": "node scripts/generate-icons.js",
     "verify": "node scripts/verify-imports.js && node scripts/verify-tokens.js",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "phone": "expo start --offline"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",

@@ -13,12 +13,15 @@ function securityHeaders(_req, res, next) {
   next();
 }
 
-// Registro de peticiones: método, ruta (con IDs largos enmascarados), estado y duración
+// Registro de peticiones: método, ruta, estado y duración. Se enmascaran los nombres de jugador y los IDs largos
+// (PUUID, ID de partida) para no dejar datos de jugadores en los logs.
 function requestLogger(req, res, next) {
   const start = Date.now();
   res.on("finish", () => {
     if (req.path === "/health") return;
-    const route = req.originalUrl.split("?")[0].replace(/[\w-]{30,}/g, ":id");
+    const route = req.originalUrl.split("?")[0]
+      .replace(/\/account\/[^/]+\/[^/]+/, "/account/:name/:tag")
+      .replace(/[\w-]{30,}/g, ":id");
     console.log(`${req.method} ${route} ${res.statusCode} ${Date.now() - start}ms`);
   });
   next();

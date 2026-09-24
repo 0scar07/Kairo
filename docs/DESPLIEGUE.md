@@ -57,6 +57,25 @@ Para evitarlo:
 - Usa un monitor gratuito (por ejemplo UptimeRobot) que llame a `https://TU-URL.onrender.com/health` cada 5 minutos, o
 - pasa a un plan de pago (el más barato no se duerme).
 
+## Generar el APK con EAS
+
+Hazlo **después** de desplegar el backend, para que el APK ya apunte a la nube.
+
+1. Pon la URL `https://…` de Render en `EXPO_PUBLIC_API_URL` dentro de los perfiles `preview` y `production` de [`eas.json`](../eas.json).
+2. En tu terminal:
+   ```bash
+   npm install -g eas-cli
+   eas login                                     # tu cuenta de expo.dev (créala gratis)
+   eas init                                      # crea el proyecto "kairo" y guarda su projectId en app.json
+   eas build -p android --profile preview        # genera un APK instalable
+   ```
+3. La primera vez EAS pregunta por la *keystore* de Android: elige **generar una nueva** y déjala guardada en EAS (sin ella no podrás actualizar la app publicada).
+4. Espera la cola y el build (10-20 minutos en el plan gratuito). Al terminar te da un enlace y un QR: ábrelo en el celular para descargar el APK e instalarlo (habilita "instalar apps desconocidas" si Android lo pide).
+
+Para Google Play se usa el perfil `production` (genera un `.aab`): `eas build -p android --profile production`.
+
+> El identificador de la app es `com.camavingaaa.kairo` (en `app.json`). Cámbialo **antes** de tu primera publicación si quieres otro: después no se puede.
+
 ## Alternativas
 
 El backend incluye un [`Dockerfile`](../server/Dockerfile), así que funciona en cualquier sitio con Docker o Node.
@@ -79,7 +98,7 @@ La app lee la URL de la variable `EXPO_PUBLIC_API_URL` **al compilar**, así que
 
 **Probar con Expo Go**
 ```bash
-EXPO_PUBLIC_API_URL=https://TU-URL.onrender.com npx expo start
+EXPO_PUBLIC_API_URL=https://TU-URL.onrender.com npm run phone
 ```
 
 **APK / build de producción**: edita `EXPO_PUBLIC_API_URL` en el perfil `production` (o `preview`) de [`eas.json`](../eas.json) y compila:
@@ -106,7 +125,7 @@ Con una URL `https://`, el APK **no** habilita el tráfico HTTP sin cifrar (`app
 - **Caché en memoria**: partidas terminadas 1 h, cuenta 10 min, rango 2 min. Reduce las llamadas a Riot y protege el límite de tu key.
 - **Validación** de región, PUUID e ID de partida, y `count` limitado a 20.
 - **Cabeceras de seguridad** y sin `X-Powered-By`.
-- **Registro** de cada petición con los IDs largos enmascarados.
+- **Registro** de cada petición con los nombres de jugador y los IDs largos enmascarados.
 - **Cierre limpio** al recibir SIGTERM (redespliegues sin cortar peticiones).
 
 ## Ojo con…

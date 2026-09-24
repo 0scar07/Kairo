@@ -20,5 +20,5 @@ No abras un *issue* público. Escribe al mantenedor por mensaje privado en GitHu
 
 - Valida región, PUUID e ID de partida antes de llamar a Riot.
 - Limita `count` a 20 por petición.
-- Incluye límite de peticiones por IP (`RATE_LIMIT_PER_MIN`), CORS configurable (`CORS_ORIGINS`), cabeceras de seguridad y registro con IDs enmascarados.
+- Incluye límite de peticiones por IP (`RATE_LIMIT_PER_MIN`), CORS configurable (`CORS_ORIGINS`), cabeceras de seguridad y registro con nombres e IDs enmascarados.
 - Al desplegar: usa HTTPS, guarda la key solo en las variables del hosting y sigue [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).

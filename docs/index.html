@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kairo · Cada partida cuenta</title>
+  <meta name="description" content="Kairo: estadísticas de League of Legends y Teamfight Tactics en una app móvil. Every match counts." />
+  <link rel="icon" href="favicon.png" />
+  <style>
+    :root { --bg:#070C0F; --surface:#0D141B; --border:#1C2733; --text:#E6EDF6; --muted:#8798AB; --accent:#35E0A1; --gold:#C89B3C; --cyan:#0BC4E3; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:radial-gradient(1200px 600px at 50% -10%, #0E2B25 0%, var(--bg) 60%); color:var(--text);
+           font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height:1.6; }
+    a { color:var(--accent); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+    header { padding: 72px 0 32px; text-align:center; }
+    header img.logo { width:96px; height:96px; border-radius:22px; }
+    h1 { font-size: 44px; letter-spacing: 12px; margin: 20px 0 4px; padding-left: 12px; }
+    .tag { color: var(--muted); letter-spacing: 5px; text-transform: uppercase; font-size: 12px; }
+    .lead { max-width: 640px; margin: 24px auto 0; color: var(--muted); font-size: 17px; }
+    .hero { width:100%; border-radius: 20px; margin: 40px 0 8px; }
+    .note { color: var(--muted); font-size: 12px; text-align:center; }
+    section { padding: 36px 0; }
+    h2 { font-size: 22px; margin: 0 0 16px; letter-spacing: 1px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: var(--surface); border:1px solid var(--border); border-radius: 16px; padding: 20px; }
+    .card h3 { margin: 0 0 8px; font-size: 16px; }
+    .card p, .card li { color: var(--muted); margin: 0; font-size: 14px; }
+    .card ul { margin: 0; padding-left: 18px; }
+    .lol h3 { color: var(--gold); } .tft h3 { color: var(--cyan); }
+    .shots { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+    .shots img { width:100%; border-radius: 16px; border:1px solid var(--border); }
+    .es-en { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 700px) { .es-en { grid-template-columns: 1fr; } h1 { font-size: 34px; letter-spacing: 8px; } }
+    footer { border-top:1px solid var(--border); padding: 32px 0 56px; color: var(--muted); font-size: 12px; text-align:center; }
+    footer p { max-width: 760px; margin: 8px auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img class="logo" src="logo.png" alt="Logo de Kairo" />
+      <h1>KAIRO</h1>
+      <div class="tag">Cada partida cuenta · Every match counts</div>
+      <p class="lead">
+        Estadísticas de <strong>League of Legends</strong> y <strong>Teamfight Tactics</strong> en una app móvil gratuita y sin anuncios.<br />
+        <em>Free, ad-free mobile stats for League of Legends and Teamfight Tactics.</em>
+      </p>
+      <img class="hero" src="screenshots/hero.png" alt="Capturas de Kairo" />
+      <div class="note">Producto en desarrollo · Product in development</div>
+    </header>
+
+    <section>
+      <h2>Qué hace · What it does</h2>
+      <div class="es-en">
+        <div class="card">
+          <h3>Español</h3>
+          <p>Busca a cualquier jugador por su Riot ID y región y consulta su rango, sus partidas recientes y estadísticas. Guarda tus favoritos y búsquedas recientes en tu propio dispositivo. Solo usa datos públicos posteriores a la partida.</p>
+        </div>
+        <div class="card">
+          <h3>English</h3>
+          <p>Look up any player by Riot ID and region to see their rank, recent matches and stats. Favorites and recent searches are stored on your own device. Only public, post-game data is used.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Características · Features</h2>
+      <div class="grid">
+        <div class="card lol">
+          <h3>League of Legends</h3>
+          <ul>
+            <li>Rango Solo/Dúo y Flex · Solo/Duo and Flex rank</li>
+            <li>Historial con KDA, CS, daño, objetos, hechizos y runas</li>
+            <li>Winrate, racha y campeones más jugados</li>
+          </ul>
+        </div>
+        <div class="card tft">
+          <h3>Teamfight Tactics</h3>
+          <ul>
+            <li>Ranked, Double Up y Hyper Roll</li>
+            <li>Posición final 1–8, rasgos y unidades con estrellas</li>
+            <li>Promedio de posición y top 4</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Toda la app · Everywhere</h3>
+          <ul>
+            <li>10 regiones · 10 regions</li>
+            <li>Favoritos y recientes en el dispositivo · On-device favorites</li>
+            <li>Sin cuentas, sin anuncios · No accounts, no ads</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Capturas · Screenshots</h2>
+      <div class="shots">
+        <img src="screenshots/home-lol.png" alt="Inicio" />
+        <img src="screenshots/profile-lol.png" alt="Perfil de LoL" />
+        <img src="screenshots/match-detail-lol.png" alt="Detalle de partida con runas" />
+        <img src="screenshots/profile-tft.png" alt="Perfil de TFT" />
+        <img src="screenshots/match-detail-tft.png" alt="Detalle de partida de TFT" />
+        <img src="screenshots/favorites.png" alt="Favoritos" />
+      </div>
+      <p class="note">Capturas renderizadas en un navegador móvil · Screenshots rendered in a mobile browser</p>
+    </section>
+
+    <section>
+      <h2>Cómo usa la API de Riot · How it uses the Riot API</h2>
+      <div class="card">
+        <p>
+          La app <strong>nunca contiene la API key</strong>: todas las consultas pasan por un backend propio que la guarda, valida las entradas,
+          limita las peticiones por IP y cachea las respuestas brevemente para minimizar llamadas.
+          Usa ACCOUNT-V1, SUMMONER-V4, LEAGUE-V4, MATCH-V5, TFT-SUMMONER-V1, TFT-LEAGUE-V1 y TFT-MATCH-V1, además de Data Dragon para imágenes.<br /><br />
+          <em>The app never contains the API key: all requests go through our own backend, which holds the key server-side, validates input,
+          rate-limits per IP and briefly caches responses to minimize calls. It uses ACCOUNT-V1, SUMMONER-V4, LEAGUE-V4, MATCH-V5,
+          TFT-SUMMONER-V1, TFT-LEAGUE-V1 and TFT-MATCH-V1, plus Data Dragon for images.</em>
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Enlaces · Links</h2>
+      <p>
+        <a href="privacy.html">Política de privacidad · Privacy policy</a> ·
+        <a href="https://github.com/0scar07/Tracker">Código fuente · Source code</a> ·
+        <a href="https://github.com/0scar07/Tracker/issues">Contacto · Contact (GitHub Issues)</a>
+      </p>
+    </section>
+
+    <footer>
+      <p>
+        Kairo no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción
+        o gestión de sus propiedades. Riot Games y todas las propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.
+      </p>
+      <p>
+        Kairo isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or
+        managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
