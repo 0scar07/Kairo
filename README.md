@@ -37,18 +37,24 @@ Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, 
 | **Resumen** | Winrate, KDA promedio, racha y campeón más jugado | Posición promedio, top 4 y victorias |
 | **Extras** | Filtros por resultado y campeón, estadísticas por campeón | Gráfico de posiciones recientes |
 
+| | Brawl Stars | Clash Royale | Clash of Clans |
+|---|---|---|---|
+| **Perfil** | Trofeos, récord, nivel y club | Trofeos, récord, nivel, clan y rol | Ayuntamiento, trofeos, liga y clan |
+| **Progreso** | Victorias 3v3, solo y dúo; brawlers con poder, rango y trofeos | Victorias, derrotas, winrate, 3 coronas y Senda de leyendas | Guerra, donaciones, héroes y base del constructor |
+| **Partidas** | Últimas 25 batallas con brawler, modo, mapa y trofeos | Últimas 30 batallas con marcador y trofeos; mazo actual con nivel y elixir | (la API no expone registro de batallas) |
+
 **En toda la app**
 
-- 🔎 **Búsqueda por Riot ID** con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada.
+- 🔎 **Búsqueda por Riot ID** (LoL y TFT) con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada, o por **`#TAG`** en los juegos de Supercell.
 - ⭐ **Favoritos** con tarjetas (ícono, región y rango con el color del tier) y **búsquedas recientes**.
 - 👤 **Mi perfil** por juego, con insignias y gráfico de KDA en LoL.
-- 🎨 **Acento por juego** (dorado LoL, cian TFT) que cambia con una transición suave y se recuerda.
+- 🎨 **Acento por juego** (dorado LoL, cian TFT, amarillo Brawl Stars, azul Clash Royale, verde Clash of Clans) que cambia con una transición suave y se recuerda.
 - 🚀 **Pantalla de carga animada** con progreso real de arranque y aparición escalonada de las secciones.
 - 🫧 **Skeletons**, estados vacíos amables y errores con botón de reintentar.
 - 📳 **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
 - ✨ **Sin emojis:** toda la interfaz usa íconos vectoriales propios (SVG) que se ven nítidos y toman el color del juego.
 - 🕹️ **Multijuego:** LoL y TFT (API de Riot) más **Brawl Stars, Clash Royale y Clash of Clans** (API de Supercell). Los de Supercell se buscan por `#TAG` y no tienen regiones. Cada juego se activa solo si el servidor tiene su key.
-- 🎮 **Logos oficiales de cada juego** (LoL, TFT, Valorant) en el selector, recientes y favoritos.
+- 🎮 **Logos e íconos oficiales de cada juego** (LoL, TFT, Valorant; Brawl Stars, Clash Royale y Clash of Clans) en el selector, recientes y favoritos.
 - 🏅 **Emblemas de rango oficiales** (Iron → Challenger) en el perfil, las tarjetas de ranked y Favoritos.
 - 📊 **LoL extra:** maestría de campeones (top 3 con nivel y puntos), rotación gratuita de la semana y aviso de mantenimiento del servidor de tu región.
 - 🧭 **Juegos según tu key:** el backend detecta qué APIs habilita tu key de Riot; lo que no esté habilitado aparece como "PRONTO" en vez de dar errores.
@@ -112,7 +118,7 @@ Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, 
 | App | React Native 0.81 · Expo SDK 54 · React Navigation 7 |
 | Animación | Reanimated 4 · SVG (`react-native-svg`) · `expo-haptics` |
 | Diseño | Sistema propio de *tokens* (`src/theme`) · Sora + Inter (`@expo-google-fonts`) |
-| Datos | Backend Express 5 · API de Riot · Data Dragon (íconos, campeones, runas, TFT) |
+| Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) |
 | Almacenamiento | AsyncStorage (favoritos, recientes, preferencias) |
 
 ## 🏗️ Arquitectura
@@ -121,10 +127,11 @@ Estadísticas de **League of Legends**, **Teamfight Tactics**, **Brawl Stars**, 
 flowchart LR
     App["📱 App Kairo<br/>(Expo)"] -- "?region=kr" --> API["🖥️ Backend Express<br/>caché + errores"]
     API -- "X-Riot-Token" --> Riot[["Riot Games API"]]
+    API -- "Bearer key · IP fija" --> Proxy[["Proxy RoyaleAPI"]] --> SC[["API de Supercell<br/>(BS · CR · CoC)"]]
     App -- "íconos y datos estáticos" --> DD[["Data Dragon"]]
 ```
 
-- La **API key de Riot nunca va en la app**: vive solo en `server/.env`.
+- Las **API keys (Riot y Supercell) nunca van en la app**: viven solo en `server/.env` o en las variables del hosting.
 - El backend **cachea** (partidas terminadas 1 h) y traduce los errores de Riot a mensajes en español.
 - Las pantallas genéricas **no conocen ningún juego**: leen todo de `src/games/`.
 
@@ -132,14 +139,14 @@ Más detalle, diagramas de secuencia y decisiones en [docs/ARQUITECTURA.md](docs
 
 ## 🚀 Puesta en marcha
 
-Necesitas **Node 20+** y una key de <https://developer.riotgames.com> (las de desarrollo caducan cada 24 h).
+Necesitas **Node 20+** y una key de <https://developer.riotgames.com> (las de desarrollo caducan cada 24 h). Para Brawl Stars, Clash Royale y Clash of Clans, además, una key de cada portal de Supercell (opcional; mira [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)).
 
 ### 1. Backend
 
 ```bash
 cd server
 npm install
-cp .env.example .env        # y pon tu RIOT_API_KEY
+cp .env.example .env        # y pon tu RIOT_API_KEY (y, si quieres, las de Supercell)
 npm start                   # http://localhost:3000  ·  comprueba /health
 ```
 
@@ -236,18 +243,18 @@ Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, 
 ## 🗂️ Estructura
 
 ```
-server/                  backend Express (proxy a Riot) + Dockerfile
-  lib/                   cliente de Riot, caché, regiones, errores, config y middlewares
-  routes/                /lol y /tft (fábrica compartida)
+server/                  backend Express (proxy a Riot y Supercell) + Dockerfile + pruebas
+  lib/                   clientes de Riot y Supercell, caché, cola de salida, regiones, errores y middlewares
+  routes/                /lol y /tft (fábrica compartida) y /brawlstars, /clashroyale, /clashofclans
 src/
   api/                   cliente del backend y Data Dragon
   boot/                  tareas de arranque y progreso de la pantalla de carga
   components/            componentes genéricos (perfil, favoritos, barra flotante…) y ui/
-  games/                 un módulo por juego (lol/, tft/) + registro
+  games/                 un módulo por juego (lol/, tft/, brawlstars/, clashroyale/, clashofclans/) + registro
   screens/               Inicio, Favoritos, Ajustes, Perfil, Mi perfil, Carga
   theme/                 colores, tipografía, espaciado y acento por juego
   utils/                 favoritos, recientes, preferencias, formato
-assets/brand/icon.svg    ícono original (npm run icons genera los PNG)
+assets/                  brand/icon.svg (npm run icons genera los PNG), ranks/ (emblemas) y games/ (íconos de juegos)
 docs/                    arquitectura, despliegue, pendientes y capturas
 scripts/                 generador de íconos y verificaciones
 ```
@@ -261,6 +268,9 @@ Base casi negra con un toque verdoso, superficies en capas y bordes sutiles. Cad
 | Kairo | ![#35E0A1](https://img.shields.io/badge/-%2335E0A1-35E0A1) | Marca, pantalla de carga |
 | LoL | ![#C89B3C](https://img.shields.io/badge/-%23C89B3C-C89B3C) | Acento de League of Legends |
 | TFT | ![#0BC4E3](https://img.shields.io/badge/-%230BC4E3-0BC4E3) | Acento de Teamfight Tactics |
+| Brawl Stars | ![#FFCE1F](https://img.shields.io/badge/-%23FFCE1F-FFCE1F) | Acento de Brawl Stars |
+| Clash Royale | ![#3F8CFF](https://img.shields.io/badge/-%233F8CFF-3F8CFF) | Acento de Clash Royale |
+| Clash of Clans | ![#79C942](https://img.shields.io/badge/-%2379C942-79C942) | Acento de Clash of Clans |
 | Victoria | ![#4FC97A](https://img.shields.io/badge/-%234FC97A-4FC97A) | Resultado positivo |
 | Derrota | ![#E05555](https://img.shields.io/badge/-%23E05555-E05555) | Resultado negativo |
 
@@ -279,9 +289,9 @@ Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** pa
 
 ## ➕ Añadir un juego
 
-1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento, ícono…) e `index.js` (`api.search`, `getProfile`, `toFavorite`, `ProfileBody`).
+1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento…) e `index.js` (`api.search`, `getProfile`, `toFavorite`, `ProfileBody`). Si el juego se busca solo por tag y no tiene regiones, añade `tagSearch: true` y `hasRegion: false` al `meta.js`.
 2. Regístralo en `src/games/registry.js` (metadatos) y `src/games/index.js` (módulo completo).
-3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`.
+3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`. Si es de Supercell, añádelo a `GAMES` en `server/lib/supercell.js` y móntalo con `createSupercellRouter`.
 
 ## 🗺️ Roadmap
 
@@ -289,12 +299,14 @@ Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** pa
 - [x] Sistema de diseño, pantalla de carga animada y micro-interacciones
 - [x] Backend con caché y errores en español
 - [x] Backend listo para la nube (límite de peticiones, CORS, Docker, `render.yaml`)
-- [ ] Desplegar el backend y publicar con una *Production API Key*
+- [x] Backend desplegado en la nube (Render) y APK de prueba con EAS
+- [ ] Publicar con una *Production API Key* de Riot
 - [ ] Valorant (requiere aprobación de Riot)
 - [ ] Modo sin conexión con el último perfil visto
 - [ ] Notificaciones cuando un favorito cambia de rango
 - [x] Cola de salida hacia Riot que respeta el cupo, y juegos no habilitados como "PRONTO"
 - [x] Maestría, rotación gratuita y estado del servidor (LoL)
+- [x] Brawl Stars, Clash Royale y Clash of Clans (API de Supercell)
 - [ ] Comparar dos jugadores
 
 La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
@@ -312,6 +324,8 @@ El repo incluye una [página del producto](docs/index.html) y una [política de 
 | "Riot limitó las solicitudes" | Superaste el límite de la key. Espera unos segundos: cada perfil hace ~14 peticiones |
 | Rango vacío o "Sin clasificar" | El jugador no tiene partidas clasificatorias en ese modo/región. Revisa que la región sea la correcta |
 | "Something went wrong" en Expo Go | Expo Go tiene una sesión iniciada y el servidor pide firmar el manifiesto. Arranca con `npm run phone` (usa `--offline`) o cierra la sesión en Expo Go |
+| "Supercell rechazó la consulta: la key no es válida o no permite la IP" | La key de Brawl Stars / Clash Royale / Clash of Clans no tiene la IP `45.79.218.79` (la del proxy de RoyaleAPI) o está mal copiada. Las keys no se editan: crea otra con esa IP |
+| Un juego de Supercell aparece como "PRONTO" o no aparece | El servidor no tiene su key configurada (`/health` → `games`). Ponla en las variables de entorno |
 | Íconos de TFT con iniciales | Data Dragon solo trae los sets vigentes; las partidas de sets antiguos usan un placeholder |
 
 ## 🤝 Contribuir
@@ -325,3 +339,5 @@ Lee [CONTRIBUTING.md](CONTRIBUTING.md). Para vulnerabilidades o keys expuestas, 
 ## ⚖️ Aviso legal
 
 Kairo no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de sus propiedades. Riot Games y todas las propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.
+
+Este contenido no está afiliado, respaldado, patrocinado ni aprobado específicamente por Supercell y Supercell no se hace responsable de él. Más información: [política de contenido de fans de Supercell](https://supercell.com/en/fan-content-policy/). Brawl Stars, Clash Royale y Clash of Clans son marcas de Supercell.

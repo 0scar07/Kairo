@@ -77,8 +77,8 @@ Las pantallas genéricas **no conocen ningún juego**: leen todo de `src/games/`
 src/games/
   registry.js      metadatos de todos los juegos (sin dependencias; el tema lo usa para el acento)
   index.js         módulos completos + getGame() + juegos "próximamente"
-  lol/  tft/       un módulo por juego
-    meta.js        id, nombre, acento, ícono, placeholder, available
+  lol/ tft/ brawlstars/ clashroyale/ clashofclans/   un módulo por juego
+    meta.js        id, nombre, acento, placeholder, available (+ tagSearch, hasRegion en Supercell)
     index.js       api.search, getProfile, toFavorite, ProfileBody
 ```
 
@@ -86,9 +86,9 @@ Contrato de un módulo:
 
 | Campo | Descripción |
 |-------|-------------|
-| `id`, `name`, `short`, `icon`, `accent` | Identidad del juego (vienen de `meta.js`) |
-| `api.search(gameName, tagLine, region)` | Devuelve `{ account, summoner, ranked, rankedError, matches, hasMore, nextStart, region }` |
-| `getProfile(data)` | `{ avatar, name, tag, subtitle, ranked }` para la cabecera |
+| `id`, `name`, `short`, `accent` | Identidad del juego (vienen de `meta.js`) |
+| `api.search(gameName, tagLine, region)` | Devuelve al menos `{ account: { gameName, tagLine, puuid }, region }` más los datos propios del juego (en Riot: `summoner`, `ranked`, `matches`…; en Supercell: `player`, `battles`) |
+| `getProfile(data)` | `{ avatar, name, tag, subtitle, ranked, badge? }` para la cabecera (`badge` es el texto de la insignia cuando no hay rango) |
 | `toFavorite(data)` | Lo que se guarda al marcar favorito |
 | `ProfileBody({ data, setData, setError, mine })` | Contenido propio del juego |
 
