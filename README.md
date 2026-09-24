@@ -83,6 +83,12 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
     <td align="center"><img src="docs/screenshots/favorites.png" width="200" /><br /><sub><b>Favoritos</b></sub></td>
   </tr>
   <tr>
+    <td align="center"><img src="docs/screenshots/live-profile-lol.png" width="200" /><br /><sub><b>Aviso de partida en vivo</b></sub></td>
+    <td align="center"><img src="docs/screenshots/live-blue-lol.png" width="200" /><br /><sub><b>Partida en vivo</b></sub></td>
+    <td align="center"><img src="docs/screenshots/live-red-lol.png" width="200" /><br /><sub><b>Equipo rojo y baneos</b></sub></td>
+    <td align="center"><img src="docs/screenshots/matches-flex-lol.png" width="200" /><br /><sub><b>Historial de Flex</b></sub></td>
+  </tr>
+  <tr>
     <td align="center"><img src="docs/screenshots/brawlstars-profile.png" width="200" /><br /><sub><b>Brawl Stars</b></sub></td>
     <td align="center"><img src="docs/screenshots/brawlstars-battles.png" width="200" /><br /><sub><b>Batallas de Brawl Stars</b></sub></td>
     <td align="center"><img src="docs/screenshots/clashroyale-profile.png" width="200" /><br /><sub><b>Clash Royale</b></sub></td>
@@ -103,6 +109,8 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 </table>
 
 <sub>Las capturas de Brawl Stars, Clash Royale y Clash of Clans usan datos reales de la API de Supercell. Las de TFT son anteriores al rediseño de íconos.</sub>
+
+<sub>La partida en vivo es de una partida real de Flex; los nombres de los otros nueve jugadores se reemplazaron por "Jugador N" para no publicar cuentas ajenas.</sub>
 
 <sub>* El aviso de mantenimiento se muestra solo cuando Riot reporta uno activo; en la captura se simuló uno para enseñar el diseño. Las demás son datos reales de la API.</sub>
 
