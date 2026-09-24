@@ -6,7 +6,11 @@ import AvatarImage from "../../components/AvatarImage";
 import { clanRole, tagOf } from "../../utils/supercell";
 
 // Clash of Clans no tiene foto de perfil: se usa el ícono de su liga
-const leagueIcon = player => player.league?.iconUrls?.medium || player.league?.iconUrls?.small || null;
+// La API nueva trae `leagueTier` (small/large); la anterior, `league` (small/medium)
+const leagueIcon = player => {
+  const icons = player.leagueTier?.iconUrls || player.league?.iconUrls;
+  return icons?.large || icons?.medium || icons?.small || null;
+};
 
 // Módulo de Clash of Clans: lo que las pantallas genéricas necesitan saber del juego.
 export default {

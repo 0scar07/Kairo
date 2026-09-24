@@ -38,7 +38,7 @@ export function battleView(item, myTag) {
     isResultBased: Boolean(b.result),
     brawler: me?.brawler || null,
     brawlerName: me?.brawler ? titleCase(me.brawler.name) : "—",
-    mode: humanize(item.event?.mode || b.mode),
+    mode: humanize(b.mode || item.event?.mode),
     map: item.event?.map || null,
     trophyChange: typeof b.trophyChange === "number" ? b.trophyChange : null,
     time: parseBattleTime(item.battleTime),
