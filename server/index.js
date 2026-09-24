@@ -47,10 +47,10 @@ app.get("/summoner/:puuid", async (req, res) => {
   }
 });
 
-app.get("/ranked/:summonerId", async (req, res) => {
+app.get("/ranked/:puuid", async (req, res) => {
   try {
     const r = await axios.get(
-      `${PLATFORM}/lol/league/v4/entries/by-summoner/${req.params.summonerId}`,
+      `${PLATFORM}/lol/league/v4/entries/by-puuid/${req.params.puuid}`,
       { headers }
     );
     res.json(r.data);
@@ -129,10 +129,10 @@ app.get("/tft/summoner/:puuid", async (req, res) => {
   }
 });
 
-app.get("/tft/ranked/:summonerId", async (req, res) => {
+app.get("/tft/ranked/:puuid", async (req, res) => {
   try {
     const r = await axios.get(
-      `${PLATFORM}/tft/league/v1/entries/by-summoner/${req.params.summonerId}`,
+      `${PLATFORM}/tft/league/v1/by-puuid/${req.params.puuid}`,
       { headers }
     );
     res.json(r.data);

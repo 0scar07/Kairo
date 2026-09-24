@@ -27,7 +27,7 @@ export const searchPlayer = async (gameName, tagLine) => {
   const account = await axios.get(`${API_BASE}/account/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`);
 
   const summoner = await axios.get(`${API_BASE}/summoner/${account.data.puuid}`);
-  const ranked = await axios.get(`${API_BASE}/ranked/${summoner.data.id}`);
+  const ranked = await axios.get(`${API_BASE}/ranked/${account.data.puuid}`);
   const page = await getMoreMatches(account.data.puuid, 0, MATCH_PAGE);
   return {
     account: account.data,
