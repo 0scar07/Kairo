@@ -26,6 +26,7 @@ export const sizes = {
   iconHero:  96,
   dot:       6,
   chart:     120,
+  tabBarSpace: 120,   // espacio inferior para que la barra flotante no tape el contenido
   splashLogo: 260,   // debe coincidir con imageWidth del plugin expo-splash-screen en app.json
   splashBar:  160,
   splashGlow: 560,

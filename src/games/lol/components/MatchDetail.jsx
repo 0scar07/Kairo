@@ -1,26 +1,39 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { championIcon, itemIcon } from "../../../api/ddragon";
+import { spellIcon, perkIcon, perksOf } from "../assets";
 import { csOf, playerName } from "../utils";
 import { formatDuration } from "../../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, tracking, useAccent } from "../../../theme";
 
-function ItemIcon({ itemId }) {
+// Ícono pequeño con placeholder si falta o falla la imagen
+function Mini({ uri, size, round }) {
   const [failed, setFailed] = useState(false);
-  if (!itemId || failed) return <View style={itemStyles.empty} />;
-  return (
-    <Image
-      source={{ uri: itemIcon(itemId) }}
-      style={itemStyles.icon}
-      onError={() => setFailed(true)}
-    />
-  );
+  const style = [{ width: size, height: size, borderRadius: round ? size / 2 : radii.xs, backgroundColor: colors.surfaceHigh }];
+  if (!uri || failed) return <View style={style} />;
+  return <Image source={{ uri }} style={style} onError={() => setFailed(true)} />;
 }
 
-const itemStyles = StyleSheet.create({
-  icon:  { width: sizes.item, height: sizes.item, borderRadius: radii.xs, backgroundColor: colors.surfaceHigh },
-  empty: { width: sizes.item, height: sizes.item, borderRadius: radii.xs, backgroundColor: colors.surfaceHigh },
-});
+function ItemIcon({ itemId }) {
+  return <Mini uri={itemId ? itemIcon(itemId) : null} size={sizes.item} />;
+}
+
+// Hechizos de invocador (2) y runas (piedra angular + estilo secundario)
+function Loadout({ p }) {
+  const { keystone, secondary } = perksOf(p);
+  return (
+    <View style={styles.loadout}>
+      <View style={styles.loadoutCol}>
+        <Mini uri={spellIcon(p.summoner1Id)} size={sizes.avatarXs - spacing.xxs} />
+        <Mini uri={spellIcon(p.summoner2Id)} size={sizes.avatarXs - spacing.xxs} />
+      </View>
+      <View style={styles.loadoutCol}>
+        <Mini uri={perkIcon(keystone)} size={sizes.avatarXs - spacing.xxs} round />
+        <Mini uri={perkIcon(secondary)} size={sizes.avatarXs - spacing.xxs} round />
+      </View>
+    </View>
+  );
+}
 
 function PlayerRow({ p, isMe, maxDmg, accent }) {
   const dmgPct = (p.totalDamageDealtToChampions / maxDmg) * 100;
@@ -29,6 +42,7 @@ function PlayerRow({ p, isMe, maxDmg, accent }) {
   return (
     <View style={[styles.playerRow, isMe && { backgroundColor: colors.surfaceRaised, borderLeftColor: accent }]}>
       <Image source={{ uri: championIcon(p.championName) }} style={styles.champImg} />
+      <Loadout p={p} />
       <View style={styles.playerInfo}>
         <Text style={[styles.playerName, isMe && { color: accent }]} numberOfLines={1}>
           {playerName(p)}
@@ -119,6 +133,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   champImg:     { width: sizes.avatarSm, height: sizes.avatarSm, borderRadius: radii.xs, backgroundColor: colors.surfaceHigh },
+  loadout:      { flexDirection: "row", gap: spacing.xxs },
+  loadoutCol:   { gap: spacing.xxs },
   playerInfo:   { flex: 1, gap: spacing.xs },
   playerName:   { ...type.caption, color: colors.textSecondary },
   itemsRow:     { flexDirection: "row", gap: spacing.xxs },

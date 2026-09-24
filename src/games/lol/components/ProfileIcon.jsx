@@ -1,15 +1,15 @@
 import React from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
 import { profileIconUrl } from "../../../api/ddragon";
-import { colors, radii, sizes, spacing, type, glow, useAccent } from "../../../theme";
+import { colors, radii, sizes, spacing, type, useAccent } from "../../../theme";
 
-export default function ProfileIcon({ iconId, level, size = sizes.avatarXl, game = "lol" }) {
+export default function ProfileIcon({ iconId, level, size = sizes.iconHero, game = "lol" }) {
   const accent = useAccent(game);
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Image
         source={{ uri: profileIconUrl(iconId) }}
-        style={[styles.image, { width: size, height: size, borderRadius: size / 2, borderColor: accent }, glow(accent, spacing.md, 0.35)]}
+        style={[styles.image, { width: size, height: size, borderRadius: size / 2, borderColor: accent }]}
       />
       {level != null && (
         <View style={[styles.levelBadge, { backgroundColor: accent }]}>

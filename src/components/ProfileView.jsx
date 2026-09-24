@@ -6,6 +6,7 @@ import { getGame } from "../games";
 import { TIER_ICONS } from "../constants/config";
 import { errorMessage } from "../utils/format";
 import { isFavoriteIn, loadFavorites, toggleFavorite } from "../utils/favorites";
+import { success } from "../utils/haptics";
 import { colors, spacing, useAccent } from "../theme";
 
 /**
@@ -15,7 +16,7 @@ import { colors, spacing, useAccent } from "../theme";
  *  - gameId, initialData: qué juego y datos iniciales (los que devolvió game.api.search)
  *  - mine: perfil propio (el juego puede mostrar extras); headerAction sustituye a la estrella de favorito
  */
-export default function ProfileView({ gameId, initialData, mine, headerAction }) {
+export default function ProfileView({ gameId, initialData, mine, headerAction, bottomSpace = spacing.xxxl }) {
   const game = getGame(gameId);
   const accent = useAccent(gameId);
   const [data, setData] = useState(initialData);
@@ -36,6 +37,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction })
     try {
       const { isFav: marked } = await toggleFavorite({ ...game.toFavorite(data), gameId, region });
       setIsFav(marked);
+      if (marked) success();
     } catch (e) {
       setError("No se pudo actualizar favoritos: " + errorMessage(e));
     }
@@ -58,7 +60,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction })
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { paddingBottom: bottomSpace }]}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
@@ -71,6 +73,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction })
           tag={profile.tag}
           subtitle={profile.subtitle}
           badge={badge}
+          glowColor={colors.tier[ranked?.tier]}
           action={headerAction ? headerAction.icon : (isFav ? "⭐" : "☆")}
           onAction={headerAction ? headerAction.onPress : onToggleFavorite}
         />
@@ -83,5 +86,5 @@ export default function ProfileView({ gameId, initialData, mine, headerAction })
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content:   { padding: spacing.lg, paddingBottom: spacing.xxxl },
+  content:   { padding: spacing.lg },
 });

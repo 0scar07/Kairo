@@ -3,7 +3,8 @@ import { initDataDragon } from "../api/ddragon";
 import { pingServer } from "../api/client";
 import { migrateLegacyStorage } from "../utils/storage";
 import { loadFavorites } from "../utils/favorites";
-import { loadActiveGame, loadRegion } from "../utils/prefs";
+import { loadActiveGame, loadRegion, loadHaptics } from "../utils/prefs";
+import { loadRecents } from "../utils/recents";
 import { getGameMeta } from "../games/registry";
 import { DEFAULT_REGION } from "../constants/regions";
 import { fontAssets } from "../theme";
@@ -31,13 +32,18 @@ export const BOOT_TASKS = [
   },
   {
     key: "prefs",
-    // Último juego y última región usados
+    // Último juego, última región y vibración
     run: async () => {
-      const [saved, region] = await Promise.all([loadActiveGame(), loadRegion()]);
+      const [saved, region, haptics] = await Promise.all([loadActiveGame(), loadRegion(), loadHaptics()]);
       const meta = getGameMeta(saved);
-      return { activeGame: meta?.available ? saved : "lol", region };
+      return { activeGame: meta?.available ? saved : "lol", region, haptics };
     },
-    fallback: { activeGame: "lol", region: DEFAULT_REGION },
+    fallback: { activeGame: "lol", region: DEFAULT_REGION, haptics: true },
+  },
+  {
+    key: "recents",
+    run: loadRecents,
+    fallback: [],
   },
   {
     key: "server",

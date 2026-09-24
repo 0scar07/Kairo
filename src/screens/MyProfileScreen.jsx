@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert } from "react-native";
 import ProfileView from "../components/ProfileView";
+import ProfileSkeleton from "../components/ProfileSkeleton";
+import { ErrorState } from "../components/ui";
 import { RegionChips } from "../components/RegionPicker";
 import { getGame } from "../games";
 import { DEFAULT_REGION } from "../constants/regions";
@@ -129,10 +131,11 @@ export default function MyProfileScreen() {
     );
   }
 
+  if (state.status === "loading") return <ProfileSkeleton />;
+
   return (
     <View style={styles.center}>
       {setup}
-      {state.status === "loading" && <Text style={[styles.message, { color: accent }]}>{game.icon} Cargando perfil...</Text>}
       {state.status === "setup" && (
         <>
           <Text style={styles.message}>{game.icon} Aún no configuras tu perfil de {game.name}</Text>
@@ -143,10 +146,7 @@ export default function MyProfileScreen() {
       )}
       {state.status === "error" && (
         <>
-          <Text style={styles.error}>{state.message}</Text>
-          <TouchableOpacity style={[styles.btn, styles.centerBtn, { backgroundColor: accent }]} onPress={() => setReload(n => n + 1)}>
-            <Text style={styles.btnText}>Reintentar</Text>
-          </TouchableOpacity>
+          <ErrorState message={state.message} onRetry={() => setReload(n => n + 1)} />
           <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowSetup(true)}>
             <Text style={styles.cancelText}>Cambiar de cuenta</Text>
           </TouchableOpacity>
@@ -159,7 +159,6 @@ export default function MyProfileScreen() {
 const styles = StyleSheet.create({
   center:        { flex: 1, backgroundColor: colors.bg, justifyContent: "center", alignItems: "center", padding: spacing.xl },
   message:       { ...type.heading, color: colors.text, textAlign: "center", marginBottom: spacing.lg },
-  error:         { ...type.body, color: colors.loss, textAlign: "center", marginBottom: spacing.lg },
   overlay:       { flex: 1, backgroundColor: colors.overlay, justifyContent: "center", alignItems: "center", padding: spacing.xl },
   modal:         {
     backgroundColor: colors.surface, borderRadius: radii.xl, padding: spacing.xl,

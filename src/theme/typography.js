@@ -26,7 +26,7 @@ export const fontSizes = {
   lg: 16, xl: 20, xxl: 24, xxxl: 28, hero: 32, icon: 48,
 };
 
-export const lineHeights = { body: 20, relaxed: 22 };
+export const lineHeights = { small: 15, body: 20, relaxed: 22 };
 
 // letter-spacing
 export const tracking = { none: 0, tight: 0.3, wide: 1, wider: 2, widest: 4, brand: 8 };

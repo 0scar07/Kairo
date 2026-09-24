@@ -1,19 +1,21 @@
 import React from "react";
-import { Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { Text, Image, StyleSheet } from "react-native";
+import PressableScale from "./PressableScale";
+import { select } from "../../utils/haptics";
 import { colors, radii, sizes, spacing, type, useAccent, withAlpha } from "../../theme";
 
 // Botón tipo píldora para filtros; opcionalmente con imagen
 export default function Chip({ label, active, onPress, image, game }) {
   const accent = useAccent(game);
   return (
-    <TouchableOpacity
+    <PressableScale
       style={[styles.chip, active && { borderColor: accent, backgroundColor: withAlpha(accent, 0.12) }]}
-      onPress={onPress}
-      activeOpacity={0.8}
+      scaleTo={0.94}
+      onPress={() => { select(); onPress(); }}
     >
       {image ? <Image source={{ uri: image }} style={styles.img} /> : null}
       <Text style={[styles.text, active && { color: accent }]}>{label}</Text>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

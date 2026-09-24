@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ACTIVE_GAME_KEY, REGION_KEY, MY_PROFILE_KEY } from "../constants/config";
+import { ACTIVE_GAME_KEY, REGION_KEY, MY_PROFILE_KEY, HAPTICS_KEY } from "../constants/config";
 import { DEFAULT_REGION, REGIONS } from "../constants/regions";
 
 export async function loadRegion() {
@@ -8,6 +8,12 @@ export async function loadRegion() {
 }
 
 export const saveRegion = id => AsyncStorage.setItem(REGION_KEY, id);
+
+// La háptica está activada salvo que el usuario la apague
+export async function loadHaptics() {
+  return (await AsyncStorage.getItem(HAPTICS_KEY)) !== "off";
+}
+export const saveHaptics = enabled => AsyncStorage.setItem(HAPTICS_KEY, enabled ? "on" : "off");
 
 export const loadActiveGame = () => AsyncStorage.getItem(ACTIVE_GAME_KEY);
 export const saveActiveGame = id => AsyncStorage.setItem(ACTIVE_GAME_KEY, id);

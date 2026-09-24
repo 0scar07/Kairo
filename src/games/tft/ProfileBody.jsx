@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import RankedCard from "../../components/RankedCard";
 import Reveal from "../../components/Reveal";
-import { Card, SectionLabel, OverallCard, LoadMoreButton, Notice } from "../../components/ui";
+import {
+  Card, SectionLabel, OverallCard, LoadMoreButton, Notice, ResultsStrip, EmptyState, RowSkeleton,
+} from "../../components/ui";
 import TftMatchRow from "./components/MatchRow";
 import { getMoreMatches } from "./api";
-import { getTftStats } from "./utils";
+import { getTftStats, placementColor } from "./utils";
 import { errorMessage } from "../../utils/format";
 import { colors, spacing, type, winrateColor, useAccent } from "../../theme";
 
 const GAME = "tft";
+const STRIP_MAX = 20;
 
 // Hyper Roll no usa tier/rango sino una escala de colores
 const TURBO_COLORS = {
@@ -41,6 +44,9 @@ export default function TftProfileBody({ data, setData, setError }) {
   const turbo       = ranked?.find(r => r.queueType === "RANKED_TFT_TURBO");
   const stats       = getTftStats(matches, account.puuid);
 
+  const stripItems = (stats?.placements || []).slice(0, STRIP_MAX)
+    .map(p => ({ color: placementColor(p), text: String(p) }));
+
   async function loadMore() {
     setLoadingMore(true);
     setError(null);
@@ -60,14 +66,17 @@ export default function TftProfileBody({ data, setData, setError }) {
   return (
     <>
       <Reveal order={1}>
-        {rankedError && <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>}
-        {(rankedEntry || doubleUp) && (
-          <View style={styles.rankedRow}>
-            {rankedEntry && <RankedCard entry={rankedEntry} label="Ranked" game={GAME} />}
-            {doubleUp    && <RankedCard entry={doubleUp}    label="Double Up" game={GAME} />}
-          </View>
-        )}
-        {turbo && <TurboCard entry={turbo} />}
+        {rankedError
+          ? <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>
+          : (
+            <>
+              <View style={styles.rankedRow}>
+                <RankedCard entry={rankedEntry} label="Ranked" game={GAME} />
+                <RankedCard entry={doubleUp}    label="Double Up" game={GAME} />
+              </View>
+              {turbo && <TurboCard entry={turbo} />}
+            </>
+          )}
       </Reveal>
 
       {stats && (
@@ -80,6 +89,7 @@ export default function TftProfileBody({ data, setData, setError }) {
               { title: "Victorias", value: stats.wins, sub: "1er lugar", color: colors.placement.first },
             ]}
           />
+          <ResultsStrip label="Posiciones recientes" summary={`Top 4: ${stats.top4}%`} items={stripItems} />
         </Reveal>
       )}
 
@@ -96,10 +106,11 @@ export default function TftProfileBody({ data, setData, setError }) {
                 onPress={() => setActiveMatch(activeMatch === m.metadata.match_id ? null : m.metadata.match_id)}
               />
             ))}
+            {loadingMore && <><RowSkeleton /><RowSkeleton /></>}
             <LoadMoreButton game={GAME} loading={loadingMore} hasMore={hasMore} onPress={loadMore} />
           </>
         ) : (
-          <Text style={styles.empty}>No se encontraron partidas de TFT</Text>
+          <EmptyState icon="♟️" title="Sin partidas de TFT" text="Este jugador no tiene partidas de Teamfight Tactics registradas." />
         )}
       </Reveal>
     </>
@@ -110,5 +121,4 @@ const styles = StyleSheet.create({
   rankedRow: { flexDirection: "row", gap: spacing.md, marginBottom: spacing.lg },
   turboTier: { ...type.title },
   turboMeta: { ...type.small, color: colors.textSecondary, marginTop: spacing.xs },
-  empty:     { ...type.body, color: colors.textFaint, textAlign: "center", marginTop: spacing.xl },
 });

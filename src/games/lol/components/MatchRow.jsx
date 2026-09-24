@@ -1,10 +1,12 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
+import { PressableScale } from "../../../components/ui";
 import { championIcon } from "../../../api/ddragon";
 import { csOf, queueLabel, kdaRatio as calcKda } from "../utils";
 import { timeSince, formatDuration } from "../../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, tracking, kdaColor, useAccent } from "../../../theme";
 
+// Fila de una partida de LoL: resultado, campeón, cola, KDA y CS/daño. Al tocarla se expande el detalle.
 export default function MatchRow({ match, myPuuid, onPress, expanded }) {
   const accent = useAccent("lol");
   if (!match?.info) return null;
@@ -13,63 +15,63 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
 
   const win         = me.win;
   const resultColor = win ? colors.win : colors.loss;
-  const kda         = `${me.kills}/${me.deaths}/${me.assists}`;
   const kdaRatio    = calcKda(me.kills, me.deaths, me.assists);
-  const dmg = Math.round(me.totalDamageDealtToChampions / 1000);
-  const ago = timeSince(match.info.gameCreation);
-  const dur = formatDuration(match.info.gameDuration);
+  const dmg         = Math.round(me.totalDamageDealtToChampions / 1000);
 
   return (
-    <TouchableOpacity
+    <PressableScale
       onPress={onPress}
+      scaleTo={0.985}
       style={[styles.row, {
         borderLeftColor: resultColor,
         backgroundColor: expanded
           ? (win ? colors.winBgStrong : colors.lossBgStrong)
           : (win ? colors.winBg : colors.lossBg),
       }]}
-      activeOpacity={0.7}
     >
-      <Image source={{ uri: championIcon(me.championName) }} style={styles.champImg} />
+      <View>
+        <Image source={{ uri: championIcon(me.championName) }} style={styles.champImg} />
+        <View style={styles.levelBadge}><Text style={styles.levelText}>{me.champLevel}</Text></View>
+      </View>
+
       <View style={styles.info}>
-        <View style={styles.topRow}>
-          <Text style={[styles.result, { color: resultColor }]}>
-            {win ? "VICTORIA" : "DERROTA"}
-          </Text>
-          <Text style={styles.meta}>{dur} · {ago}</Text>
-        </View>
-        <Text style={styles.champName}>{me.championName}</Text>
-        <Text style={styles.queue}>{queueLabel(match.info.queueId)}</Text>
+        <Text style={[styles.result, { color: resultColor }]}>{win ? "VICTORIA" : "DERROTA"}</Text>
+        <Text style={styles.champName} numberOfLines={1}>{me.championName}</Text>
+        <Text style={styles.meta}>
+          {queueLabel(match.info.queueId)} · {formatDuration(match.info.gameDuration)} · {timeSince(match.info.gameCreation)}
+        </Text>
       </View>
-      <View style={styles.kdaBlock}>
-        <Text style={styles.kdaText}>{kda}</Text>
-        <Text style={[styles.kdaRatio, { color: kdaColor(kdaRatio) }]}>{kdaRatio} KDA</Text>
+
+      <View style={styles.stats}>
+        <Text style={styles.kda}>{me.kills}/{me.deaths}/{me.assists}</Text>
+        <Text style={[styles.ratio, { color: kdaColor(kdaRatio) }]}>{kdaRatio} KDA</Text>
+        <Text style={styles.minor}>
+          <Text style={{ color: accent }}>{dmg}k</Text> dmg · {csOf(me)} CS
+        </Text>
       </View>
-      <View style={styles.dmgBlock}>
-        <Text style={[styles.dmgText, { color: accent }]}>{dmg}k dmg</Text>
-        <Text style={styles.csText}>{csOf(me)} CS</Text>
-      </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row", alignItems: "center",
-    gap: spacing.md, padding: spacing.md, paddingHorizontal: spacing.lg,
+    gap: spacing.md, padding: spacing.md,
     borderLeftWidth: sizes.borderAccent, borderRadius: radii.md, marginBottom: spacing.xs,
   },
-  champImg: { width: sizes.avatarLg, height: sizes.avatarLg, borderRadius: radii.sm, backgroundColor: colors.surfaceHigh },
-  info:     { flex: 1 },
-  topRow:   { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  result:   { ...type.label, fontSize: fontSizes.sm, letterSpacing: tracking.wide },
-  meta:     { ...type.caption, color: colors.textMuted },
-  champName:{ ...type.bodyStrong, color: colors.text, marginTop: spacing.xxs },
-  queue:    { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
-  kdaBlock: { alignItems: "flex-end" },
-  kdaText:  { ...type.bodyStrong, color: colors.text },
-  kdaRatio: { ...type.caption },
-  dmgBlock: { alignItems: "flex-end", minWidth: spacing.xxxl + spacing.sm },
-  dmgText:  { ...type.smallStrong },
-  csText:   { ...type.caption, color: colors.textMuted },
+  champImg:   { width: sizes.placement, height: sizes.placement, borderRadius: radii.md, backgroundColor: colors.surfaceHigh },
+  levelBadge: {
+    position: "absolute", right: -spacing.xs, bottom: -spacing.xs,
+    backgroundColor: colors.bg, borderRadius: radii.pill, paddingHorizontal: spacing.xs,
+    borderWidth: sizes.hairline, borderColor: colors.borderStrong,
+  },
+  levelText:  { ...type.micro, color: colors.textSecondary },
+  info:       { flex: 1 },
+  result:     { ...type.label, fontSize: fontSizes.xs, letterSpacing: tracking.wide },
+  champName:  { ...type.bodyStrong, color: colors.text, marginTop: spacing.xxs },
+  meta:       { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
+  stats:      { alignItems: "flex-end" },
+  kda:        { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
+  ratio:      { ...type.caption },
+  minor:      { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
 });

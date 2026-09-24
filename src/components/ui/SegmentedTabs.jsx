@@ -1,23 +1,46 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { colors, radii, spacing, fontSizes, type, tracking, useAccent } from "../../theme";
+import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import PressableScale from "./PressableScale";
+import { select } from "../../utils/haptics";
+import { colors, radii, sizes, spacing, fontSizes, type, tracking, useAccent, withAlpha } from "../../theme";
 
-// tabs: [{ key, label }]. El tab activo usa el acento del juego.
+const SPRING = { damping: 18, stiffness: 220, mass: 0.7 };
+
+// tabs: [{ key, label }]. Un indicador se desliza hasta el tab activo, que toma el acento del juego.
 export default function SegmentedTabs({ tabs, value, onChange, game }) {
   const accent = useAccent(game);
+  const [width, setWidth] = useState(0);
+  const index = Math.max(0, tabs.findIndex(t => t.key === value));
+  const tabWidth = width ? (width - spacing.xs * 2) / tabs.length : 0;
+
+  const x = useSharedValue(0);
+  const indicator = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
+
+  React.useEffect(() => {
+    x.value = withSpring(index * tabWidth, SPRING);
+  }, [index, tabWidth]);
+
   return (
-    <View style={styles.wrap}>
+    <View style={styles.wrap} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+      {tabWidth > 0 && (
+        <Animated.View style={[
+          styles.indicator,
+          { width: tabWidth, backgroundColor: withAlpha(accent, 0.14), borderColor: withAlpha(accent, 0.35) },
+          indicator,
+        ]} />
+      )}
       {tabs.map(t => {
         const active = t.key === value;
         return (
-          <TouchableOpacity
+          <PressableScale
             key={t.key}
-            style={[styles.tab, active && styles.tabActive]}
-            onPress={() => onChange(t.key)}
-            activeOpacity={0.8}
+            scaleTo={0.96}
+            style={styles.tab}
+            onPress={() => { if (!active) { select(); onChange(t.key); } }}
           >
             <Text style={[styles.text, active && { color: accent }]}>{t.label}</Text>
-          </TouchableOpacity>
+          </PressableScale>
         );
       })}
     </View>
@@ -29,7 +52,10 @@ const styles = StyleSheet.create({
     flexDirection: "row", marginBottom: spacing.lg,
     backgroundColor: colors.surface, borderRadius: radii.md, padding: spacing.xs,
   },
+  indicator: {
+    position: "absolute", top: spacing.xs, bottom: spacing.xs, left: spacing.xs,
+    borderRadius: radii.sm, borderWidth: sizes.hairline,
+  },
   tab:       { flex: 1, paddingVertical: spacing.sm, alignItems: "center", borderRadius: radii.sm },
-  tabActive: { backgroundColor: colors.surfaceRaised },
   text:      { ...type.label, fontSize: fontSizes.sm, color: colors.textMuted, letterSpacing: tracking.wide },
 });

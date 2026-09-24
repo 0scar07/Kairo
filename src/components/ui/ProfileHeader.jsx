@@ -1,28 +1,32 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Card from "./Card";
-import { colors, radii, spacing, type, fontSizes, useAccent, withAlpha } from "../../theme";
+import PressableScale from "./PressableScale";
+import { colors, radii, sizes, spacing, type, fontSizes, glow, useAccent, withAlpha } from "../../theme";
 
-// Cabecera de perfil: avatar + nombre#tag + insignia + acción (favorito, editar) a la derecha
-export default function ProfileHeader({ avatar, name, tag, badge, subtitle, game, action, onAction }) {
+// Cabecera de perfil: avatar grande con resplandor del color del rango + nombre#tag + insignia + acción
+export default function ProfileHeader({
+  avatar, name, tag, badge, subtitle, game, glowColor, action, onAction, avatarSize,
+}) {
   const accent = useAccent(game);
+  const tint = glowColor || accent;
   return (
-    <Card style={styles.card}>
-      {avatar}
+    <Card style={[styles.card, { borderColor: withAlpha(tint, 0.35), backgroundColor: withAlpha(tint, 0.05) }]}>
+      <View style={[styles.avatar, avatarSize && { borderRadius: avatarSize / 2 }, glow(tint, spacing.xl, 0.5)]}>{avatar}</View>
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>{name}</Text>
         <Text style={styles.tag}>#{tag}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         {badge ? (
-          <View style={[styles.badge, { backgroundColor: withAlpha(accent, 0.12) }]}>
-            <Text style={[styles.badgeText, { color: accent }]}>{badge}</Text>
+          <View style={[styles.badge, { backgroundColor: withAlpha(tint, 0.14), borderColor: withAlpha(tint, 0.4) }]}>
+            <Text style={[styles.badgeText, { color: tint }]}>{badge}</Text>
           </View>
         ) : null}
       </View>
       {action ? (
-        <TouchableOpacity onPress={onAction} style={styles.action}>
+        <PressableScale onPress={onAction} haptic scaleTo={0.85} style={styles.action} accessibilityLabel="Favorito">
           <Text style={styles.actionText}>{action}</Text>
-        </TouchableOpacity>
+        </PressableScale>
       ) : null}
     </Card>
   );
@@ -30,12 +34,13 @@ export default function ProfileHeader({ avatar, name, tag, badge, subtitle, game
 
 const styles = StyleSheet.create({
   card:      { flexDirection: "row", alignItems: "center" },
+  avatar:    { borderRadius: radii.pill },
   info:      { marginLeft: spacing.lg, flex: 1 },
   name:      { ...type.title, color: colors.text },
   tag:       { ...type.small, color: colors.textMuted },
   subtitle:  { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
   badge:     {
-    marginTop: spacing.sm, alignSelf: "flex-start",
+    marginTop: spacing.sm, alignSelf: "flex-start", borderWidth: sizes.hairline,
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radii.pill,
   },
   badgeText: { ...type.smallStrong },

@@ -1,8 +1,8 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import UnitIcon from "./UnitIcon";
 import TraitBadge from "./TraitBadge";
-import { SectionLabel } from "../../../components/ui";
+import { SectionLabel, Expandable, PressableScale } from "../../../components/ui";
 import { tftAugment } from "../assets";
 import {
   activeTraits, participantName, placementColor, placementLabel, queueLabel,
@@ -32,9 +32,9 @@ export default function TftMatchRow({ match, puuid, expanded, onPress }) {
 
   return (
     <View>
-      <TouchableOpacity
+      <PressableScale
         onPress={onPress}
-        activeOpacity={0.7}
+        scaleTo={0.985}
         style={[styles.row, { borderLeftColor: color, backgroundColor: expanded ? colors.surface : colors.bg }]}
       >
         <PlacementBox placement={me.placement} />
@@ -54,9 +54,9 @@ export default function TftMatchRow({ match, puuid, expanded, onPress }) {
           <Text style={[styles.level, { color }]}>Nv. {me.level}</Text>
           <Text style={styles.dmg}>{me.total_damage_to_players} dmg</Text>
         </View>
-      </TouchableOpacity>
+      </PressableScale>
 
-      {expanded && (
+      <Expandable open={expanded}>
         <View style={styles.detail}>
           <SectionLabel>Todos los jugadores</SectionLabel>
           {[...info.participants].sort((a, b) => a.placement - b.placement).map(p => {
@@ -81,7 +81,7 @@ export default function TftMatchRow({ match, puuid, expanded, onPress }) {
             );
           })}
         </View>
-      )}
+      </Expandable>
     </View>
   );
 }

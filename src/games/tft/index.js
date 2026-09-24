@@ -4,13 +4,13 @@ import meta from "./meta";
 import { searchPlayer } from "./api";
 import ProfileBody from "./ProfileBody";
 import { profileIconUrl } from "../../api/ddragon";
-import { colors, sizes, glow, spacing, fontSizes, accents } from "../../theme";
+import { colors, sizes, fontSizes, accents } from "../../theme";
 
 // Ícono de perfil (es de la cuenta Riot: el mismo que en LoL); si falta, el emoji del juego
 function TftAvatar({ iconId }) {
   const accent = accents[meta.id];
   return (
-    <View style={[styles.avatar, { borderColor: accent }, glow(accent, spacing.md, 0.35)]}>
+    <View style={[styles.avatar, { borderColor: accent }]}>
       {iconId != null
         ? <Image source={{ uri: profileIconUrl(iconId) }} style={styles.img} />
         : <Text style={styles.emoji}>{meta.icon}</Text>}
@@ -48,7 +48,7 @@ export default {
 
 const styles = StyleSheet.create({
   avatar: {
-    width: sizes.avatarXl, height: sizes.avatarXl, borderRadius: sizes.avatarXl / 2,
+    width: sizes.iconHero, height: sizes.iconHero, borderRadius: sizes.iconHero / 2,
     borderWidth: sizes.borderAccent, backgroundColor: colors.surfaceHigh,
     justifyContent: "center", alignItems: "center", overflow: "hidden",
   },

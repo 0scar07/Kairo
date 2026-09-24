@@ -4,6 +4,7 @@ import RankedCard from "../../components/RankedCard";
 import Reveal from "../../components/Reveal";
 import {
   Card, SectionLabel, SegmentedTabs, Chip, OverallCard, LoadMoreButton, Notice,
+  Expandable, ResultsStrip, EmptyState, RowSkeleton,
 } from "../../components/ui";
 import MatchRow from "./components/MatchRow";
 import MatchDetail from "./components/MatchDetail";
@@ -16,6 +17,7 @@ import { errorMessage } from "../../utils/format";
 import { colors, radii, sizes, spacing, type, kdaColor, winrateColor, useAccent } from "../../theme";
 
 const GAME = "lol";
+const STRIP_MAX = 20;
 
 const TABS = [
   { key: "partidas",  label: "🎮 PARTIDAS" },
@@ -44,6 +46,9 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
   const overall    = getOverallStats(matches || [], account.puuid);
   const streak     = getStreak(matches || [], account.puuid);
   const topChamp   = champStats[0];
+
+  const recent = (matches || []).map(m => findMe(m, account.puuid)).filter(Boolean).slice(0, STRIP_MAX);
+  const stripItems = recent.map(p => ({ color: p.win ? colors.win : colors.loss }));
 
   const uniqueChamps = [...new Set(
     (matches || []).map(m => findMe(m, account.puuid)?.championName).filter(Boolean)
@@ -86,8 +91,19 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
 
   return (
     <>
+      <Reveal order={1}>
+        {rankedError
+          ? <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>
+          : (
+            <View style={styles.rankedRow}>
+              <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />
+              <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />
+            </View>
+          )}
+      </Reveal>
+
       {streak && (
-        <Reveal order={1}>
+        <Reveal order={2}>
           <View style={[styles.streak, {
             backgroundColor: streak.isWin ? colors.winBgStrong : colors.lossBgStrong,
             borderColor:     streak.isWin ? colors.win : colors.loss,
@@ -100,24 +116,19 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
       )}
 
       {overall && (
-        <Reveal order={2}>
+        <Reveal order={3}>
           <OverallCard
             label={`Resumen — últimas ${overall.games} partidas`}
             blocks={summaryBlocks}
             bar={{ value: overall.wr, color: winrateColor(overall.wr, accent) }}
           />
+          <ResultsStrip
+            label="Resultados recientes"
+            summary={`${recent.filter(p => p.win).length}V · ${recent.filter(p => !p.win).length}D`}
+            items={stripItems}
+          />
         </Reveal>
       )}
-
-      <Reveal order={3}>
-        {rankedError && <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>}
-        {(soloQ || flex) && (
-          <View style={styles.rankedRow}>
-            {soloQ && <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />}
-            {flex  && <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />}
-          </View>
-        )}
-      </Reveal>
 
       {mine && <MineExtras data={data} />}
 
@@ -127,53 +138,68 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
 
       <Reveal order={5}>
         {activeTab === "campeones" && (
-          <Card>
-            <SectionLabel>Más jugados (últimas {matches?.length} partidas)</SectionLabel>
-            {champStats.map((c, i) => (
-              <ChampionStatsRow key={c.name} champ={c} game={GAME} rank={mine ? i : undefined} />
-            ))}
-          </Card>
+          champStats.length ? (
+            <Card>
+              <SectionLabel>Más jugados (últimas {matches?.length} partidas)</SectionLabel>
+              {champStats.map((c, i) => (
+                <ChampionStatsRow key={c.name} champ={c} game={GAME} rank={mine ? i : undefined} />
+              ))}
+            </Card>
+          ) : (
+            <EmptyState icon="🏆" title="Sin campeones todavía" text="Cuando juegue partidas verás aquí sus campeones más jugados." />
+          )
         )}
 
         {activeTab === "partidas" && (
-          <>
-            <View style={styles.filters}>
-              <View style={styles.filterRow}>
-                {RESULT_FILTERS.map(f => (
-                  <Chip key={f.key} label={f.label} active={filterWin === f.key} game={GAME} onPress={() => setFilterWin(f.key)} />
-                ))}
+          !matches?.length ? (
+            <EmptyState icon="🎮" title="Sin partidas recientes" text="Este jugador no tiene partidas registradas en este momento." />
+          ) : (
+            <>
+              <View style={styles.filters}>
+                <View style={styles.filterRow}>
+                  {RESULT_FILTERS.map(f => (
+                    <Chip key={f.key} label={f.label} active={filterWin === f.key} game={GAME} onPress={() => setFilterWin(f.key)} />
+                  ))}
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <Chip label="Todos" active={filterChamp === "all"} game={GAME} onPress={() => setFilterChamp("all")} />
+                  {uniqueChamps.map(c => (
+                    <Chip
+                      key={c}
+                      label={c}
+                      image={championIcon(c)}
+                      active={filterChamp === c}
+                      game={GAME}
+                      onPress={() => setFilterChamp(filterChamp === c ? "all" : c)}
+                    />
+                  ))}
+                </ScrollView>
               </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <Chip label="Todos" active={filterChamp === "all"} game={GAME} onPress={() => setFilterChamp("all")} />
-                {uniqueChamps.map(c => (
-                  <Chip
-                    key={c}
-                    label={c}
-                    image={championIcon(c)}
-                    active={filterChamp === c}
-                    game={GAME}
-                    onPress={() => setFilterChamp(filterChamp === c ? "all" : c)}
-                  />
-                ))}
-              </ScrollView>
-            </View>
 
-            <SectionLabel>{filteredMatches.length} partidas</SectionLabel>
+              <SectionLabel>{filteredMatches.length} partidas</SectionLabel>
 
-            {filteredMatches.map(m => (
-              <View key={m.metadata.matchId}>
-                <MatchRow
-                  match={m}
-                  myPuuid={account.puuid}
-                  expanded={activeMatch === m.metadata.matchId}
-                  onPress={() => setActiveMatch(activeMatch === m.metadata.matchId ? null : m.metadata.matchId)}
+              {filteredMatches.length === 0 && (
+                <EmptyState
+                  compact icon="🔎" title="Nada con esos filtros"
+                  actionLabel="Quitar filtros"
+                  onAction={() => { setFilterWin("all"); setFilterChamp("all"); }}
                 />
-                {activeMatch === m.metadata.matchId && <MatchDetail match={m} myPuuid={account.puuid} />}
-              </View>
-            ))}
+              )}
 
-            <LoadMoreButton game={GAME} loading={loadingMore} hasMore={hasMore} onPress={loadMore} />
-          </>
+              {filteredMatches.map(m => {
+                const open = activeMatch === m.metadata.matchId;
+                return (
+                  <View key={m.metadata.matchId}>
+                    <MatchRow match={m} myPuuid={account.puuid} expanded={open} onPress={() => setActiveMatch(open ? null : m.metadata.matchId)} />
+                    <Expandable open={open}><MatchDetail match={m} myPuuid={account.puuid} /></Expandable>
+                  </View>
+                );
+              })}
+
+              {loadingMore && <><RowSkeleton /><RowSkeleton /></>}
+              <LoadMoreButton game={GAME} loading={loadingMore} hasMore={hasMore} onPress={loadMore} />
+            </>
+          )
         )}
       </Reveal>
     </>
