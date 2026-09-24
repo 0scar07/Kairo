@@ -8,7 +8,7 @@ import { searchPlayer } from "../api/riot";
 import { searchValorantPlayer } from "../api/valorant";
 import { searchTFTPlayer } from "../api/tft";
 import { profileIconUrl } from "../api/ddragon";
-import { FAVORITES_KEY } from "../constants/config";
+import { FAVORITES_KEY, APP_NAME, APP_TAGLINE } from "../constants/config";
 import { errorMessage } from "../utils/lol";
 
 const GAMES = [
@@ -106,9 +106,9 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.logo}>
           <Text style={styles.logoIcon}>🎮</Text>
           <Text style={styles.logoText}>
-            GG<Text style={{ color: activeGame.color }}>Tracker</Text>
+            <Text style={{ color: activeGame.color }}>{APP_NAME}</Text>
           </Text>
-          <Text style={styles.logoSub}>MULTI-GAME STATS</Text>
+          <Text style={styles.logoSub}>{APP_TAGLINE.toUpperCase()}</Text>
         </View>
 
         {/* Selector de juego */}

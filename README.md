@@ -1,31 +1,40 @@
-# LoLTracker 🗡️
+# Kairo
 
-App móvil para ver stats de League of Legends (React Native + Expo)
+*Cada partida cuenta.*
 
-## Setup rápido
+App móvil (React Native + Expo SDK 54) para ver estadísticas de jugadores con la API de Riot: League of Legends, TFT y Valorant.
 
-1. Instalar dependencias:
-   npm install
+La API key de Riot **nunca** va en la app: vive solo en `server/.env` y todas las llamadas pasan por el backend.
 
-2. Agregar tu API key en:
-   src/constants/config.js  →  API_KEY = "tu-key-aqui"
-   
-   Obtén tu key en: https://developer.riotgames.com
+## Puesta en marcha
 
-3. Cambiar tu región en config.js si es necesario:
-   - la1 / la2  → Latinoamérica
-   - na1        → Norteamérica  
-   - euw1       → Europa Oeste
-   - kr         → Corea
-   - br1        → Brasil
+### 1. Backend (`server/`)
 
-4. Correr la app:
-   npx expo start
+```bash
+cd server
+npm install
+cp .env.example .env     # y pon tu RIOT_API_KEY (https://developer.riotgames.com)
+npm start                # http://localhost:3000  (comprueba /health)
+```
 
-5. Escanear el QR con la app Expo Go en tu celular
+### 2. App
+
+```bash
+npm install
+npx expo start
+```
+
+En un dispositivo físico, apunta la app a la IP de tu PC con la variable `EXPO_PUBLIC_API_URL`
+(por ejemplo `EXPO_PUBLIC_API_URL=http://192.168.1.8:3000`) o edita `API_BASE` en `src/constants/config.js`.
+
+Las keys de desarrollo de Riot caducan cada 24 h: regénerala y actualiza `server/.env`.
 
 ## Estructura
-- src/api/riot.js          → Todas las llamadas a Riot API
-- src/components/          → Componentes reutilizables
-- src/screens/             → Pantallas de la app
-- src/constants/config.js  → Config y constantes
+
+- `server/` — backend Express (proxy a Riot, guarda la key)
+- `src/api/` — llamadas al backend y a Data Dragon
+- `src/components/` — componentes reutilizables
+- `src/screens/` — pantallas
+- `src/theme/` — sistema de diseño (colores, tipografía, espaciado)
+- `src/constants/config.js` — configuración y constantes
+- `assets/brand/icon.svg` — ícono original; `npm run icons` genera los PNG

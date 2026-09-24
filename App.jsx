@@ -10,6 +10,7 @@ import ValorantScreen  from "./src/screens/ValorantScreen";
 import TFTScreen       from "./src/screens/TFTScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
 import { initDataDragon } from "./src/api/ddragon";
+import { migrateLegacyStorage } from "./src/utils/storage";
 
 const Stack = createNativeStackNavigator();
 const Tab   = createBottomTabNavigator();
@@ -49,7 +50,7 @@ export default function App() {
 
   // Lee la versión vigente de Data Dragon antes de mostrar imágenes
   useEffect(() => {
-    initDataDragon().finally(() => setReady(true));
+    Promise.all([migrateLegacyStorage(), initDataDragon()]).finally(() => setReady(true));
   }, []);
 
   if (!ready) return null;

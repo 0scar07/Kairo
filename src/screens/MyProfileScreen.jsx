@@ -7,11 +7,10 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LineChart } from "react-native-chart-kit";
 import { searchPlayer } from "../api/riot";
-import { TIER_COLORS, TIER_ICONS } from "../constants/config";
+import { TIER_COLORS, TIER_ICONS, MY_PROFILE_KEY } from "../constants/config";
 import { championIcon, profileIconUrl } from "../api/ddragon";
 import { errorMessage, queueLabel, winrate } from "../utils/lol";
 
-const MY_PROFILE_KEY = "ggtracker_my_profile";
 const SCREEN_WIDTH   = Dimensions.get("window").width - 32;
 
 function getChampionStats(matches, puuid) {
