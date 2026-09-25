@@ -80,6 +80,9 @@ Con el servidor encendido, un vigilante revisa cada 2 minutos a los favoritos co
 - **Sin repetir avisos:** el estado de cada jugador (partida ya avisada, resultados pendientes) se guarda en la base, así que reiniciar el servidor no duplica nada.
 - **Tokens muertos:** si Expo indica `DeviceNotRegistered` (app desinstalada), el dispositivo se da de baja solo.
 - **Android:** las push necesitan Firebase (FCM V1). El archivo `google-services.json` va como variable de archivo `GOOGLE_SERVICES_JSON` en EAS (entorno `preview`) y la llave de la cuenta de servicio se sube en expo.dev, *Credentials*, Android, *FCM V1 service account key*. Ninguno de los dos va en git.
+- **En la app:** `expo-notifications` (canal «Partidas en vivo», botones «Ver partida» y «Silenciar jugador», enlace `kairo://live/<región>/<puuid>`), campanita por favorito con hoja de permiso propia, y en Ajustes el interruptor general, qué avisar, horario silencioso y una prueba. Solo hay push en **Android** con la app instalada (no en Expo Go, iPhone ni web: en iPhone haría falta una cuenta Apple Developer).
+- **Banner con la app abierta:** `src/notifications/banner/`. En móvil el fondo se dibuja con Skia (formas que se funden: gota, cápsula, chip); en la web se usa una versión con vidrio CSS. La animación corre en el hilo de UI (Reanimated).
+- **Firebase en el build:** `eas.json` fija el entorno `preview`, donde vive la variable de archivo `GOOGLE_SERVICES_JSON`; `app.config.js` la usa como `android.googleServicesFile`. Sin ella la app compila igual, pero sin push.
 - **Probar sin esperar una partida:** `POST /devices/me/test` (con el encabezado del dispositivo) manda una notificación de prueba a ese celular; `{"type":"live_start"}` o `{"type":"live_end"}` muestran cómo se verían los avisos reales.
 - `/health` incluye el estado del vigilante (`watcher`). Se apaga con `WATCHER_ENABLED=false`.
 

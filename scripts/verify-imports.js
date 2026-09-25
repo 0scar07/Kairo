@@ -5,7 +5,8 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
-const EXTS = ["", ".js", ".jsx", "/index.js", "/index.jsx"];
+// Metro también resuelve archivos por plataforma (Componente.native.jsx / Componente.web.jsx)
+const EXTS = ["", ".js", ".jsx", ".native.js", ".native.jsx", ".web.js", ".web.jsx", ".ios.jsx", ".android.jsx", "/index.js", "/index.jsx"];
 
 const resolve = (from, spec) => {
   const base = path.resolve(path.dirname(from), spec);

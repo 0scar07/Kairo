@@ -108,5 +108,6 @@ export function championLabel(name) {
 }
 
 export const championIcon    = name => `${ddBase()}/img/champion/${championId(name)}.png`;
+export const championSplash  = name => `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId(name)}_0.jpg`;
 export const itemIcon        = id   => `${ddBase()}/img/item/${id}.png`;
 export const profileIconUrl  = id   => `${ddBase()}/img/profileicon/${id}.png`;

@@ -200,6 +200,7 @@ export default {
   "live.loadError": "Couldn't load the game",
   "live.endedTitle": "No longer in a game",
   "live.endedText": "The game ended or the player isn't playing right now.",
+  "live.viewProfile": "View profile and last game",
 
   // --- Teamfight Tactics
   "tft.normal": "Normal",

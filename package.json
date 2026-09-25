@@ -1,6 +1,6 @@
 {
   "name": "kairo",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -18,6 +18,7 @@
     "@react-navigation/bottom-tabs": "^7.15.9",
     "@react-navigation/native": "^7.2.2",
     "@react-navigation/native-stack": "^7.14.11",
+    "@shopify/react-native-skia": "2.6.2",
     "axios": "^1.6.7",
     "expo": "^57.0.25",
     "expo-build-properties": "~57.0.22",

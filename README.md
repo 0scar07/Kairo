@@ -61,8 +61,10 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 | **Detalle** | Los 10 jugadores con objetos, **hechizos y runas** | Los 8 jugadores con **rasgos y unidades con estrellas** |
 | **Resumen** | Winrate, KDA promedio, racha y campeón más jugado; estadísticas por campeón | Posición promedio, top 4, victorias y gráfico de posiciones |
 | **Maestría y rotación** | Top 3 de campeones con nivel y puntos, rotación gratuita de la semana y aviso de mantenimiento de tu región | (no aplica) |
-| **En vivo** | **Partida en vivo**: aviso en el perfil y pantalla con los dos equipos, campeón, hechizos, runas, rango de cada jugador, baneos y cronómetro | (la API aún no está habilitada) |
+| **En vivo** | **Partida en vivo**: aviso en el perfil y pantalla con splash art del campeón, los dos equipos, hechizos, runas, rango de cada jugador, baneos y cronómetro; **notificaciones** cuando un favorito entra en partida y su resultado (Android) | (la API aún no está habilitada) |
 | **Mi perfil** | Tu Riot ID con insignias y gráfico de KDA | Tu Riot ID |
+
+**Notificaciones de partida en vivo (LoL, Android):** toca la campanita de un favorito y Kairo te avisa cuando entra en partida y cuando termina, con el resultado, aunque la app esté cerrada. Con la app abierta el aviso aparece como un **banner fluido** (una gota de vidrio que se estira en cápsula, con efecto líquido dibujado con Skia) y queda un indicador «N en vivo». En Ajustes eliges qué avisar, el horario silencioso y puedes enviarte una prueba. Sin cuentas: cada celular se registra con su token y un secreto propio. Los detalles están en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
 TFT y LoL comparten la búsqueda por **Riot ID** con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada. **Valorant** llegará cuando Riot apruebe una *production key* (su API de partidas la exige).
 

@@ -202,6 +202,7 @@ export default {
   "live.loadError": "Impossible de charger la partie",
   "live.endedTitle": "N'est plus en partie",
   "live.endedText": "La partie est terminée ou le joueur ne joue pas en ce moment.",
+  "live.viewProfile": "Voir le profil et la dernière partie",
 
   // --- Teamfight Tactics
   "tft.normal": "Normal",

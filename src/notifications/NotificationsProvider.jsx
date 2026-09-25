@@ -108,7 +108,7 @@ export function NotificationsProvider({ children }) {
     if (!pushSupported) return undefined;
     loadPrefs().then(setPrefsState);
     getPermission().then(setPermission).catch(e => console.warn("Permiso de notificaciones:", e.message));
-    installForegroundHandler(true);   // TODO fase 4: false, para mostrar el banner de la app en vez del del sistema
+    installForegroundHandler(false);   // con la app abierta se muestra el banner de la app (BannerHost), no el del sistema
     const sub = AppState.addEventListener("change", state => {
       if (state === "active") getPermission().then(setPermission).catch(() => {});   // pudo cambiarse en los ajustes del sistema
     });
@@ -145,7 +145,7 @@ export function NotificationsProvider({ children }) {
         }
         return;
       }
-      if (data.puuid && data.region) navigateWhenReady("LiveGame", { puuid: data.puuid, region: data.region });
+      if (data.puuid && data.region) navigateWhenReady("LiveGame", { puuid: data.puuid, region: data.region, riotId: data.riotId });
     };
 
     const received = Notifications.addNotificationReceivedListener(n => {

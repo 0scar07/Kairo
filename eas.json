@@ -16,7 +16,8 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://kairo-api-nqts.onrender.com"
-      }
+      },
+      "environment": "preview"
     },
     "production": {
       "autoIncrement": true,

@@ -22,6 +22,7 @@ import { BootProvider } from "./src/boot/BootContext";
 import { I18nProvider, useT } from "./src/i18n/I18nProvider";
 import { NotificationsProvider } from "./src/notifications/NotificationsProvider";
 import PermissionSheet from "./src/notifications/PermissionSheet";
+import BannerHost from "./src/notifications/BannerHost";
 import { navigationRef, flushNavigationQueue } from "./src/navigation/ref";
 import { colors, fonts, tracking, GameProvider, useAccent } from "./src/theme";
 
@@ -98,6 +99,7 @@ export default function App() {
                   <RootStack />
                 </NavigationContainer>
                 <PermissionSheet />
+                <BannerHost />
               </NotificationsProvider>
             </GameProvider>
           </BootProvider>

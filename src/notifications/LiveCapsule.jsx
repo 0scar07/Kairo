@@ -9,7 +9,8 @@ import { colors, sizes, spacing, fontSizes, type, withAlpha } from "../theme";
  * hora, y el estado con el punto rojo pulsando. Es solo el contenido; el vidrio y la animación los pone quien lo use
  * (FluidBanner, la vista previa del permiso…).
  */
-export default function LiveCapsule({ name, time, subtitle, avatarUri, badgeUri, accent, avatarSize = sizes.avatarLg + spacing.xs }) {
+// live=false (resultado de una partida ya terminada): sin el punto rojo
+export default function LiveCapsule({ name, time, subtitle, avatarUri, badgeUri, accent, live = true, avatarSize = sizes.avatarLg + spacing.xs }) {
   return (
     <View style={styles.row}>
       <View style={{ width: avatarSize, height: avatarSize }}>
@@ -30,7 +31,7 @@ export default function LiveCapsule({ name, time, subtitle, avatarUri, badgeUri,
           {time ? <Text style={styles.time} numberOfLines={1}>{time}</Text> : null}
         </View>
         <View style={styles.status}>
-          <LiveDot size={sizes.dot + 2} />
+          {live ? <LiveDot size={sizes.dot + 2} /> : null}
           <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>
         </View>
       </View>

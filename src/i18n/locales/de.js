@@ -202,6 +202,7 @@ export default {
   "live.loadError": "Das Spiel konnte nicht geladen werden",
   "live.endedTitle": "Nicht mehr im Spiel",
   "live.endedText": "Das Spiel ist beendet oder der Spieler spielt gerade nicht.",
+  "live.viewProfile": "Profil und letztes Spiel ansehen",
 
   // --- Teamfight Tactics
   "tft.normal": "Normal",

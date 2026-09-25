@@ -6,6 +6,7 @@ import TimeStepper from "./TimeStepper";
 import { useNotifications } from "./NotificationsProvider";
 import { useT } from "../i18n/I18nProvider";
 import { errorMessage } from "../utils/format";
+import { emitLive } from "./events";
 import { accents, colors, sizes, spacing, type, withAlpha } from "../theme";
 
 // Ajustes > Notificaciones: interruptor general, qué avisar, horario silencioso, estado del permiso y una prueba
@@ -18,6 +19,14 @@ export default function NotificationsSection() {
   const toggle = (value, onChange) => (
     <Switch value={value} onValueChange={onChange} trackColor={track} thumbColor={value ? accent : colors.textMuted} />
   );
+
+  // Banner de ejemplo con datos ficticios: enseña cómo se ve un aviso con la app abierta
+  function demo() {
+    emitLive({
+      id: `demo-${Date.now()}`, kind: "start", title: "", body: "",
+      data: { demo: true, puuid: "demo", region: "la1", riotId: "Perico Bandit#LAN", iconId: 588, championId: 103, queueId: 420 },
+    });
+  }
 
   async function test() {
     setSending(true);
@@ -76,6 +85,13 @@ export default function NotificationsSection() {
               <Text style={styles.statusText}>{t(`notif.perm.${permission}`)}</Text>
             </View>
           }
+        />
+        <View style={styles.divider} />
+        <SettingRow
+          label={t("notif.demo")}
+          hint={t("notif.demoHint")}
+          onPress={demo}
+          right={<Icon name="eye" size={sizes.item - spacing.xs} color={accent} />}
         />
         <View style={styles.divider} />
         <SettingRow

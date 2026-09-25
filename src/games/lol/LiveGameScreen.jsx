@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../../i18n/I18nProvider";
-import { View, Text, ScrollView, RefreshControl, StyleSheet } from "react-native";
+import { View, Text, ScrollView, RefreshControl, StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Card, SectionLabel, EmptyState, ErrorState, PressableScale, Skeleton } from "../../components/ui";
+import { Card, SectionLabel, EmptyState, ErrorState, LiveDot, PressableScale, Skeleton } from "../../components/ui";
 import RankEmblem from "../../components/RankEmblem";
 import Icon from "../../components/Icon";
 import Mini from "./components/Mini";
 import { getLive } from "./api";
 import { ensureLolAssets, spellIcon, perkIcon } from "./assets";
 import { queueLabel } from "./utils";
-import { championByKey, championIcon, championLabel } from "../../api/ddragon";
+import { championByKey, championIcon, championLabel, championSplash } from "../../api/ddragon";
 import { errorMessage, formatDuration, tierLabel, winrate } from "../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../../theme";
 
@@ -99,14 +99,16 @@ function BanRow({ bans, color }) {
 }
 
 // Partida en vivo de un jugador de LoL: los dos equipos con campeón, hechizos, runas y rango.
-// params: { puuid, region, name? }
+// params: { puuid, region, riotId? }  (riotId = "Nombre#TAG", para poder abrir el perfil cuando la partida ya terminó)
 export default function LiveGameScreen({ route }) {
   const t = useT();
-  const { puuid, region } = route.params;
+  const navigation = useNavigation();
+  const { puuid, region, riotId } = route.params;
   const accent = useAccent(GAME);
   const [state, setState] = useState({ status: "loading" });   // loading | live | ended | error
   const [refreshing, setRefreshing] = useState(false);
   const [now, setNow] = useState(Date.now());
+  const target = splitRiotId(riotId);
 
   const load = useCallback(async () => {
     try {
@@ -151,12 +153,22 @@ export default function LiveGameScreen({ route }) {
   if (state.status === "ended") {
     return (
       <View style={styles.center}>
-        <EmptyState icon="gamepad" title={t("live.endedTitle")} text={t("live.endedText")} />
+        <EmptyState
+          icon="gamepad"
+          title={t("live.endedTitle")}
+          text={t("live.endedText")}
+          actionLabel={target ? t("live.viewProfile") : undefined}
+          onAction={target ? () => navigation.navigate("Profile", { gameId: GAME, gameName: target.gameName, tagLine: target.tagLine, region }) : undefined}
+        />
       </View>
     );
   }
 
   const { live } = state;
+  const me = live.participants.find(p => p.puuid === puuid);
+  const meChamp = championByKey(me?.championId);
+  const splash = meChamp ? championSplash(meChamp.name) : null;
+  const meName = splitRiotId(me?.riotId || riotId)?.gameName;
   const elapsed = live.startTime > 0 ? Math.max(0, Math.floor((now - live.startTime) / 1000)) : null;
 
   return (
@@ -165,14 +177,17 @@ export default function LiveGameScreen({ route }) {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
-      <Card style={[styles.summary, { borderColor: withAlpha(colors.loss, 0.5) }]}>
+      <View style={[styles.hero, { borderColor: withAlpha(colors.loss, 0.5) }]}>
+        {splash ? <Image source={{ uri: splash }} style={StyleSheet.absoluteFill} blurRadius={4} resizeMode="cover" /> : null}
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: withAlpha(colors.bg, splash ? 0.66 : 0.9) }]} />
         <View style={styles.liveBadge}>
-          <View style={styles.liveDot} />
+          <LiveDot size={sizes.dot + 1} />
           <Text style={styles.liveText}>{t("live.badge")}</Text>
         </View>
+        {meName ? <Text style={styles.heroName} numberOfLines={1}>{meName}{meChamp ? ` · ${championLabel(meChamp.name)}` : ""}</Text> : null}
         <Text style={styles.mode}>{queueLabel(live.queueId)}</Text>
         <Text style={styles.timer}>{elapsed == null ? t("live.loading") : formatDuration(elapsed)}</Text>
-      </Card>
+      </View>
 
       {TEAMS.map(team => {
         const players = live.participants.filter(p => p.teamId === team.id);
@@ -198,9 +213,9 @@ const styles = StyleSheet.create({
   content:    { padding: spacing.lg, paddingBottom: spacing.xxxl },
   center:     { flex: 1, backgroundColor: colors.bg, justifyContent: "center" },
   gap:        { marginBottom: spacing.lg },
-  summary:    { alignItems: "center", gap: spacing.xs },
-  liveBadge:  { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  liveDot:    { width: sizes.dot + spacing.xs, height: sizes.dot + spacing.xs, borderRadius: radii.pill, backgroundColor: colors.loss },
+  hero:       { alignItems: "center", gap: spacing.xs, padding: spacing.xl, marginBottom: spacing.lg, borderRadius: radii.lg, borderWidth: sizes.hairline, overflow: "hidden", backgroundColor: colors.surface },
+  heroName:   { ...type.bodyStrong, fontSize: 15, color: colors.textSecondary },
+  liveBadge:  { flexDirection: "row", alignItems: "center", gap: spacing.xs },
   liveText:   { ...type.label, color: colors.loss },
   mode:       { ...type.heading, color: colors.text },
   timer:      { ...type.statLarge, color: colors.text },
