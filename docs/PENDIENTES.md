@@ -17,7 +17,7 @@
 - [ ] Base de datos solo si hace falta: favoritos sincronizados entre dispositivos (cuentas + Postgres/Supabase), caché persistente (Redis) o historial propio de LP.
 - [ ] Mostrar "el servidor está despertando…" cuando el plan gratuito de Render tarda en responder.
 - [x] Mostrar los juegos no habilitados como "PRONTO" (detección automática con `/health`).
-- [ ] Actualizar `expo` al último parche (`npx expo install expo@~54.0.37`).
+- [x] Actualizado a Expo SDK 57 (React Native 0.86).
 
 ## Funcionalidad
 - [x] Partida en vivo de LoL probada con una partida real (Flex, 10 jugadores con rango, runas, hechizos y baneos).

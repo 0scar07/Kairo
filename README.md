@@ -15,8 +15,8 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 ![Idiomas](https://img.shields.io/badge/idiomas-5-0BC4E3)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
 
-![Expo SDK](https://img.shields.io/badge/Expo-SDK%2054-000020?logo=expo&logoColor=white)
-![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?logo=react&logoColor=black)
+![Expo SDK](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white)
+![React Native](https://img.shields.io/badge/React%20Native-0.86-61DAFB?logo=react&logoColor=black)
 ![Node](https://img.shields.io/badge/Node-20%2B-339933?logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
 
@@ -183,10 +183,11 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
 
 | Capa | Tecnología |
 |------|------------|
-| App | React Native 0.81 · Expo SDK 54 · React Navigation 7 |
-| Animación | Reanimated 4 · SVG (`react-native-svg`) · `expo-haptics` |
+| App | React Native 0.86 · Expo SDK 57 · React Navigation 7 |
+| Animación | Reanimated 4 · Skia (`@shopify/react-native-skia`, banner líquido) · SVG (`react-native-svg`) · `expo-haptics` |
 | Diseño | Sistema propio de *tokens* (`src/theme`) · Sora + Inter (`@expo-google-fonts`) |
 | Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · OpenDota · Fortnite-API · Apex Legends Status · API de PUBG · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) |
+| Notificaciones | `expo-notifications` + Expo Push (FCM en Android) · vigilante de partidas en el backend · Postgres (Neon) para los dispositivos |
 | Almacenamiento | AsyncStorage (favoritos, recientes, preferencias) |
 
 ## 🏗️ Arquitectura
