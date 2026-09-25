@@ -3,6 +3,8 @@
 // Android bloquea por defecto el tráfico HTTP sin cifrar en las apps instaladas. Solo se habilita
 // cuando el backend configurado es http:// (pruebas locales). Con un backend https:// queda desactivado.
 module.exports = ({ config }) => {
+  // Subcarpeta donde se publica la versión web (GitHub Pages: /Kairo/app)
+  if (process.env.EXPO_BASE_URL) config = { ...config, experiments: { ...config.experiments, baseUrl: process.env.EXPO_BASE_URL } };
   const apiUrl = process.env.EXPO_PUBLIC_API_URL || "";
   const plugins = (config.plugins || []).filter(p => (Array.isArray(p) ? p[0] : p) !== "expo-build-properties");
 

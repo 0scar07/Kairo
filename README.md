@@ -44,7 +44,7 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 - **APK directo:** cada versión se publica en [GitHub Releases](https://github.com/0scar07/Kairo/releases). Al instalarlo, Android pedirá permitir instalar apps desde esa fuente.
 - **Obtainium:** añade el repositorio con el botón de arriba y la app se actualiza sola con cada versión nueva.
-- **Ahora mismo:** la primera versión pública todavía no está publicada; mientras tanto puedes [probarla con Expo Go](#3-probar-en-el-celular) o construir el APK tú mismo.
+- **iPhone:** abre <https://0scar07.github.io/Kairo/app/> en Safari, toca *Compartir* y luego *Añadir a pantalla de inicio*. Queda como una app más, sin cuenta ni App Store (es la versión web, así que algunas animaciones pueden variar).
 
 > Las versiones las construye el flujo [`release.yml`](.github/workflows/release.yml) al subir una etiqueta `v*`; cómo se usa está en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md#publicar-una-versión-apk).
 
