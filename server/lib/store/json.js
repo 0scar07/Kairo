@@ -15,6 +15,8 @@ class JsonStore {
     this.flushMs = flushMs;
     this.devices = new Map();
     this.watch = new Map();     // estado del vigilante por jugador (puuid)
+    this.rank = new Map();      // historial de rango: puuid -> fotos diarias ordenadas por día
+    this.track = new Map();     // a quién se le guarda el historial: puuid -> { puuid, region, lastSeen }
     this.timer = null;
     this.writing = Promise.resolve();
   }
@@ -26,6 +28,8 @@ class JsonStore {
       const data = JSON.parse(fs.readFileSync(this.file, "utf8"));
       for (const d of Array.isArray(data.devices) ? data.devices : []) this.devices.set(d.id, d);
       for (const w of Array.isArray(data.watch) ? data.watch : []) this.watch.set(w.puuid, w);
+      for (const r of Array.isArray(data.rank) ? data.rank : []) this.rank.set(r.puuid, (this.rank.get(r.puuid) || []).concat(r));
+      for (const t of Array.isArray(data.track) ? data.track : []) this.track.set(t.puuid, t);
     } catch (e) {
       const broken = `${this.file}.dañado-${Date.now()}`;
       fs.renameSync(this.file, broken);
@@ -59,6 +63,23 @@ class JsonStore {
   async putWatch(state) { this.watch.set(state.puuid, structuredClone(state)); this.schedule(); }
   async removeWatch(puuid) { if (this.watch.delete(puuid)) this.schedule(); }
 
+  // Historial de rango: una foto por jugador y día (la última del día reemplaza a las anteriores)
+  async putRank(doc) {
+    const list = (this.rank.get(doc.puuid) || []).filter(r => r.day !== doc.day);
+    list.push(structuredClone(doc));
+    list.sort((a, b) => (a.day < b.day ? -1 : 1));
+    this.rank.set(doc.puuid, list.slice(-400));
+    this.schedule();
+  }
+  async listRank(puuid, sinceDay = "0000-00-00") { return (this.rank.get(puuid) || []).filter(r => r.day >= sinceDay).map(r => structuredClone(r)); }
+  async latestRank(puuid) { const l = this.rank.get(puuid) || []; return l.length ? structuredClone(l[l.length - 1]) : null; }
+
+  async touchTrack(items, now) {
+    for (const { puuid, region } of items) this.track.set(puuid, { puuid, region, lastSeen: now });
+    this.schedule();
+  }
+  async listTrack(sinceMs) { return [...this.track.values()].filter(t => t.lastSeen >= sinceMs).map(t => ({ ...t })); }
+
   schedule() {
     if (this.timer) return;
     this.timer = setTimeout(() => { this.timer = null; this.flush(); }, this.flushMs);
@@ -67,7 +88,7 @@ class JsonStore {
 
   flush() {
     const tmp = `${this.file}.tmp`;
-    const body = JSON.stringify({ version: 1, devices: [...this.devices.values()], watch: [...this.watch.values()] });
+    const body = JSON.stringify({ version: 1, devices: [...this.devices.values()], watch: [...this.watch.values()], rank: [...this.rank.values()].flat(), track: [...this.track.values()] });
     this.writing = this.writing
       .then(() => fs.promises.writeFile(tmp, body).then(() => fs.promises.rename(tmp, this.file)))
       .catch(e => console.error("No pude guardar los dispositivos:", e.message));

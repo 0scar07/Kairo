@@ -13,6 +13,8 @@ const { createStore } = require("./lib/store");
 const { createDevicesRouter } = require("./routes/devices");
 const push = require("./lib/push");
 const { Watcher } = require("./lib/watcher");
+const { RankTracker } = require("./lib/rankTracker");
+const storeRef = require("./lib/storeRef");
 let artRouter;
 try {
   artRouter = require("./routes/art");
@@ -70,6 +72,7 @@ for (const [id, module] of Object.entries(extra.ROUTES)) app.use(`/${id}`, modul
 // Dispositivos para las notificaciones (Postgres si hay DATABASE_URL; si no, un archivo JSON local).
 // Si el almacén no arranca, el resto de la API sigue funcionando y solo /devices responde 503.
 const store = createStore();
+storeRef.set(store);
 const storeReady = store.init().then(() => console.log(`   dispositivos: almacén ${store.kind}`)).catch(e => {
   console.error("No pude iniciar el almacén de dispositivos:", e.message);
   throw e;
@@ -79,7 +82,7 @@ app.use("/devices", (_req, _res, next) => storeReady.then(() => next(), () => ne
   createDevicesRouter(store, { maxDevices: config.maxDevices, push }));
 
 // Vigilante: revisa a los favoritos con alertas y manda las notificaciones (solo si el almacén arrancó)
-const watcher = new Watcher({ store, push, maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
+const watcher = new Watcher({ store, push, rank: new RankTracker({ store, push }), maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
 storeReady.then(() => { if (config.watcherEnabled) watcher.start(config.watchIntervalMs); }).catch(() => {});
 
 // Imágenes firmadas para las notificaciones (las descarga el celular)

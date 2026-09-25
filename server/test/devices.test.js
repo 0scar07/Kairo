@@ -65,6 +65,25 @@ for (const kind of ["json", "postgres"]) {
     await store.close();
   });
 
+  test(`almacén ${kind}: historial de rango (una foto por día) y jugadores rastreados`, async () => {
+    const store = stores[kind]();
+    await store.init();
+    await store.putRank({ puuid: "p1", day: "2026-09-01", region: "la1", solo: { score: 1000 } });
+    await store.putRank({ puuid: "p1", day: "2026-09-03", region: "la1", solo: { score: 1100 } });
+    await store.putRank({ puuid: "p1", day: "2026-09-03", region: "la1", solo: { score: 1120 } });   // misma fecha: reemplaza
+    await store.putRank({ puuid: "p2", day: "2026-09-02", region: "kr", solo: { score: 5 } });
+    assert.deepStrictEqual((await store.listRank("p1")).map(r => [r.day, r.solo.score]), [["2026-09-01", 1000], ["2026-09-03", 1120]]);
+    assert.deepStrictEqual((await store.listRank("p1", "2026-09-02")).map(r => r.day), ["2026-09-03"]);
+    assert.strictEqual((await store.latestRank("p1")).solo.score, 1120);
+    assert.strictEqual(await store.latestRank("nadie"), null);
+
+    await store.touchTrack([{ puuid: "p1", region: "la1" }, { puuid: "p2", region: "kr" }], 1000);
+    await store.touchTrack([{ puuid: "p2", region: "kr" }], 5000);
+    assert.deepStrictEqual((await store.listTrack(2000)).map(t => t.puuid), ["p2"]);
+    assert.strictEqual((await store.listTrack(0)).length, 2);
+    await store.close();
+  });
+
   test(`almacén ${kind}: un token pertenece a un solo dispositivo`, async () => {
     const store = stores[kind]();
     await store.init();

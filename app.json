@@ -3,7 +3,7 @@
     "name": "Kairo",
     "slug": "kairo",
     "scheme": "kairo",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "icon": "./assets/icon.png",
     "android": {
       "package": "com.camavingaaa.kairo",
@@ -53,6 +53,14 @@
         "projectId": "be7b143d-54cf-4f31-9e50-62eccfb267bc"
       }
     },
-    "owner": "camavingaaa"
+    "owner": "camavingaaa",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/be7b143d-54cf-4f31-9e50-62eccfb267bc",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, ScrollView, Switch, StyleSheet, Alert } from "react-native";
 import Constants from "expo-constants";
+import * as Updates from "expo-updates";
 import { Card, SectionLabel, SettingRow, Chip } from "../components/ui";
 import NotificationsSection from "../notifications/NotificationsSection";
 import { RegionChips } from "../components/RegionPicker";
@@ -103,6 +104,7 @@ export default function SettingsScreen({ navigation }) {
         <Card>
           <Text style={styles.about}>{t("settings.version", { app: APP_NAME, version })}</Text>
           <Text style={styles.rowHint}>{t("app.tagline")}</Text>
+          {Updates.updateId ? <Text style={styles.rowHint}>{t("settings.update", { id: Updates.updateId.slice(0, 8) })}</Text> : null}
           <Text style={styles.legal}>{t("legal.riot", { app: APP_NAME })}</Text>
           <Text style={styles.legal}>{t("legal.supercell")}</Text>
           <Text style={styles.legal}>{t("legal.games")}</Text>

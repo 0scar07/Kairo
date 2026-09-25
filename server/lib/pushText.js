@@ -70,6 +70,50 @@ const ART = {
 };
 const artText = locale => ART[locale] || ART.es;
 
+// ---- Resumen semanal y cambios de rango
+const TIER_NAMES = {
+  es: ["Hierro", "Bronce", "Plata", "Oro", "Platino", "Esmeralda", "Diamante", "Maestro", "Gran Maestro", "Retador"],
+  en: ["Iron", "Bronze", "Silver", "Gold", "Platinum", "Emerald", "Diamond", "Master", "Grandmaster", "Challenger"],
+  pt: ["Ferro", "Bronze", "Prata", "Ouro", "Platina", "Esmeralda", "Diamante", "Mestre", "Grão-Mestre", "Desafiante"],
+  fr: ["Fer", "Bronze", "Argent", "Or", "Platine", "Émeraude", "Diamant", "Maître", "Grand Maître", "Challenger"],
+  de: ["Eisen", "Bronze", "Silber", "Gold", "Platin", "Smaragd", "Diamant", "Meister", "Großmeister", "Herausforderer"],
+};
+const TIER_ORDER = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATINUM", "EMERALD", "DIAMOND", "MASTER", "GRANDMASTER", "CHALLENGER"];
+const tierLabel = (locale, tier, rank) => {
+  const name = (TIER_NAMES[locale] || TIER_NAMES.es)[TIER_ORDER.indexOf(tier)] || tier;
+  return TIER_ORDER.indexOf(tier) >= 7 ? name : `${name} ${rank}`;   // desde Maestro no hay divisiones
+};
+
+const WEEKLY = {
+  es: { title: "Resumen semanal", games: n => `${n} partidas`, wins: p => `${p} % victorias`, more: n => `(+${n} más)` },
+  en: { title: "Weekly summary", games: n => `${n} games`, wins: p => `${p}% wins`, more: n => `(+${n} more)` },
+  pt: { title: "Resumo semanal", games: n => `${n} partidas`, wins: p => `${p} % de vitórias`, more: n => `(+${n} mais)` },
+  fr: { title: "Résumé de la semaine", games: n => `${n} parties`, wins: p => `${p} % de victoires`, more: n => `(+${n} de plus)` },
+  de: { title: "Wochenübersicht", games: n => `${n} Spiele`, wins: p => `${p} % Siege`, more: n => `(+${n} weitere)` },
+};
+
+// "Faker: +45 LP · 12 partidas · 58 % victorias" (con el más destacado y cuántos más hay)
+function weeklyText(locale, { name, lp, games, winrate, extra }) {
+  const w = WEEKLY[locale] || WEEKLY.es;
+  const sign = lp > 0 ? `+${lp}` : String(lp);
+  const body = `${name}: ${sign} LP · ${w.games(games)} · ${w.wins(winrate)}${extra > 0 ? ` ${w.more(extra)}` : ""}`;
+  return { title: w.title, body };
+}
+
+const RANK = {
+  es: { up: n => `${n} subió de rango`, down: n => `${n} bajó de rango`, promo: n => `${n} está en promoción`, now: r => `Ahora es ${r}`, series: r => `Serie de ascenso en ${r}` },
+  en: { up: n => `${n} ranked up`, down: n => `${n} dropped a rank`, promo: n => `${n} is in promotion`, now: r => `Now ${r}`, series: r => `Promotion series in ${r}` },
+  pt: { up: n => `${n} subiu de elo`, down: n => `${n} caiu de elo`, promo: n => `${n} está em promoção`, now: r => `Agora é ${r}`, series: r => `Série de promoção em ${r}` },
+  fr: { up: n => `${n} a gagné un rang`, down: n => `${n} a perdu un rang`, promo: n => `${n} est en promotion`, now: r => `Maintenant ${r}`, series: r => `Série de promotion en ${r}` },
+  de: { up: n => `${n} ist aufgestiegen`, down: n => `${n} ist abgestiegen`, promo: n => `${n} ist in der Beförderung`, now: r => `Jetzt ${r}`, series: r => `Beförderungsserie in ${r}` },
+};
+
+function rankChangeText(locale, { name, kind, tier, rank }) {
+  const t = RANK[locale] || RANK.es;
+  const label = tierLabel(locale, tier, rank);
+  return { title: t[kind](name), body: kind === "promo" ? t.series(label) : t.now(label) };
+}
+
 const testText = locale => ({ title: tr(locale).testTitle, body: tr(locale).testBody });
 
-module.exports = { LOCALES, queueName, startText, endText, testText, artText };
+module.exports = { LOCALES, queueName, startText, endText, testText, artText, weeklyText, rankChangeText, tierLabel };

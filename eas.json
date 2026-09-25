@@ -17,13 +17,15 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://kairo-api-nqts.onrender.com"
       },
-      "environment": "preview"
+      "environment": "preview",
+      "channel": "preview"
     },
     "production": {
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_API_URL": "https://kairo-api-nqts.onrender.com"
-      }
+      },
+      "channel": "production"
     }
   },
   "submit": {

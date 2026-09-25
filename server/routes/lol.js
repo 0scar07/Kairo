@@ -4,6 +4,9 @@ const { platformHost } = require("../lib/regions");
 const PATHS = require("../lib/paths");
 const { HttpError } = require("../lib/errors");
 const { normalizeLive, soloEntry } = require("../lib/live");
+const storeRef = require("../lib/storeRef");
+const rank = require("../lib/rank");
+const { isRegion } = require("../lib/regions");
 
 // League of Legends: summoner-v4, league-v4, match-v5 + maestría, rotación, estado del servidor y partida en vivo
 const router = createGameRouter("lol", PATHS.lol);
@@ -75,6 +78,39 @@ router.get("/live/:puuid", handle(async (req, res) => {
   players.forEach((p, i) => { ranks[p.puuid] = results[i].status === "fulfilled" ? soloEntry(results[i].value) : null; });
 
   res.json(normalizeLive(game, ranks));
+}));
+
+// Historial de rango: fotos diarias de Solo/Dúo y Flex. Pedirlo también le dice al servidor que siga guardando a ese
+// jugador (los últimos 30 días), y si aún no hay ninguna foto toma la primera ahora mismo. Son datos públicos de rango.
+const PUUID_RE = /^[A-Za-z0-9_-]{20,100}$/;
+
+router.get("/history/:puuid", handle(async (req, res) => {
+  const store = storeRef.get();
+  if (!store) throw new HttpError(503, "El historial no está disponible ahora", { code: "DEVICES_UNAVAILABLE" });
+  const puuid = puuidOf(req);
+  const region = regionOf(req);
+  const days = Math.min(Math.max(parseInt(req.query.days, 10) || 180, 7), 400);
+  const now = Date.now();
+
+  await store.touchTrack([{ puuid, region }], now);
+  let list = await store.listRank(puuid, rank.dayKey(now - days * 86_400_000));
+  if (list.length === 0) {
+    const entries = await riotGet(`${platformHost(region)}${PATHS.lol.ranked(puuid)}`, { ttl: 2 * MIN });
+    const doc = { puuid, region, day: rank.dayKey(now), at: now, ...rank.snapshotFromEntries(entries) };
+    await store.putRank(doc);
+    list = [doc];
+  }
+  res.json({ snapshots: list.map(({ day, solo, flex }) => ({ day, solo, flex })) });
+}));
+
+// La app avisa de sus favoritos (una vez al día) para que el servidor siga guardando su historial
+router.post("/history/touch", handle(async (req, res) => {
+  const store = storeRef.get();
+  if (!store) throw new HttpError(503, "El historial no está disponible ahora", { code: "DEVICES_UNAVAILABLE" });
+  const items = Array.isArray(req.body?.items) ? req.body.items.slice(0, 50) : [];
+  const valid = items.filter(i => i && PUUID_RE.test(String(i.puuid)) && isRegion(i.region)).map(i => ({ puuid: i.puuid, region: i.region }));
+  await store.touchTrack(valid, Date.now());
+  res.json({ ok: true, count: valid.length });
 }));
 
 module.exports = router;

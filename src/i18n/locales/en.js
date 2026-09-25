@@ -140,6 +140,7 @@ export default {
   "settings.clearRecentsBody": "They will be removed from the home screen. Your favorites won't change.",
   "settings.about": "About",
   "settings.version": "{app} · version {version}",
+  "settings.update": "Update {id}",
   "legal.riot": "{app} isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.",
   "legal.supercell": "This content is not affiliated with, endorsed, sponsored, or specifically approved by Supercell and Supercell is not responsible for it. For more information see Supercell's Fan Content Policy: www.supercell.com/fan-content-policy.",
   "legal.games": "Dota 2 is a trademark of Valve Corporation, Fortnite of Epic Games, Apex Legends of Electronic Arts and PUBG of KRAFTON, Inc. Kairo isn't affiliated with or endorsed by them; its data comes from OpenDota, Fortnite-API, Apex Legends Status and the official PUBG API.",

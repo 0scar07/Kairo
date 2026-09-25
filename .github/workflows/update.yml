@@ -1,0 +1,55 @@
+name: Publicar actualización (sin APK)
+
+# Cada cambio de la app (pantallas, textos, lógica) que llega a main se publica como actualización por aire en el canal
+# "preview": quien tenga el APK instalado la recibe al abrir la app y se aplica en el siguiente arranque.
+# Las actualizaciones solo llegan a APK de la MISMA versión de app (runtimeVersion = versión de app.json): si un cambio
+# toca código nativo, sube la versión en app.json y publica un APK nuevo (ver docs/DESPLIEGUE.md).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "App.jsx"
+      - "assets/**"
+      - "package.json"
+      - "app.json"
+      - "app.config.js"
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Mensaje de la actualización"
+        required: false
+
+concurrency:
+  group: eas-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EXPO_PUBLIC_API_URL: https://kairo-api-nqts.onrender.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Comprobar el secreto de Expo
+        run: test -n "$EXPO_TOKEN" || (echo "Falta el secreto EXPO_TOKEN" && exit 1)
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      # Misma comprobación que el CI: si algo está roto, no se publica
+      - name: Verificar imports, tokens y traducciones
+        run: npm run verify
+
+      - name: Publicar la actualización
+        run: |
+          MSG="${{ github.event.inputs.message }}"
+          if [ -z "$MSG" ]; then MSG=$(git log -1 --pretty=%s); fi
+          npx --yes eas-cli@latest update --channel preview --message "$MSG" --non-interactive

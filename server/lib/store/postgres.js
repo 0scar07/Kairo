@@ -25,6 +25,19 @@ class PostgresStore {
         doc        jsonb NOT NULL,
         updated_at timestamptz NOT NULL DEFAULT now()
       )`);
+    await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS rank_history (
+        puuid text NOT NULL,
+        day   text NOT NULL,
+        doc   jsonb NOT NULL,
+        PRIMARY KEY (puuid, day)
+      )`);
+    await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS rank_track (
+        puuid     text PRIMARY KEY,
+        region    text NOT NULL,
+        last_seen bigint NOT NULL
+      )`);
   }
 
   async count() {
@@ -88,6 +101,40 @@ class PostgresStore {
 
   async removeWatch(puuid) {
     await this.pool.query("DELETE FROM watch WHERE puuid = $1", [puuid]);
+  }
+
+  // Historial de rango: una foto por jugador y día (la última del día reemplaza a las anteriores)
+  async putRank(doc) {
+    await this.pool.query(
+      `INSERT INTO rank_history (puuid, day, doc) VALUES ($1, $2, $3)
+       ON CONFLICT (puuid, day) DO UPDATE SET doc = EXCLUDED.doc`,
+      [doc.puuid, doc.day, JSON.stringify(doc)],
+    );
+  }
+
+  async listRank(puuid, sinceDay = "0000-00-00") {
+    const { rows } = await this.pool.query("SELECT doc FROM rank_history WHERE puuid = $1 AND day >= $2 ORDER BY day", [puuid, sinceDay]);
+    return rows.map(r => r.doc);
+  }
+
+  async latestRank(puuid) {
+    const { rows } = await this.pool.query("SELECT doc FROM rank_history WHERE puuid = $1 ORDER BY day DESC LIMIT 1", [puuid]);
+    return rows[0]?.doc ?? null;
+  }
+
+  async touchTrack(items, now) {
+    for (const { puuid, region } of items) {
+      await this.pool.query(
+        `INSERT INTO rank_track (puuid, region, last_seen) VALUES ($1, $2, $3)
+         ON CONFLICT (puuid) DO UPDATE SET region = EXCLUDED.region, last_seen = EXCLUDED.last_seen`,
+        [puuid, region, now],
+      );
+    }
+  }
+
+  async listTrack(sinceMs) {
+    const { rows } = await this.pool.query("SELECT puuid, region, last_seen FROM rank_track WHERE last_seen >= $1", [sinceMs]);
+    return rows.map(r => ({ puuid: r.puuid, region: r.region, lastSeen: Number(r.last_seen) }));
   }
 
   async close() {

@@ -74,8 +74,8 @@ function isQuiet(settings, nowMs) {
 const newState = (puuid, region) => ({ puuid, region, current: null, pending: [], lastCheckedAt: 0, notifiedStart: null, notifiedEnd: [] });
 
 class Watcher {
-  constructor({ store, push, riot = defaultRiot, names = championName, art = defaultArt, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
-    Object.assign(this, { store, push, riot, names, art, now, maxPerTick, canWatch, log });
+  constructor({ store, push, riot = defaultRiot, names = championName, art = defaultArt, rank = null, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
+    Object.assign(this, { store, push, riot, names, art, rank, now, maxPerTick, canWatch, log });
     this.running = false;
     this.timer = null;
     this.receiptQueue = [];   // avisos enviados cuyo recibo falta por revisar (en memoria: si se pierde, no pasa nada grave)
@@ -130,6 +130,9 @@ class Watcher {
         spend();
         await this.guard(() => this.checkLive(states.get(puuid) || newState(puuid, targets.get(puuid).region), targets.get(puuid)));
       }
+
+      // Historial de rango: usa lo que sobre del presupuesto (con un mínimo, para que no se quede sin turno)
+      if (this.rank) await this.guard(() => this.rank.tick(Math.max(budget, 3)));
 
       await this.checkReceipts();
       this.stats.tracked = targets.size;

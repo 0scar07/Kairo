@@ -17,6 +17,8 @@ const DEFAULT_SETTINGS = Object.freeze({
   notifyStart: true,    // avisar cuando entra en partida
   notifyEnd: true,      // avisar el resultado al terminar
   locale: "es",          // idioma de los textos de las notificaciones
+  weekly: true,         // resumen semanal (domingo por la tarde)
+  rankAlerts: true,     // avisar cuando un favorito sube o baja de rango, o entra en promoción
   quiet: { enabled: false, from: "23:00", to: "07:00", utcOffsetMinutes: 0 },   // horario silencioso (hora local del celular)
 });
 
@@ -56,7 +58,7 @@ function parseFavorites(list) {
 function parseSettings(input, current = DEFAULT_SETTINGS) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw bad("Ajustes no válidos", "INVALID_SETTINGS");
   const next = { ...current, quiet: { ...current.quiet } };
-  for (const key of ["enabled", "notifyStart", "notifyEnd"]) {
+  for (const key of ["enabled", "notifyStart", "notifyEnd", "weekly", "rankAlerts"]) {
     if (input[key] === undefined) continue;
     if (!isBool(input[key])) throw bad(`Ajuste no válido: ${key}`, "INVALID_SETTINGS");
     next[key] = input[key];

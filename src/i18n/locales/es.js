@@ -141,6 +141,7 @@ export default {
   "settings.clearRecentsBody": "Se quitarán de la pantalla de inicio. Tus favoritos no cambian.",
   "settings.about": "Acerca de",
   "settings.version": "{app} · versión {version}",
+  "settings.update": "Actualización {id}",
   "legal.riot": "{app} no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de sus propiedades. Riot Games y todas las propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.",
   "legal.supercell": "Este contenido no está afiliado, respaldado, patrocinado ni aprobado específicamente por Supercell y Supercell no se hace responsable de él. Más información: la política de contenido de fans de Supercell (supercell.com/fan-content-policy). Brawl Stars, Clash Royale y Clash of Clans son marcas de Supercell.",
   "legal.games": "Dota 2 es marca de Valve Corporation, Fortnite de Epic Games, Apex Legends de Electronic Arts y PUBG de KRAFTON, Inc. Kairo no está afiliada ni respaldada por ellas; sus datos vienen de OpenDota, Fortnite-API, Apex Legends Status y la API oficial de PUBG.",

@@ -142,6 +142,7 @@ export default {
   "settings.clearRecentsBody": "Elles seront retirées de l'écran d'accueil. Vos favoris ne changent pas.",
   "settings.about": "À propos",
   "settings.version": "{app} · version {version}",
+  "settings.update": "Mise à jour {id}",
   "legal.riot": en["legal.riot"],
   "legal.supercell": en["legal.supercell"],
   "legal.games": "Dota 2 est une marque de Valve Corporation, Fortnite d'Epic Games, Apex Legends d'Electronic Arts et PUBG de KRAFTON, Inc. Kairo n'est ni affilié ni approuvé par ces sociétés ; ses données proviennent d'OpenDota, de Fortnite-API, d'Apex Legends Status et de l'API officielle de PUBG.",
