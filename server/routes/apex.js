@@ -22,10 +22,11 @@ const PLATFORMS = ["PC", "PS4", "X1"];
 
 // Esta API a veces responde 200/4xx con { Error: "..." } en vez de un código claro
 function errorFromBody(data) {
-  const text = String(data?.Error || "");
+  // A veces responde texto plano ("Unauthorized format", "Error: API key doesn't exist !") en vez de JSON
+  const text = typeof data === "string" ? data : String(data?.Error || "");
   if (/not found|no player|couldn't find/i.test(text)) return new HttpError(404, "Jugador no encontrado", { code: "PLAYER_NOT_FOUND" });
   if (/rate|too many|limit/i.test(text)) return new HttpError(429, "Apex Legends Status limitó las solicitudes, reintenta en 5 s", { code: "RATE_LIMITED", retryAfter: 5, provider: "Apex Legends Status" });
-  if (/api key|auth/i.test(text)) return new HttpError(503, "Apex Legends Status rechazó la consulta: la key no es válida", { code: "KEY_INVALID", provider: "Apex Legends Status" });
+  if (/api key|auth|doesn't exist/i.test(text)) return new HttpError(503, "Apex Legends Status rechazó la consulta: la key no es válida", { code: "KEY_INVALID", provider: "Apex Legends Status" });
   return new HttpError(502, "Apex Legends Status tuvo un problema, intenta de nuevo", { code: "UPSTREAM_ERROR", provider: "Apex Legends Status" });
 }
 
@@ -43,8 +44,8 @@ router.get("/player/:name", handle(async (req, res) => {
     notFound: { message: "Jugador no encontrado", code: "PLAYER_NOT_FOUND" },
     mapError,
   });
-  if (data?.Error) throw errorFromBody(data);
-  if (!data?.global) throw new HttpError(404, "Jugador no encontrado", { code: "PLAYER_NOT_FOUND" });
+  if (typeof data === "string" || data?.Error) throw errorFromBody(data);
+  if (!data?.global) throw new HttpError(502, "Apex Legends Status tuvo un problema, intenta de nuevo", { code: "UPSTREAM_ERROR", provider: "Apex Legends Status" });
 
   const g = data.global;
   const selected = data.legends?.selected;

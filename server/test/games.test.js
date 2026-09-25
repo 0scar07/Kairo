@@ -35,6 +35,7 @@ const upstream = http.createServer((req, res) => {
   // --- Apex Legends Status
   if (p === "/apex/bridge") {
     const name = url.searchParams.get("player");
+    if (name === "SinKey") { res.writeHead(200, { "Content-Type": "text/plain" }); return res.end("Unauthorized format"); }
     if (name === "Nadie") return json(res, 404, { Error: "Player not found" });
     return json(res, 200, { global: { name, uid: "1", level: 300, toNextLevelPercent: 40, bans: { isActive: false }, rank: { rankScore: 7000, rankName: "Platinum", rankDiv: 2, ladderPosPlatform: -1, rankImg: "r.png", rankedSeason: "s25" } },
       realtime: { isOnline: 1, isInGame: 0, lobbyState: "open", selectedLegend: "Wraith" },
@@ -133,6 +134,10 @@ test("Apex: rango, leyenda seleccionada y estado en línea; los errores del cuer
   assert.strictEqual(ok.body.legend.banner, "b.png");
   assert.deepStrictEqual(ok.body.totals, { kills: { name: "Kills", value: 1200 } });
   assert.strictEqual(seen.find(s => s.path === "/apex/bridge" && s.query.player === "Tester").auth, "clave-apex");
+
+  const unauthorized = await get("/apex/player/SinKey");   // texto plano, no JSON
+  assert.strictEqual(unauthorized.status, 503);
+  assert.strictEqual(unauthorized.body.code, "KEY_INVALID");
 
   const missing = await get("/apex/player/Nadie");
   assert.strictEqual(missing.status, 404);
