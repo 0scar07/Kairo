@@ -21,6 +21,9 @@ services:
         value: la1
       - key: RATE_LIMIT_PER_MIN
         value: "240"
+      # Notificaciones: base de datos Postgres (Neon). Sin esto se usa un archivo que Render borra al reiniciar
+      - key: DATABASE_URL
+        sync: false
       # Supercell (opcionales: cada juego se activa al poner su key; permite la IP 45.79.218.79 al crearlas)
       - key: BRAWLSTARS_API_KEY
         sync: false

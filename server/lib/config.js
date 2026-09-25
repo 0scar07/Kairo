@@ -11,6 +11,8 @@ module.exports = {
   port: int(process.env.PORT, 3000),
   // Peticiones por minuto y por IP (un perfil completo hace ~14)
   rateLimitPerMin: int(process.env.RATE_LIMIT_PER_MIN, 240),
+  // Tope de dispositivos registrados para notificaciones (protege el plan gratuito de la base de datos)
+  maxDevices: int(process.env.MAX_DEVICES, 5000),
   // Orígenes web permitidos, separados por comas. Vacío = cualquiera (las apps nativas no envían Origin)
   corsOrigins: (process.env.CORS_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean),
   // Detrás de un proxy (Render, Railway, Fly…) hay que confiar en él para ver la IP real del cliente

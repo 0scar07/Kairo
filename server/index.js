@@ -9,6 +9,8 @@ const lolRouter = require("./routes/lol");
 const tftRouter = require("./routes/tft");
 const { createSupercellRouter } = require("./routes/supercell");
 const extra = require("./lib/extra");
+const { createStore } = require("./lib/store");
+const { createDevicesRouter } = require("./routes/devices");
 
 if (!process.env.RIOT_API_KEY) {
   console.error("Falta RIOT_API_KEY (en server/.env o en las variables de entorno del hosting). Ver .env.example");
@@ -56,6 +58,17 @@ app.use("/clashofclans", createSupercellRouter("clashofclans"));
 // Dota 2, Fortnite, Apex Legends y PUBG (APIs de terceros; se activan al configurar su key, salvo Dota 2)
 for (const [id, module] of Object.entries(extra.ROUTES)) app.use(`/${id}`, module.router);
 
+// Dispositivos para las notificaciones (Postgres si hay DATABASE_URL; si no, un archivo JSON local).
+// Si el almacén no arranca, el resto de la API sigue funcionando y solo /devices responde 503.
+const store = createStore();
+const storeReady = store.init().then(() => console.log(`   dispositivos: almacén ${store.kind}`)).catch(e => {
+  console.error("No pude iniciar el almacén de dispositivos:", e.message);
+  throw e;
+});
+storeReady.catch(() => {});
+app.use("/devices", (_req, _res, next) => storeReady.then(() => next(), () => next(new HttpError(503, "Las notificaciones no están disponibles ahora", { code: "DEVICES_UNAVAILABLE" }))),
+  createDevicesRouter(store, { maxDevices: config.maxDevices }));
+
 // Alias antiguos (/account, /summoner, /ranked, /matches, /match) = /lol/...
 // Se mantienen mientras alguna versión de la app los use; avisan una vez por ruta.
 const LEGACY_ROUTES = new Set(["account", "summoner", "ranked", "matches", "match"]);
@@ -81,7 +94,7 @@ const server = app.listen(config.port, () => {
 // Cierre limpio: los hostings envían SIGTERM al reiniciar o redesplegar
 function shutdown(signal) {
   console.log(`${signal} recibido: cerrando…`);
-  server.close(() => process.exit(0));
+  server.close(() => store.close().catch(() => {}).finally(() => process.exit(0)));
   setTimeout(() => process.exit(1), 10_000).unref();
 }
 process.on("SIGTERM", () => shutdown("SIGTERM"));
