@@ -82,6 +82,8 @@ export default {
   "matches.moreError": "Não foi possível carregar mais partidas: {error}",
   "matches.emptyTitle": "Sem partidas recentes",
   "matches.emptyText": "Este jogador não tem partidas registradas no momento.",
+  "matches.last_one": "Última partida",
+  "matches.last_other": "Últimas {count} partidas",
   "filters.allMatches": "Todas",
   "filters.allChamps": "Todos",
   "filters.allPlayers": "Todos",

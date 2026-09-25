@@ -82,6 +82,8 @@ export default {
   "matches.moreError": "Weitere Spiele konnten nicht geladen werden: {error}",
   "matches.emptyTitle": "Keine aktuellen Spiele",
   "matches.emptyText": "Dieser Spieler hat im Moment keine Spiele aufgezeichnet.",
+  "matches.last_one": "Letztes Spiel",
+  "matches.last_other": "Letzte {count} Spiele",
   "filters.allMatches": "Alle",
   "filters.allChamps": "Alle",
   "filters.allPlayers": "Alle",

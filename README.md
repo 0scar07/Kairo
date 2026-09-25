@@ -114,6 +114,12 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
     <td align="center"><img src="docs/screenshots/clashofclans-profile.png" width="200" /><br /><sub><b>Clash of Clans</b></sub></td>
   </tr>
   <tr>
+    <td align="center"><img src="docs/screenshots/dota2-profile.png" width="200" /><br /><sub><b>Dota 2</b></sub></td>
+    <td align="center"><img src="docs/screenshots/dota2-matches.png" width="200" /><br /><sub><b>Partidas de Dota 2</b></sub></td>
+    <td align="center"><img src="docs/screenshots/lol-english.png" width="200" /><br /><sub><b>LoL en English</b></sub></td>
+    <td align="center"><img src="docs/screenshots/clashroyale-portugues.png" width="200" /><br /><sub><b>Clash Royale en Português</b></sub></td>
+  </tr>
+  <tr>
     <td align="center"><img src="docs/screenshots/clashofclans-heroes.png" width="200" /><br /><sub><b>Héroes y clan</b></sub></td>
     <td align="center"><img src="docs/screenshots/home-tft.png" width="200" /><br /><sub><b>Inicio en TFT</b></sub></td>
     <td align="center"><img src="docs/screenshots/profile-tft.png" width="200" /><br /><sub><b>Perfil de TFT</b></sub></td>
@@ -127,7 +133,7 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
   </tr>
 </table>
 
-<sub>Las capturas de Brawl Stars, Clash Royale y Clash of Clans usan datos reales de la API de Supercell. Las de TFT son anteriores al rediseño de íconos.</sub>
+<sub>Las capturas de Dota 2 usan datos reales de OpenDota (una cuenta de un jugador profesional público). Fortnite, Apex Legends y PUBG aún no tienen captura: se añadirán con sus keys puestas. Las de Brawl Stars, Clash Royale y Clash of Clans usan datos reales de la API de Supercell. Las de TFT son anteriores al rediseño de íconos.</sub>
 
 <sub>La partida en vivo es de una partida real de Flex, con los nombres tal como los muestra la app.</sub>
 

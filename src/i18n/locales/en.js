@@ -80,6 +80,8 @@ export default {
   "matches.moreError": "Couldn't load more games: {error}",
   "matches.emptyTitle": "No recent games",
   "matches.emptyText": "This player has no games recorded right now.",
+  "matches.last_one": "Last game",
+  "matches.last_other": "Last {count} games",
   "filters.allMatches": "All",
   "filters.allChamps": "All",
   "filters.allPlayers": "All",

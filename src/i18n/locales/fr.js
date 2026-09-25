@@ -82,6 +82,8 @@ export default {
   "matches.moreError": "Impossible de charger plus de parties : {error}",
   "matches.emptyTitle": "Aucune partie récente",
   "matches.emptyText": "Ce joueur n'a aucune partie enregistrée pour le moment.",
+  "matches.last_one": "Dernière partie",
+  "matches.last_other": "{count} dernières parties",
   "filters.allMatches": "Toutes",
   "filters.allChamps": "Tous",
   "filters.allPlayers": "Tous",

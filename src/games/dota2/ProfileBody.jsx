@@ -100,7 +100,7 @@ export default function DotaProfileBody({ data }) {
             summary={t("results.summary", { wins, losses: recent.length - wins })}
             items={recent.slice(0, STRIP_MAX).map(m => ({ color: m.win ? colors.win : colors.loss }))}
           />
-          <SectionLabel style={styles.sectionLabel}>{t("sc.lastBattles", { count: recent.length })}</SectionLabel>
+          <SectionLabel style={styles.sectionLabel}>{t("matches.last", { count: recent.length })}</SectionLabel>
           {recent.map(m => (
             <BattleRow
               key={m.matchId}

@@ -71,7 +71,7 @@ export default function PubgProfileBody({ data }) {
 
       {player.matches.length > 0 && (
         <Reveal order={4}>
-          <SectionLabel style={styles.sectionLabel}>{t("sc.lastBattles", { count: player.matches.length })}</SectionLabel>
+          <SectionLabel style={styles.sectionLabel}>{t("matches.last", { count: player.matches.length })}</SectionLabel>
           {player.matches.map(m => {
             const place = m.stats.winPlace;
             const color = place === 1 ? colors.gold : place <= 10 ? colors.win : colors.textSecondary;
