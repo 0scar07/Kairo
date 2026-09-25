@@ -32,6 +32,12 @@
     .shots img { width:100%; border-radius: 16px; border:1px solid var(--border); }
     .es-en { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 700px) { .es-en { grid-template-columns: 1fr; } h1 { font-size: 34px; letter-spacing: 8px; } }
+    .download { text-align:center; margin: 28px 0 0; }
+    .btn { display:inline-flex; align-items:center; gap:10px; background:var(--accent); color:#04130D; font-weight:700; text-decoration:none;
+           padding: 14px 26px; border-radius: 999px; font-size: 16px; }
+    .btn:hover { filter: brightness(1.08); }
+    .btn svg { width:20px; height:20px; }
+    .alt { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
     footer { border-top:1px solid var(--border); padding: 32px 0 56px; color: var(--muted); font-size: 12px; text-align:center; }
     footer p { max-width: 760px; margin: 8px auto; }
   </style>
@@ -46,6 +52,17 @@
         Estadísticas de <strong>League of Legends</strong> y <strong>Teamfight Tactics</strong> en una app móvil gratuita y sin anuncios.<br />
         <em>Free, ad-free mobile stats for League of Legends and Teamfight Tactics.</em>
       </p>
+      <div class="download">
+        <a class="btn" href="https://github.com/0scar07/Kairo/releases/latest/download/Kairo.apk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Descargar APK para Android · Download Android APK
+        </a>
+        <p class="alt">
+          Al instalarlo, Android pedirá permitir instalar apps desde el navegador. · Android will ask to allow installs from your browser.<br />
+          <a href="https://github.com/0scar07/Kairo/releases">Todas las versiones · All versions</a> ·
+          <a href="app/">iPhone: versión web · iPhone: web version</a>
+        </p>
+      </div>
       <img class="hero" src="screenshots/hero.png" alt="Capturas de Kairo" />
       <div class="note">Producto en desarrollo · Product in development</div>
     </header>

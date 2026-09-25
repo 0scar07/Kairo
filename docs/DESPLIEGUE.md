@@ -92,7 +92,7 @@ Las versiones las publica el flujo [`.github/workflows/release.yml`](../.github/
 
 1. Crea un token en <https://expo.dev/settings/access-tokens> y guárdalo en el repositorio como secreto `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Nunca en el código.
 2. Sube la versión en `package.json` y `app.json`, haz commit y crea la etiqueta: `git tag v1.1.0 && git push origin v1.1.0`.
-3. El flujo espera a EAS (la cola gratuita puede tardar más de una hora) y publica `Kairo-v1.1.0.apk` en *Releases*.
+3. El flujo espera a EAS (la cola gratuita puede tardar más de una hora) y publica `Kairo.apk` en *Releases* (el nombre es fijo para que el enlace de descarga directa, `releases/latest/download/Kairo.apk`, siempre baje la última versión).
 
 También puedes lanzarlo a mano desde la pestaña *Actions* con la etiqueta que quieras. Mientras no exista ninguna release, el botón "Descargar APK" del README no tiene a dónde apuntar.
 

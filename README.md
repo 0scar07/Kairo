@@ -36,13 +36,13 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 <div align="center">
 
-<a href="https://github.com/0scar07/Kairo/releases/latest"><img src="https://img.shields.io/badge/Descargar-APK-3DDC84?logo=android&logoColor=white&style=for-the-badge" alt="Descargar APK" height="54" align="middle" /></a>
+<a href="https://github.com/0scar07/Kairo/releases/latest/download/Kairo.apk"><img src="https://img.shields.io/badge/Descargar-APK-3DDC84?logo=android&logoColor=white&style=for-the-badge" alt="Descargar APK" height="54" align="middle" /></a>
 &nbsp;
 <a href="https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/0scar07/Kairo"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Obtainium" height="54" align="middle" /></a>
 
 </div>
 
-- **APK directo:** cada versión se publica en [GitHub Releases](https://github.com/0scar07/Kairo/releases). Al instalarlo, Android pedirá permitir instalar apps desde esa fuente.
+- **APK directo:** el botón de arriba baja `Kairo.apk` de la última versión (todas están en [GitHub Releases](https://github.com/0scar07/Kairo/releases)). Al instalarlo, Android pedirá permitir instalar apps desde esa fuente.
 - **Obtainium:** añade el repositorio con el botón de arriba y la app se actualiza sola con cada versión nueva.
 - **iPhone:** abre <https://0scar07.github.io/Kairo/app/> en Safari, toca *Compartir* y luego *Añadir a pantalla de inicio*. Queda como una app más, sin cuenta ni App Store (es la versión web, así que algunas animaciones pueden variar).
 

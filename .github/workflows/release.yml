@@ -41,12 +41,13 @@ jobs:
         run: |
           URL=$(jq -r '.[0].artifacts.buildUrl' build.json)
           test "$URL" != "null" && test -n "$URL"
-          curl -fsSL -o "Kairo-${TAG}.apk" "$URL"
-          ls -lh "Kairo-${TAG}.apk"
+          # Nombre fijo (Kairo.apk): así https://github.com/<repo>/releases/latest/download/Kairo.apk siempre baja la última versión
+          curl -fsSL -o Kairo.apk "$URL"
+          ls -lh Kairo.apk
 
       - name: Publicar en GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "$TAG" "Kairo-${TAG}.apk" --title "Kairo ${TAG}" --generate-notes || \
-            gh release upload "$TAG" "Kairo-${TAG}.apk" --clobber
+          gh release create "$TAG" Kairo.apk --title "Kairo ${TAG}" --generate-notes || \
+            gh release upload "$TAG" Kairo.apk --clobber
