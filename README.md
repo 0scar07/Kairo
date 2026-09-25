@@ -36,9 +36,9 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 <div align="center">
 
-[![Descargar APK](https://img.shields.io/badge/Descargar-APK-3DDC84?logo=android&logoColor=white&style=for-the-badge)](https://github.com/0scar07/Kairo/releases/latest)
+<a href="https://github.com/0scar07/Kairo/releases/latest"><img src="https://img.shields.io/badge/Descargar-APK-3DDC84?logo=android&logoColor=white&style=for-the-badge" alt="Descargar APK" height="54" align="middle" /></a>
 &nbsp;
-[<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Obtainium" height="54" />](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/0scar07/Kairo)
+<a href="https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/0scar07/Kairo"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Obtainium" height="54" align="middle" /></a>
 
 </div>
 
