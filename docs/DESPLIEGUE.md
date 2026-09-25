@@ -72,6 +72,17 @@ El registro de dispositivos (`/devices`) guarda el token de notificaciones, los 
 - El registro está limitado por IP (20 altas por hora) y por total (`MAX_DEVICES`, 5000 por defecto) para no agotar el plan gratuito.
 - Si la base falla al arrancar, el resto de la API sigue funcionando y solo `/devices` responde 503.
 
+## Vigilante de partidas y notificaciones (solo LoL)
+
+Con el servidor encendido, un vigilante revisa cada 2 minutos a los favoritos con alertas de todos los dispositivos (cada jugador se consulta una sola vez aunque lo sigan varios) y manda las notificaciones por Expo Push: una al entrar en partida y otra al terminar, con el resultado.
+
+- **Presupuesto:** máximo `WATCH_MAX_PER_TICK` consultas a Riot por tanda (40 por defecto, menos de la mitad del cupo de 95 cada 2 min); si hay más jugadores, se rotan. Se detiene si Riot devuelve 403 o 429.
+- **Sin repetir avisos:** el estado de cada jugador (partida ya avisada, resultados pendientes) se guarda en la base, así que reiniciar el servidor no duplica nada.
+- **Tokens muertos:** si Expo indica `DeviceNotRegistered` (app desinstalada), el dispositivo se da de baja solo.
+- **Android:** las push necesitan Firebase (FCM V1). El archivo `google-services.json` va como variable de archivo `GOOGLE_SERVICES_JSON` en EAS (entorno `preview`) y la llave de la cuenta de servicio se sube en expo.dev, *Credentials*, Android, *FCM V1 service account key*. Ninguno de los dos va en git.
+- **Probar sin esperar una partida:** `POST /devices/me/test` (con el encabezado del dispositivo) manda una notificación de prueba a ese celular; `{"type":"live_start"}` o `{"type":"live_end"}` muestran cómo se verían los avisos reales.
+- `/health` incluye el estado del vigilante (`watcher`). Se apaga con `WATCHER_ENABLED=false`.
+
 ## Publicar una versión (APK)
 
 Las versiones las publica el flujo [`.github/workflows/release.yml`](../.github/workflows/release.yml): al subir una etiqueta `v*` construye el APK con EAS y lo adjunta a una *release* de GitHub, que es de donde lo descargan el botón del README y [Obtainium](https://github.com/ImranR98/Obtainium).

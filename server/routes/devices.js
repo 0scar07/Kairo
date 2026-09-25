@@ -3,6 +3,7 @@ const { Router } = require("express");
 const rateLimit = require("express-rate-limit");
 const { handle } = require("../lib/riot");
 const { HttpError } = require("../lib/errors");
+const text = require("../lib/pushText");
 const {
   DEFAULT_SETTINGS, parsePushToken, parsePlatform, parseFavorites, parseSettings,
   newSecret, hashSecret, secretMatches, publicDevice,
@@ -16,13 +17,14 @@ const {
  *   PUT    /devices/me/favorites    { favorites: [{ puuid, region, riotId, muted? }] }   (reemplaza la lista)
  *   PUT    /devices/me/settings     { enabled?, notifyStart?, notifyEnd?, quiet? }        (cambia solo lo enviado)
  *   PUT    /devices/me/token        { pushToken }                                          (Expo puede rotar el token)
+ *   POST   /devices/me/test         { type?: "live_start" | "live_end" } -> manda una notificación de prueba a este dispositivo
  *   DELETE /devices/me              -> 204 (baja)
  *
  * El registro devuelve un secreto UNA sola vez. Las demás llamadas lo envían así:
  *   Authorization: Device <deviceId>.<secret>
  * Registrar un token ya existente entrega un secreto nuevo (el token solo lo conocen el celular y este servidor).
  */
-function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20 } = {}) {
+function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20, push = null, testPerHour = 10 } = {}) {
   const router = Router();
 
   const registerLimiter = rateLimit({
@@ -93,6 +95,32 @@ function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20 } 
   router.put("/me/token", auth, handle(async (req, res) => {
     const pushToken = parsePushToken(req.body?.pushToken);
     res.json(publicDevice(await save(req.device, { pushToken })));
+  }));
+
+  // Notificación de prueba: sirve para comprobar que llegan (y cómo se ven) sin esperar una partida real
+  const testLimiter = rateLimit({
+    windowMs: 60 * 60_000,
+    limit: testPerHour,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    keyGenerator: req => req.device.id,
+    handler(req, _res, next) {
+      const retryAfter = Math.max(1, Math.ceil((req.rateLimit.resetTime - Date.now()) / 1000));
+      next(new HttpError(429, "Demasiadas pruebas, reintenta más tarde", { retryAfter, code: "RATE_LIMITED_IP" }));
+    },
+  });
+
+  router.post("/me/test", auth, testLimiter, handle(async (req, res) => {
+    if (!push) throw new HttpError(503, "Las notificaciones no están disponibles ahora", { code: "DEVICES_UNAVAILABLE" });
+    const type = req.body?.type ?? "test";
+    if (!["test", "live_start", "live_end"].includes(type)) throw new HttpError(400, "Tipo de prueba no válido", { code: "INVALID_TEST" });
+    const locale = req.device.settings.locale || "es";
+    const content = type === "live_start" ? text.startText(locale, { name: "Kairo", queueId: 420, champion: "Ahri", minutes: 0 })
+      : type === "live_end" ? text.endText(locale, { name: "Kairo", win: true, champion: "Ahri", kills: 8, deaths: 2, assists: 11, queueId: 420 })
+      : text.testText(locale);
+    const [result] = await push.send([{ to: req.device.pushToken, ...content, sound: "default", priority: "high", channelId: "live", categoryId: "live_game", ttl: 300, data: { type: type === "test" ? "test" : type, test: true } }]);
+    if (!result.ok && result.error === "DeviceNotRegistered") await store.remove(req.device.id);
+    res.json({ ok: result.ok, error: result.ok ? undefined : result.error });
   }));
 
   router.delete("/me", auth, handle(async (req, res) => {

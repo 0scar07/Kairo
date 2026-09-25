@@ -16,6 +16,9 @@ const routingHost  = region => `https://${REGIONS[region]}.api.riotgames.com`;
 // account-v1 no existe en el clúster "sea": se consulta en "asia"
 const accountHost  = region => `https://${REGIONS[region] === "sea" ? "asia" : REGIONS[region]}.api.riotgames.com`;
 
+// Prefijo del matchId de match-v5 ("LA1_123"): la plataforma en mayúsculas, con PH2/TH2 fusionadas en SG2
+const platformId = region => (PLATFORM_ALIASES[region] || region).toUpperCase();
+
 const isRegion = value => Object.prototype.hasOwnProperty.call(REGIONS, value);
 
 // El ID de partida empieza con la plataforma ("LA1_123", "KR_456"): sirve para elegir el clúster correcto
@@ -25,5 +28,5 @@ const regionFromMatchId = matchId => {
 };
 
 module.exports = {
-  REGIONS, DEFAULT_REGION, isRegion, platformHost, routingHost, accountHost, regionFromMatchId,
+  REGIONS, DEFAULT_REGION, isRegion, platformHost, routingHost, accountHost, regionFromMatchId, platformId,
 };

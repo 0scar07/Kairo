@@ -1,6 +1,7 @@
 const crypto = require("node:crypto");
 const { HttpError } = require("./errors");
 const { isRegion } = require("./regions");
+const { LOCALES } = require("./pushText");
 
 // Un dispositivo = un celular con la app: su token de notificaciones, sus favoritos vigilados y sus ajustes.
 // Sin cuentas: al registrarse recibe un secreto propio (que el servidor guarda con hash) y con él se identifica.
@@ -15,6 +16,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   enabled: true,        // interruptor general
   notifyStart: true,    // avisar cuando entra en partida
   notifyEnd: true,      // avisar el resultado al terminar
+  locale: "es",          // idioma de los textos de las notificaciones
   quiet: { enabled: false, from: "23:00", to: "07:00", utcOffsetMinutes: 0 },   // horario silencioso (hora local del celular)
 });
 
@@ -58,6 +60,10 @@ function parseSettings(input, current = DEFAULT_SETTINGS) {
     if (input[key] === undefined) continue;
     if (!isBool(input[key])) throw bad(`Ajuste no válido: ${key}`, "INVALID_SETTINGS");
     next[key] = input[key];
+  }
+  if (input.locale !== undefined) {
+    if (!LOCALES.includes(input.locale)) throw bad("Idioma no válido", "INVALID_SETTINGS");
+    next.locale = input.locale;
   }
   if (input.quiet !== undefined) {
     const q = input.quiet;

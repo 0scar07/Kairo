@@ -14,6 +14,7 @@ class JsonStore {
     this.file = file;
     this.flushMs = flushMs;
     this.devices = new Map();
+    this.watch = new Map();     // estado del vigilante por jugador (puuid)
     this.timer = null;
     this.writing = Promise.resolve();
   }
@@ -24,6 +25,7 @@ class JsonStore {
     try {
       const data = JSON.parse(fs.readFileSync(this.file, "utf8"));
       for (const d of Array.isArray(data.devices) ? data.devices : []) this.devices.set(d.id, d);
+      for (const w of Array.isArray(data.watch) ? data.watch : []) this.watch.set(w.puuid, w);
     } catch (e) {
       const broken = `${this.file}.dañado-${Date.now()}`;
       fs.renameSync(this.file, broken);
@@ -52,6 +54,11 @@ class JsonStore {
     return existed;
   }
 
+  // Estado del vigilante: qué partida tiene cada jugador vigilado y qué avisos ya se enviaron
+  async listWatch() { return [...this.watch.values()].map(w => structuredClone(w)); }
+  async putWatch(state) { this.watch.set(state.puuid, structuredClone(state)); this.schedule(); }
+  async removeWatch(puuid) { if (this.watch.delete(puuid)) this.schedule(); }
+
   schedule() {
     if (this.timer) return;
     this.timer = setTimeout(() => { this.timer = null; this.flush(); }, this.flushMs);
@@ -60,7 +67,7 @@ class JsonStore {
 
   flush() {
     const tmp = `${this.file}.tmp`;
-    const body = JSON.stringify({ version: 1, devices: [...this.devices.values()] });
+    const body = JSON.stringify({ version: 1, devices: [...this.devices.values()], watch: [...this.watch.values()] });
     this.writing = this.writing
       .then(() => fs.promises.writeFile(tmp, body).then(() => fs.promises.rename(tmp, this.file)))
       .catch(e => console.error("No pude guardar los dispositivos:", e.message));

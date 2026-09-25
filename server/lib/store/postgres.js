@@ -19,6 +19,12 @@ class PostgresStore {
         doc        jsonb NOT NULL,
         updated_at timestamptz NOT NULL DEFAULT now()
       )`);
+    await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS watch (
+        puuid      text PRIMARY KEY,
+        doc        jsonb NOT NULL,
+        updated_at timestamptz NOT NULL DEFAULT now()
+      )`);
   }
 
   async count() {
@@ -64,6 +70,24 @@ class PostgresStore {
   async remove(id) {
     const { rowCount } = await this.pool.query("DELETE FROM devices WHERE id = $1", [id]);
     return rowCount > 0;
+  }
+
+  // Estado del vigilante: qué partida tiene cada jugador vigilado y qué avisos ya se enviaron
+  async listWatch() {
+    const { rows } = await this.pool.query("SELECT doc FROM watch");
+    return rows.map(r => r.doc);
+  }
+
+  async putWatch(state) {
+    await this.pool.query(
+      `INSERT INTO watch (puuid, doc, updated_at) VALUES ($1, $2, now())
+       ON CONFLICT (puuid) DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
+      [state.puuid, JSON.stringify(state)],
+    );
+  }
+
+  async removeWatch(puuid) {
+    await this.pool.query("DELETE FROM watch WHERE puuid = $1", [puuid]);
   }
 
   async close() {

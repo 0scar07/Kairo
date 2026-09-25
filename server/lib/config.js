@@ -13,6 +13,10 @@ module.exports = {
   rateLimitPerMin: int(process.env.RATE_LIMIT_PER_MIN, 240),
   // Tope de dispositivos registrados para notificaciones (protege el plan gratuito de la base de datos)
   maxDevices: int(process.env.MAX_DEVICES, 5000),
+  // Vigilante de partidas (notificaciones): cada cuántos ms revisa y cuántas consultas a Riot gasta como máximo por tanda
+  watcherEnabled: process.env.WATCHER_ENABLED !== "false",
+  watchIntervalMs: int(process.env.WATCH_INTERVAL_MS, 120_000),
+  watchMaxPerTick: int(process.env.WATCH_MAX_PER_TICK, 40),
   // Orígenes web permitidos, separados por comas. Vacío = cualquiera (las apps nativas no envían Origin)
   corsOrigins: (process.env.CORS_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean),
   // Detrás de un proxy (Render, Railway, Fly…) hay que confiar en él para ver la IP real del cliente

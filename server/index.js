@@ -11,6 +11,8 @@ const { createSupercellRouter } = require("./routes/supercell");
 const extra = require("./lib/extra");
 const { createStore } = require("./lib/store");
 const { createDevicesRouter } = require("./routes/devices");
+const push = require("./lib/push");
+const { Watcher } = require("./lib/watcher");
 
 if (!process.env.RIOT_API_KEY) {
   console.error("Falta RIOT_API_KEY (en server/.env o en las variables de entorno del hosting). Ver .env.example");
@@ -44,6 +46,7 @@ app.get("/health", (_req, res) => res.json({
   riotQueue: riotLimiter.stats(),
   // Qué juegos puede consultar la key (Riot habilita cada API por producto); la app oculta los que no
   games: access.games(),
+  watcher: watcher.status(),
   regions: Object.keys(REGIONS),
   defaultRegion: DEFAULT_REGION,
 }));
@@ -67,7 +70,11 @@ const storeReady = store.init().then(() => console.log(`   dispositivos: almacé
 });
 storeReady.catch(() => {});
 app.use("/devices", (_req, _res, next) => storeReady.then(() => next(), () => next(new HttpError(503, "Las notificaciones no están disponibles ahora", { code: "DEVICES_UNAVAILABLE" }))),
-  createDevicesRouter(store, { maxDevices: config.maxDevices }));
+  createDevicesRouter(store, { maxDevices: config.maxDevices, push }));
+
+// Vigilante: revisa a los favoritos con alertas y manda las notificaciones (solo si el almacén arrancó)
+const watcher = new Watcher({ store, push, maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
+storeReady.then(() => { if (config.watcherEnabled) watcher.start(config.watchIntervalMs); }).catch(() => {});
 
 // Alias antiguos (/account, /summoner, /ranked, /matches, /match) = /lol/...
 // Se mantienen mientras alguna versión de la app los use; avisan una vez por ruta.
@@ -94,6 +101,7 @@ const server = app.listen(config.port, () => {
 // Cierre limpio: los hostings envían SIGTERM al reiniciar o redesplegar
 function shutdown(signal) {
   console.log(`${signal} recibido: cerrando…`);
+  watcher.stop();
   server.close(() => store.close().catch(() => {}).finally(() => process.exit(0)));
   setTimeout(() => process.exit(1), 10_000).unref();
 }

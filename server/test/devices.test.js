@@ -50,6 +50,21 @@ for (const kind of ["json", "postgres"]) {
     await store.close();
   });
 
+  test(`almacén ${kind}: estado del vigilante (guardar, actualizar, listar, borrar)`, async () => {
+    const store = stores[kind]();
+    await store.init();
+    await store.putWatch({ puuid: "p1", region: "la1", current: null, pending: [] });
+    await store.putWatch({ puuid: "p1", region: "la1", current: { gameId: 5 }, pending: [] });
+    await store.putWatch({ puuid: "p2", region: "kr", current: null, pending: [] });
+    const all = await store.listWatch();
+    assert.strictEqual(all.length, 2);
+    assert.strictEqual(all.find(w => w.puuid === "p1").current.gameId, 5);
+    await store.removeWatch("p1");
+    await store.removeWatch("nadie");
+    assert.deepStrictEqual((await store.listWatch()).map(w => w.puuid), ["p2"]);
+    await store.close();
+  });
+
   test(`almacén ${kind}: un token pertenece a un solo dispositivo`, async () => {
     const store = stores[kind]();
     await store.init();
