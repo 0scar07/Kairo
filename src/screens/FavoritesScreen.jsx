@@ -9,6 +9,7 @@ import { Chip, EmptyState, ErrorBanner } from "../components/ui";
 import { GAMES } from "../games";
 import { errorMessage } from "../utils/format";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
+import { profileTarget } from "../utils/target";
 import { useBootData } from "../boot/BootContext";
 import { colors, spacing, sizes, fontSizes, type, tracking } from "../theme";
 
@@ -29,7 +30,7 @@ export default function FavoritesScreen({ navigation }) {
   const visible = known.filter(f => filter === "all" || f.gameId === filter);
 
   function open(fav) {
-    navigation.navigate("Profile", { gameId: fav.gameId, gameName: fav.gameName, tagLine: fav.tagLine, region: fav.region });
+    navigation.navigate("Profile", profileTarget(fav));
   }
 
   async function remove(fav) {

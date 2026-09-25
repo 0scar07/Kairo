@@ -11,6 +11,7 @@ import FavoritesScreen from "./src/screens/FavoritesScreen";
 import SettingsScreen  from "./src/screens/SettingsScreen";
 import ProfileScreen   from "./src/screens/ProfileScreen";
 import LiveGameScreen  from "./src/games/lol/LiveGameScreen";
+import SearchResultsScreen from "./src/screens/SearchResultsScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
 import LoadingScreen from "./src/screens/LoadingScreen";
 import FloatingTabBar from "./src/components/FloatingTabBar";
@@ -62,6 +63,7 @@ function RootStack() {
         options={({ route }) => ({ title: getGame(route.params.gameId)?.name ?? t("screens.profile") })}
       />
       <Stack.Screen name="MyProfile" component={MyProfileScreen} options={{ title: t("screens.myProfile") }} />
+      <Stack.Screen name="SearchResults" component={SearchResultsScreen} options={({ route }) => ({ title: getGame(route.params.gameId)?.name ?? t("screens.results") })} />
       <Stack.Screen name="LiveGame" component={LiveGameScreen} options={{ title: t("screens.live") }} />
     </Stack.Navigator>
   );

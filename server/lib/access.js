@@ -2,6 +2,7 @@ const { riotGet, TTL } = require("./riot");
 const { platformHost, accountHost, DEFAULT_REGION } = require("./regions");
 const PATHS = require("./paths");
 const supercell = require("./supercell");
+const extra = require("./extra");
 
 /**
  * ¿Qué juegos puede consultar la key de este servidor? Cada API se habilita por producto en el
@@ -57,10 +58,12 @@ function start(intervalMs = 10 * 60_000) {
   timer.unref?.();
 }
 
-// Los juegos de Supercell no se sondean: están disponibles si el servidor tiene su key configurada
+// Los juegos de Supercell y los demás (Dota 2, Fortnite, Apex, PUBG) no se sondean: están disponibles si el servidor tiene su key configurada
 const games = () => ({
   ...state,
   ...Object.fromEntries(Object.keys(supercell.GAMES).map(id => [id, supercell.configured(id)])),
+  // Dota 2 (OpenDota) no necesita key; Fortnite, Apex y PUBG, sí
+  ...Object.fromEntries(Object.entries(extra.UPSTREAMS).map(([id, up]) => [id, up.configured()])),
 });
 
 module.exports = { start, probe, games, markWorking, lastProbeAt: () => lastProbe };

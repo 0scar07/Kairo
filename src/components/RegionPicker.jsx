@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { useT } from "../i18n/I18nProvider";
 import { View, Text, Modal, Pressable, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Chip } from "./ui";
-import { REGIONS, getRegion, regionName } from "../constants/regions";
+import { REGIONS, regionName } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../theme";
 
 // Botón con la región actual que abre una lista para elegir otra
-export function RegionButton({ value, onChange, disabled }) {
+export function RegionButton({ value, onChange, disabled, options = REGIONS, nameOf = regionName, title, label }) {
   const t = useT();
   const accent = useAccent();
   const [open, setOpen] = useState(false);
@@ -18,17 +18,17 @@ export function RegionButton({ value, onChange, disabled }) {
         onPress={() => setOpen(true)}
         disabled={disabled}
         activeOpacity={0.8}
-        accessibilityLabel={t("region.choose")}
+        accessibilityLabel={label || t("region.choose")}
       >
-        <Text style={[styles.buttonText, { color: accent }]}>{getRegion(value).label}</Text>
+        <Text style={[styles.buttonText, { color: accent }]}>{(options.find(o => o.id === value) || options[0]).label}</Text>
         <Text style={styles.caret}>▾</Text>
       </TouchableOpacity>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
           <Pressable style={styles.sheet}>
-            <Text style={styles.title}>{t("region.title").toUpperCase()}</Text>
-            {REGIONS.map(r => {
+            <Text style={styles.title}>{(title || t("region.title")).toUpperCase()}</Text>
+            {options.map(r => {
               const active = r.id === value;
               return (
                 <TouchableOpacity
@@ -37,7 +37,7 @@ export function RegionButton({ value, onChange, disabled }) {
                   onPress={() => { onChange(r.id); setOpen(false); }}
                 >
                   <Text style={[styles.optionLabel, active && { color: accent }]}>{r.label}</Text>
-                  <Text style={styles.optionName}>{regionName(r.id)}</Text>
+                  {nameOf ? <Text style={styles.optionName}>{nameOf(r.id)}</Text> : null}
                 </TouchableOpacity>
               );
             })}
@@ -49,10 +49,10 @@ export function RegionButton({ value, onChange, disabled }) {
 }
 
 // Selector en línea (chips desplazables), para formularios
-export function RegionChips({ value, onChange, game }) {
+export function RegionChips({ value, onChange, game, options = REGIONS }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chips}>
-      {REGIONS.map(r => (
+      {options.map(r => (
         <Chip key={r.id} label={r.label} active={r.id === value} game={game} onPress={() => onChange(r.id)} />
       ))}
     </ScrollView>

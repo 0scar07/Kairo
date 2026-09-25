@@ -28,3 +28,12 @@ services:
         sync: false
       - key: CLASHOFCLANS_API_KEY
         sync: false
+      # Dota 2, Fortnite, Apex Legends y PUBG (opcionales; Dota 2 funciona sin key)
+      - key: OPENDOTA_API_KEY
+        sync: false
+      - key: FORTNITE_API_KEY
+        sync: false
+      - key: APEX_API_KEY
+        sync: false
+      - key: PUBG_API_KEY
+        sync: false

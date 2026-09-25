@@ -3,10 +3,11 @@ import { RECENTS_KEY } from "../constants/config";
 
 export const MAX_RECENTS = 8;
 
-// Una búsqueda reciente: { gameId, region, gameName, tagLine, ts }
+// Una búsqueda reciente: { gameId, region, gameName, tagLine, lookup?, ts }
 const same = (a, b) =>
   a.gameId === b.gameId && a.region === b.region &&
-  a.gameName.toLowerCase() === b.gameName.toLowerCase() && a.tagLine.toLowerCase() === b.tagLine.toLowerCase();
+  a.gameName.toLowerCase() === b.gameName.toLowerCase() && (a.tagLine || "").toLowerCase() === (b.tagLine || "").toLowerCase() &&
+  (a.lookup || "") === (b.lookup || "");
 
 export async function loadRecents() {
   const raw = await AsyncStorage.getItem(RECENTS_KEY);

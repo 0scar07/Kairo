@@ -3,6 +3,10 @@ import tft from "./tft";
 import brawlstars from "./brawlstars";
 import clashroyale from "./clashroyale";
 import clashofclans from "./clashofclans";
+import dota2 from "./dota2";
+import fortnite from "./fortnite";
+import apex from "./apex";
+import pubg from "./pubg";
 import valorant from "./valorant/meta";
 
 /**
@@ -15,10 +19,13 @@ import valorant from "./valorant/meta";
  *  - getProfile(data) -> { avatar, name, tag, subtitle, ranked, badge? }   cabecera del perfil (badge: texto si no hay rango)
  *  - toFavorite(data) -> { puuid, gameName, tagLine, iconId | iconUrl, tier, rank, label? }
  *  - meta.tagSearch / meta.hasRegion: juegos que se buscan solo por tag y no tienen regiones (Supercell)
+ *  - meta.search === "name" (+ platforms, searchResults): juegos que se buscan por nombre, con plataforma opcional
+ *    y, si el nombre se repite (Dota 2), una lista de resultados (api.find)
+ *  - getProfile(...).badgeIcon / favoriteStat(fav): icono de la insignia y texto de la tarjeta de favorito (opcionales)
  *  - ProfileBody({ data, setData, setError, mine })         contenido propio del juego
  *  - HomeExtras({ region })                                 (opcional) extras de Inicio propios del juego
  */
-export const GAMES = [lol, tft, brawlstars, clashroyale, clashofclans];
+export const GAMES = [lol, tft, brawlstars, clashroyale, clashofclans, dota2, fortnite, apex, pubg];
 
 // Juegos anunciados que aún no están disponibles (se muestran como "Próximamente")
 export const UPCOMING_GAMES = [valorant];

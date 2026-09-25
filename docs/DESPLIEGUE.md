@@ -123,6 +123,16 @@ La key de Supercell **se ata a las IP que le permitas** y Render gratis no tiene
 
 Si prefieres no depender del proxy, usa un servidor con IP fija, permite esa IP y define `*_API_BASE` con la URL oficial (`https://api.brawlstars.com/v1`, `https://api.clashroyale.com/v1`, `https://api.clashofclans.com/v1`).
 
+## Keys de Dota 2, Fortnite, Apex Legends y PUBG
+
+Dota 2 (OpenDota) **no necesita key**: funciona desde el primer día (60 peticiones por minuto; con `OPENDOTA_API_KEY` suben). Los otros tres piden una key gratuita:
+
+- Fortnite (Fortnite-API): <https://dash.fortnite-api.com>, con tu cuenta de Discord. Variable `FORTNITE_API_KEY`.
+- Apex Legends (Apex Legends Status): <https://portal.apexlegendsapi.com>, con tu cuenta de Discord. Variable `APEX_API_KEY`.
+- PUBG (API oficial): <https://developer.pubg.com>. Variable `PUBG_API_KEY`. Su límite es de 10 peticiones por minuto en todo salvo las partidas.
+
+Añádelas en Render como el resto (nunca en git). Estas APIs no atan la key a una IP, así que no hace falta ningún proxy. Cada juego aparece en la app solo cuando su key está puesta: `/health` → `games` lo muestra.
+
 ## Variables del backend
 
 | Variable | Por defecto | Para qué |
@@ -136,6 +146,8 @@ Si prefieres no depender del proxy, usa un servidor con IP fija, permite esa IP 
 | `RIOT_RATE_LIMITS` | `18:1,95:120` | Cupo hacia Riot (`peticiones:segundos`); pon el de tu key un poco por debajo |
 | `PROBE_RIOT_ID` | `Hide on bush#KR1@kr` | Cuenta pública para detectar qué juegos habilita la key |
 | `BRAWLSTARS_API_KEY`, `CLASHROYALE_API_KEY`, `CLASHOFCLANS_API_KEY` | (vacías) | Keys de Supercell; cada juego se activa solo al ponerla |
+| `FORTNITE_API_KEY`, `APEX_API_KEY`, `PUBG_API_KEY` | (vacías) | Keys gratuitas de Fortnite-API, Apex Legends Status y PUBG |
+| `OPENDOTA_API_KEY` | (vacía) | Opcional: Dota 2 funciona sin key |
 | `BRAWLSTARS_API_BASE`, `CLASHROYALE_API_BASE`, `CLASHOFCLANS_API_BASE` | proxies de RoyaleAPI | URL base de cada API (usa la oficial solo si tu servidor tiene IP fija) |
 
 ## Qué protege el backend

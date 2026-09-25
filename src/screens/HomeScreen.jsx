@@ -7,6 +7,8 @@ import { APP_NAME } from "../constants/config";
 import { regionName } from "../constants/regions";
 import { errorMessage } from "../utils/format";
 import { GLOBAL_REGION, tagOf } from "../utils/supercell";
+import { profileTarget } from "../utils/target";
+import { loadPlatforms, savePlatform } from "../utils/prefs";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
 import { loadRecents, clearRecents } from "../utils/recents";
 import { select } from "../utils/haptics";
@@ -34,9 +36,19 @@ export default function HomeScreen({ navigation }) {
   const [input,     setInput]     = useState("");
   const [favorites, setFavorites] = useState(bootFavorites);
   const [recents,   setRecents]   = useState(bootRecents);
+  const [platforms, setPlatforms] = useState({});   // plataforma elegida por juego (Fortnite, Apex, PUBG…)
 
   const game = getGame(gameId) || GAMES[0];
   const Extras = game.HomeExtras;
+  const platform = game.platforms ? (platforms[game.id] || game.platforms[0].id) : null;
+
+  useEffect(() => { loadPlatforms().then(setPlatforms); }, []);
+  useEffect(() => { setInput(""); }, [game.id]);   // lo escrito para un juego no vale para otro
+
+  function changePlatform(id) {
+    setPlatforms(prev => ({ ...prev, [game.id]: id }));
+    savePlatform(game.id, id).catch(e => console.warn("No se pudo guardar la plataforma:", e.message));
+  }
 
   // Si el juego activo dejó de estar disponible (la key no tiene esa API), se pasa al primero que sí lo esté
   useEffect(() => {
@@ -66,6 +78,18 @@ export default function HomeScreen({ navigation }) {
         return;
       }
       openProfile({ gameId: game.id, gameName: "", tagLine: tag, region: GLOBAL_REGION });
+      return;
+    }
+
+    // Juegos que se buscan por nombre (Dota 2, Fortnite, Apex, PUBG): una plataforma opcional y, en Dota 2, una lista de resultados
+    if (game.search === "name") {
+      if (text.length < 2) {
+        Alert.alert(t("home.badFormat"), t("home.badName"));
+        return;
+      }
+      const target = { gameId: game.id, gameName: text, tagLine: "", region: platform || GLOBAL_REGION };
+      if (game.searchResults && !/^\d+$/.test(text)) navigation.navigate("SearchResults", { gameId: game.id, query: text, region: target.region });
+      else openProfile(target);
       return;
     }
 
@@ -126,12 +150,19 @@ export default function HomeScreen({ navigation }) {
           <Card style={[styles.searchCard, { borderColor: withAlpha(accent, 0.45) }, glow(accent, spacing.xl, 0.18)]}>
             <SectionLabel>{t("home.searchIn", { game: game.name })}</SectionLabel>
             <View style={styles.searchRow}>
-              {game.hasRegion === false ? null : <RegionButton value={region} onChange={setRegion} />}
+              {game.hasRegion === false
+                ? (game.platforms ? (
+                  <RegionButton
+                    value={platform} onChange={changePlatform} options={game.platforms} nameOf={null}
+                    title={t("platform.title")} label={t("platform.choose")}
+                  />
+                ) : null)
+                : <RegionButton value={region} onChange={setRegion} />}
               <TextInput
                 value={input}
                 onChangeText={setInput}
                 onSubmitEditing={handleSearch}
-                placeholder={game.tagSearch ? t("home.placeholderTag") : t("home.placeholderRiotId")}
+                placeholder={game.tagSearch ? t("home.placeholderTag") : game.search === "name" ? t(game.searchResults ? "home.placeholderNameOrId" : "home.placeholderName") : t("home.placeholderRiotId")}
                 placeholderTextColor={colors.textFaint}
                 style={styles.input}
                 autoCapitalize="none"
@@ -153,7 +184,7 @@ export default function HomeScreen({ navigation }) {
 
         {/* Selector de juego */}
         <Reveal order={2} baseDelay={HANDOFF_MS}>
-          <View style={styles.gameSelector}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.gameScroll} contentContainerStyle={styles.gameSelector}>
             {GAMES.map(g => {
               const active = g.id === game.id;
               // Un juego que la key del servidor no puede consultar aparece como "PRONTO"
@@ -185,7 +216,7 @@ export default function HomeScreen({ navigation }) {
                 <Text style={styles.soon}>{t("home.soon")}</Text>
               </View>
             ))}
-          </View>
+          </ScrollView>
         </Reveal>
 
         {/* Extras propios del juego (LoL: estado del servidor y rotación gratuita) */}
@@ -210,11 +241,11 @@ export default function HomeScreen({ navigation }) {
                   key={`${r.gameId}-${r.region}-${r.gameName}-${r.tagLine}`}
                   scaleTo={0.94}
                   haptic
-                  onPress={() => openProfile({ gameId: r.gameId, gameName: r.gameName, tagLine: r.tagLine, region: r.region })}
+                  onPress={() => openProfile(profileTarget(r))}
                   style={styles.recent}
                 >
                   <GameLogo game={r.gameId} size={sizes.avatarXs} color={getGame(r.gameId).accent} />
-                  <Text style={styles.recentText} numberOfLines={1}>{r.gameName}<Text style={styles.recentTag}> #{r.tagLine}</Text></Text>
+                  <Text style={styles.recentText} numberOfLines={1}>{r.gameName}{r.tagLine ? <Text style={styles.recentTag}> #{r.tagLine}</Text> : null}</Text>
                 </PressableScale>
               ))}
             </ScrollView>
@@ -238,7 +269,7 @@ export default function HomeScreen({ navigation }) {
                   key={`${fav.gameId}-${fav.puuid}`}
                   fav={fav}
                   style={styles.cell}
-                  onPress={() => openProfile({ gameId: fav.gameId, gameName: fav.gameName, tagLine: fav.tagLine, region: fav.region })}
+                  onPress={() => openProfile(profileTarget(fav))}
                   onRemove={() => onRemoveFavorite(fav)}
                 />
               ))}
@@ -279,9 +310,10 @@ const styles = StyleSheet.create({
     borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.md, color: colors.text, minWidth: 0,
   },
   go:            { width: sizes.button, flexShrink: 0, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
-  gameSelector:  { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginBottom: spacing.xl },
+  gameScroll:    { marginBottom: spacing.xl, marginHorizontal: -spacing.xl },
+  gameSelector:  { flexDirection: "row", gap: spacing.sm, paddingHorizontal: spacing.xl },
   gameBtn:       {
-    flexBasis: "30%", flexGrow: 1, alignItems: "center", paddingVertical: spacing.md,
+    width: sizes.iconHero - spacing.sm, alignItems: "center", paddingVertical: spacing.md,
     backgroundColor: colors.surface, borderWidth: sizes.hairline,
     borderColor: colors.border, borderRadius: radii.lg,
   },

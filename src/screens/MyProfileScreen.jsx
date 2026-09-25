@@ -23,14 +23,16 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
   const [tag, setTag]       = useState("");
   const [region, setRegion] = useState(initialRegion);
   const tagOnly = Boolean(game.tagSearch);   // Supercell: solo el tag, sin nombre ni región
+  const byName = game.search === "name";      // Dota 2, Fortnite, Apex, PUBG: un nombre (o ID) y una plataforma opcional
+  const [platform, setPlatform] = useState(game.platforms?.[0]?.id);
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.modalTitle}>{t("settings.myProfile", { game: game.short })}</Text>
-          <Text style={styles.modalSubtitle}>{tagOnly ? t("myProfile.subtitleTag") : t("myProfile.subtitleRiot")}</Text>
-          {!tagOnly && <TextInput
+          <Text style={styles.modalSubtitle}>{byName ? t(game.searchResults ? "myProfile.subtitleId" : "myProfile.subtitleName") : tagOnly ? t("myProfile.subtitleTag") : t("myProfile.subtitleRiot")}</Text>
+          {!tagOnly && !byName && <TextInput
             value={name}
             onChangeText={setName}
             placeholder={t("myProfile.namePlaceholder")}
@@ -42,16 +44,22 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
           <TextInput
             value={tag}
             onChangeText={setTag}
-            placeholder={tagOnly ? t("myProfile.tagOnlyPlaceholder") : t("myProfile.tagPlaceholder")}
+            placeholder={byName ? t(game.searchResults ? "myProfile.idPlaceholder" : "myProfile.nameOnlyPlaceholder") : tagOnly ? t("myProfile.tagOnlyPlaceholder") : t("myProfile.tagPlaceholder")}
             placeholderTextColor={colors.textFaint}
             style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}
           />
-          {!tagOnly && <RegionChips value={region} onChange={setRegion} game={game.id} />}
+          {!tagOnly && !byName && <RegionChips value={region} onChange={setRegion} game={game.id} />}
+          {byName && game.platforms && <RegionChips value={platform} onChange={setPlatform} game={game.id} options={game.platforms} />}
           <TouchableOpacity
             style={[styles.btn, { backgroundColor: accent }, glow(accent, spacing.md, 0.4)]}
             onPress={() => {
+              if (byName) {
+                if (!tag.trim()) { Alert.alert(t("myProfile.missingTitle"), t("myProfile.missingName")); return; }
+                onSave(tag.trim(), "", platform || GLOBAL_REGION);
+                return;
+              }
               if ((!tagOnly && !name.trim()) || !tag.trim()) {
                 Alert.alert(t("myProfile.missingTitle"), tagOnly ? t("myProfile.missingTag") : t("myProfile.missingNameTag"));
                 return;
@@ -88,7 +96,7 @@ export default function MyProfileScreen() {
       try {
         const mine = (await loadMyProfiles())[gameId];
         if (!mine) { if (!cancelled) setState({ status: "setup" }); return; }
-        const data = await game.api.search(mine.gameName, mine.tagLine, mine.region || DEFAULT_REGION);
+        const data = await game.api.search(mine.lookup ?? mine.gameName, mine.tagLine ?? "", mine.region || DEFAULT_REGION);
         if (!cancelled) setState({ status: "ready", data });
       } catch (e) {
         if (!cancelled) setState({ status: "error", message: errorMessage(e) });
@@ -103,7 +111,7 @@ export default function MyProfileScreen() {
     try {
       // Se comprueba que el jugador exista antes de guardarlo
       const data = await game.api.search(name, tag, region);
-      await saveMyProfile(gameId, { gameName: data.account.gameName, tagLine: data.account.tagLine, region });
+      await saveMyProfile(gameId, { gameName: data.account.gameName, tagLine: data.account.tagLine, lookup: data.account.lookup, region });
       setState({ status: "ready", data });
     } catch (e) {
       Alert.alert(t("profile.loadError"), errorMessage(e));

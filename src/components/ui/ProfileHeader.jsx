@@ -17,7 +17,7 @@ export default function ProfileHeader({
       <View style={[styles.avatar, avatarSize && { borderRadius: avatarSize / 2 }, glow(tint, spacing.xl, 0.5)]}>{avatar}</View>
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>{name}</Text>
-        <Text style={styles.tag}>#{tag}</Text>
+        {tag ? <Text style={styles.tag}>#{tag}</Text> : null}
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         {badge ? (
           <View style={[styles.badge, { backgroundColor: withAlpha(tint, 0.14), borderColor: withAlpha(tint, 0.4) }]}>

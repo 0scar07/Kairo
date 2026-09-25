@@ -21,6 +21,8 @@
 
 ## Funcionalidad
 - [x] Partida en vivo de LoL probada con una partida real (Flex, 10 jugadores con rango, runas, hechizos y baneos).
+- [ ] Probar Fortnite, Apex Legends y PUBG con datos reales (se construyeron con su documentación y datos de prueba; Dota 2 sí está probado con OpenDota): verificar campos e imágenes.
+- [ ] Dota 2: partida detallada, tiempo en vivo y nombres de héroes en otros idiomas (Valve datafeed).
 - [ ] Probar los juegos de Supercell con datos reales (se construyeron con la documentación y con datos de prueba): verificar los campos y los íconos de Brawlify.
 - [ ] Supercell: clanes (`/clans/:tag`), campeones de Brawl Stars por poder de estrella/gadget, cartas y evoluciones de Clash Royale, tropas y hechizos de Clash of Clans.
 - [ ] **Valorant**, cuando Riot apruebe una production key (`val-match-v1`).

@@ -27,7 +27,7 @@ export default function ProfileScreen({ route }) {
       .then(data => {
         if (cancelled) return;
         setState({ status: "ready", data });
-        addRecent({ gameId, region, gameName: data.account.gameName, tagLine: data.account.tagLine })
+        addRecent({ gameId, region, gameName: data.account.gameName, tagLine: data.account.tagLine, lookup: data.account.lookup })
           .catch(e => console.warn("No se pudo guardar la búsqueda reciente:", e.message));
       })
       .catch(e => { if (!cancelled) setState({ status: "error", message: errorMessage(e, t("profile.loadError")) }); });

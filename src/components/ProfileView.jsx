@@ -56,7 +56,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
     setRefreshing(true);
     setError(null);
     try {
-      setData(await game.api.search(account.gameName, account.tagLine, region));
+      setData(await game.api.search(account.lookup ?? account.gameName, account.tagLine, region));
     } catch (e) {
       setError(t("profile.refreshError", { error: errorMessage(e) }));
     }
@@ -82,7 +82,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
           tag={profile.tag}
           subtitle={profile.subtitle}
           badge={badge}
-          badgeIcon={ranked ? <RankEmblem tier={ranked.tier} size={sizes.item} /> : null}
+          badgeIcon={ranked ? <RankEmblem tier={ranked.tier} size={sizes.item} /> : profile.badgeIcon || null}
           glowColor={colors.tier[ranked?.tier]}
           action={headerAction ? headerAction.icon : (
             <Icon name="star" size={sizes.avatarSm} color={isFav ? colors.gold : colors.textMuted} filled={isFav} />

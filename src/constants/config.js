@@ -15,6 +15,7 @@ export const REGION_KEY = "kairo_region";
 export const RECENTS_KEY = "kairo_recents";
 export const HAPTICS_KEY = "kairo_haptics";
 export const LANGUAGE_KEY = "kairo_language";
+export const PLATFORMS_KEY = "kairo_platforms";
 export const LEGACY_KEYS = {
   [FAVORITES_KEY]:  ["loltracker_favorites"],
   [MY_PROFILE_KEY]: ["ggtracker_my_profile"],

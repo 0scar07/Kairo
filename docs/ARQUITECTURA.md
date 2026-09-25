@@ -120,6 +120,12 @@ La key tiene un cupo (por ejemplo 20 peticiones/s y 100 cada 2 min) compartido p
 - Si una petición espera más de 20 s, o la cola pasa de 300, se rechaza con 429 ("servidor ocupado").
 - Cupo configurable con `RIOT_RATE_LIMITS`; `npm test` en `server/` cubre el comportamiento.
 
+### Dota 2, Fortnite, Apex Legends y PUBG
+
+`lib/upstream.js` (`createUpstream`) es un cliente genérico para APIs de terceros: URL base y key por variable de entorno, cabeceras propias, caché (la key no forma parte de la clave de caché) y errores normalizados a `HttpError` con `code` y `provider`. Cada juego tiene su router (`routes/dota2.js`, `fortnite.js`, `apex.js`, `pubg.js`) que llama a su API, recorta lo que la app usa y devuelve una forma estable; `lib/extra.js` los agrupa para montarlos y para `/health.games`. Dota 2 usa OpenDota (sin key), Fortnite usa Fortnite-API, Apex usa Apex Legends Status y PUBG su API oficial (allí el perfil son varias llamadas: jugador, temporada, estadísticas, clasificatoria y partidas).
+
+En la app estos juegos declaran `search: "name"` en su `meta.js`: la búsqueda de Inicio pide un nombre y, si el juego tiene `platforms`, un selector de plataforma que se recuerda por juego. Si el nombre se repite (Dota 2, `searchResults`), se abre primero `SearchResultsScreen` con `api.find()`. Como el nombre visible puede repetirse, las cuentas llevan un `lookup` (el ID interno) que usan favoritos, recientes y "Mi perfil" para volver a abrir el perfil correcto (`utils/target.js`). El módulo puede aportar `getProfile().badgeIcon` y `favoriteStat(fav)` para su insignia y el texto de sus tarjetas.
+
 ### Juegos de Supercell
 
 `lib/supercell.js` y `routes/supercell.js` sirven Brawl Stars, Clash Royale y Clash of Clans con la misma forma: `GET /{juego}/player/:tag` y, en los dos primeros, `GET /{juego}/battles/:tag` (siempre `{ items }`). El tag se normaliza (`#`, minúsculas, la letra O como cero) y se valida antes de llamar a Supercell. Los errores se traducen igual que los de Riot (404, 403 → `KEY_INVALID`, 429, 503 → `MAINTENANCE`). Un juego sin key responde `NOT_CONFIGURED` y `/health.games` lo marca como `false`.

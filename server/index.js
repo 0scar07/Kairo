@@ -8,6 +8,7 @@ const { securityHeaders, requestLogger, corsMiddleware, limiter } = require("./l
 const lolRouter = require("./routes/lol");
 const tftRouter = require("./routes/tft");
 const { createSupercellRouter } = require("./routes/supercell");
+const extra = require("./lib/extra");
 
 if (!process.env.RIOT_API_KEY) {
   console.error("Falta RIOT_API_KEY (en server/.env o en las variables de entorno del hosting). Ver .env.example");
@@ -52,6 +53,8 @@ app.use("/tft", tftRouter);
 app.use("/brawlstars", createSupercellRouter("brawlstars"));
 app.use("/clashroyale", createSupercellRouter("clashroyale"));
 app.use("/clashofclans", createSupercellRouter("clashofclans"));
+// Dota 2, Fortnite, Apex Legends y PUBG (APIs de terceros; se activan al configurar su key, salvo Dota 2)
+for (const [id, module] of Object.entries(extra.ROUTES)) app.use(`/${id}`, module.router);
 
 // Alias antiguos (/account, /summoner, /ranked, /matches, /match) = /lol/...
 // Se mantienen mientras alguna versión de la app los use; avisan una vez por ruta.

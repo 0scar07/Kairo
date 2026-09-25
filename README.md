@@ -6,7 +6,7 @@
 
 **Cada partida cuenta.**
 
-Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale** y **Clash of Clans** en una app móvil premium, hecha con React Native y Expo.
+Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale**, **Clash of Clans**, **Dota 2**, **Fortnite**, **Apex Legends** y **PUBG** en una app móvil premium, hecha con React Native y Expo.
 
 ![Expo SDK](https://img.shields.io/badge/Expo-SDK%2054-000020?logo=expo&logoColor=white)
 ![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?logo=react&logoColor=black)
@@ -53,10 +53,21 @@ TFT y LoL comparten la búsqueda por **Riot ID** con selector de **región** (LA
 
 Se buscan por **`#TAG`** y no tienen regiones.
 
+### Dota 2, Fortnite, Apex Legends y PUBG
+
+| | Dota 2 | Fortnite | Apex Legends | PUBG |
+|---|---|---|---|---|
+| **Búsqueda** | Nombre de Steam (con lista de resultados) o ID | Nombre + plataforma (Epic, PlayStation, Xbox) | Nombre + plataforma (PC, PlayStation, Xbox) | Nombre + plataforma (Steam, PlayStation, Xbox, Kakao) |
+| **Rango** | **Medalla oficial** con estrellas y puesto en el ranking mundial | (no tiene) | Rango con su imagen, RP y nivel | Clasificatoria: tier, puntos y K/D |
+| **Estadísticas** | Victorias, derrotas, winrate y héroes más jugados | Por modo (general, solo, dúos, tríos, escuadrones): victorias, K/D, top N, horas | Leyenda seleccionada con su banner, totales de bajas y daño, estado en línea | Por modo (FPP y TPP): victorias, K/D, daño medio, headshots, baja más lejana |
+| **Partidas** | Últimas 20 con héroe, modo, K/D/A y duración | (la API solo da estadísticas) | (la API solo da estadísticas) | Últimas 8 con mapa, puesto, bajas y daño |
+
+Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita. Todas se buscan por nombre y cada una recuerda su plataforma.
+
 ### En toda la app
 
 - **Cinco idiomas:** español, English, Português, Français y Deutsch. Se elige solo según el idioma del dispositivo o a mano en Ajustes, se recuerda, y cambia los textos, los nombres de los campeones de LoL (Data Dragon), los mensajes de error del servidor y el formato de los números.
-- **Multijuego:** cinco juegos con un módulo cada uno; las pantallas genéricas no conocen ninguno. Cada juego se activa solo si el servidor tiene su key, y lo que no esté disponible aparece como "PRONTO" en vez de dar errores.
+- **Multijuego:** nueve juegos con un módulo cada uno; las pantallas genéricas no conocen ninguno. Cada juego se activa solo si el servidor tiene su key, y lo que no esté disponible aparece como "PRONTO" en vez de dar errores.
 - **Favoritos** con tarjetas (ícono, rango o trofeos con el color del juego) y **búsquedas recientes**; funcionan igual en los cinco juegos.
 - **Identidad visual:** acento propio por juego con transición suave, logos e íconos oficiales de cada juego y **cero emojis** (íconos vectoriales propios en SVG que toman el color del juego).
 - **Pantalla de carga animada** con progreso real de arranque, aparición escalonada de las secciones, skeletons, estados vacíos amables y errores con botón de reintentar.
@@ -129,7 +140,7 @@ Se buscan por **`#TAG`** y no tienen regiones.
 | App | React Native 0.81 · Expo SDK 54 · React Navigation 7 |
 | Animación | Reanimated 4 · SVG (`react-native-svg`) · `expo-haptics` |
 | Diseño | Sistema propio de *tokens* (`src/theme`) · Sora + Inter (`@expo-google-fonts`) |
-| Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) |
+| Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · OpenDota · Fortnite-API · Apex Legends Status · API de PUBG · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) |
 | Almacenamiento | AsyncStorage (favoritos, recientes, preferencias) |
 
 ## 🏗️ Arquitectura
@@ -218,6 +229,8 @@ Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad
 | `PROBE_RIOT_ID` | Cuenta pública para detectar qué juegos habilita la key (`Nombre#TAG@region`) |
 | `BRAWLSTARS_API_KEY` · `CLASHROYALE_API_KEY` · `CLASHOFCLANS_API_KEY` | Keys de Supercell (opcionales: cada juego se activa al ponerla). Permite la IP `45.79.218.79` al crearlas |
 | `*_API_BASE` | Otra URL base para esos juegos (por defecto los proxies de RoyaleAPI, que dan una IP fija) |
+| `FORTNITE_API_KEY` · `APEX_API_KEY` · `PUBG_API_KEY` | Keys gratuitas de Fortnite-API, Apex Legends Status y PUBG (opcionales: cada juego se activa al ponerla) |
+| `OPENDOTA_API_KEY` | Opcional: Dota 2 funciona sin key; con ella suben los límites de OpenDota |
 
 App
 
@@ -250,19 +263,28 @@ Supercell (sin región; el tag se acepta con o sin `#`):
 | `GET /{brawlstars, clashroyale}/battles/:tag` | Últimas batallas (`{ items }`) |
 | `GET /{brawlstars, clashroyale, clashofclans}/top?limit=10` | Mejores jugadores del mundo (sirve para descubrir tags) |
 
+Otros juegos (por nombre; la plataforma va en `?platform=`):
+
+| Ruta | Descripción |
+|------|-------------|
+| `GET /dota2/search?q=` · `GET /dota2/player/:id` · `GET /dota2/heroes` | Búsqueda por nombre, perfil (ID de cuenta o Steam64) y héroes |
+| `GET /fortnite/player/:name?platform=epic\|psn\|xbl` | Estadísticas de batalla campal por modo |
+| `GET /apex/player/:name?platform=PC\|PS4\|X1` | Rango, leyenda seleccionada, totales y estado |
+| `GET /pubg/player/:name?platform=steam\|psn\|xbox\|kakao` | Temporada, clasificatoria y últimas partidas |
+
 Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, `/match`) siguen funcionando como alias de `/lol/…`.
 
 ## 🗂️ Estructura
 
 ```
-server/                  backend Express (proxy a Riot y Supercell) + Dockerfile + pruebas
+server/                  backend Express (proxy a Riot, Supercell y las APIs de los demás juegos) + Dockerfile + pruebas
   lib/                   clientes de Riot y Supercell, caché, cola de salida, regiones, errores y middlewares
   routes/                /lol y /tft (fábrica compartida) y /brawlstars, /clashroyale, /clashofclans
 src/
   api/                   cliente del backend y Data Dragon
   boot/                  tareas de arranque y progreso de la pantalla de carga
   components/            componentes genéricos (perfil, favoritos, barra flotante…) y ui/
-  games/                 un módulo por juego (lol/, tft/, brawlstars/, clashroyale/, clashofclans/) + registro
+  games/                 un módulo por juego (lol/, tft/, brawlstars/, clashroyale/, clashofclans/, dota2/, fortnite/, apex/, pubg/) + registro
   screens/               Inicio, Favoritos, Ajustes, Perfil, Mi perfil, Carga
   theme/                 colores, tipografía, espaciado y acento por juego
   utils/                 favoritos, recientes, preferencias, formato
@@ -283,6 +305,10 @@ Base casi negra con un toque verdoso, superficies en capas y bordes sutiles. Cad
 | Brawl Stars | ![#FFCE1F](https://img.shields.io/badge/-%23FFCE1F-FFCE1F) | Acento de Brawl Stars |
 | Clash Royale | ![#3F8CFF](https://img.shields.io/badge/-%233F8CFF-3F8CFF) | Acento de Clash Royale |
 | Clash of Clans | ![#79C942](https://img.shields.io/badge/-%2379C942-79C942) | Acento de Clash of Clans |
+| Dota 2 | ![#E4572E](https://img.shields.io/badge/-%23E4572E-E4572E) | Acento de Dota 2 |
+| Fortnite | ![#A855F7](https://img.shields.io/badge/-%23A855F7-A855F7) | Acento de Fortnite |
+| Apex Legends | ![#E23E57](https://img.shields.io/badge/-%23E23E57-E23E57) | Acento de Apex Legends |
+| PUBG | ![#F5A623](https://img.shields.io/badge/-%23F5A623-F5A623) | Acento de PUBG |
 | Victoria | ![#4FC97A](https://img.shields.io/badge/-%234FC97A-4FC97A) | Resultado positivo |
 | Derrota | ![#E05555](https://img.shields.io/badge/-%23E05555-E05555) | Resultado negativo |
 
@@ -309,7 +335,7 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 
 1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento…; los textos van en `src/i18n/locales/`) e `index.js` (`api.search`, `getProfile`, `toFavorite`, `ProfileBody`). Si el juego se busca solo por tag y no tiene regiones, añade `tagSearch: true` y `hasRegion: false` al `meta.js`.
 2. Regístralo en `src/games/registry.js` (metadatos) y `src/games/index.js` (módulo completo).
-3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`. Si es de Supercell, añádelo a `GAMES` en `server/lib/supercell.js` y móntalo con `createSupercellRouter`.
+3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`. Si es de Supercell, añádelo a `GAMES` en `server/lib/supercell.js` y móntalo con `createSupercellRouter`. Para otras APIs de terceros usa `createUpstream` (`server/lib/upstream.js`) como en `server/routes/dota2.js`, y regístrala en `server/lib/extra.js`. Los juegos que se buscan por nombre declaran `search: "name"` (y `platforms`, o `searchResults` si el nombre se repite) en su `meta.js`.
 
 ## 🗺️ Roadmap
 
@@ -325,6 +351,7 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 - [x] Cola de salida hacia Riot que respeta el cupo, y juegos no habilitados como "PRONTO"
 - [x] Maestría, rotación gratuita y estado del servidor (LoL)
 - [x] Brawl Stars, Clash Royale y Clash of Clans (API de Supercell)
+- [x] Dota 2, Fortnite, Apex Legends y PUBG (búsqueda por nombre y plataforma)
 - [ ] Comparar dos jugadores
 
 La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
@@ -343,6 +370,9 @@ El repo incluye una [página del producto](docs/index.html) y una [política de 
 | Rango vacío o "Sin clasificar" | El jugador no tiene partidas clasificatorias en ese modo/región. Revisa que la región sea la correcta |
 | "Something went wrong" en Expo Go | Expo Go tiene una sesión iniciada y el servidor pide firmar el manifiesto. Arranca con `npm run phone` (usa `--offline`) o cierra la sesión en Expo Go |
 | "Supercell rechazó la consulta: la key no es válida o no permite la IP" | La key de Brawl Stars / Clash Royale / Clash of Clans no tiene la IP `45.79.218.79` (la del proxy de RoyaleAPI) o está mal copiada. Las keys no se editan: crea otra con esa IP |
+| Fortnite, Apex o PUBG aparecen como "PRONTO" | El servidor no tiene su key (`FORTNITE_API_KEY`, `APEX_API_KEY` o `PUBG_API_KEY`); mira `/health` → `games` |
+| "Las estadísticas de esta cuenta son privadas" (Fortnite) | La cuenta tiene las estadísticas en privado en su configuración de Epic; no se pueden ver |
+| Un perfil de Dota 2 casi vacío | El jugador no tiene activado "Exponer datos públicos de partidas" en Dota 2 |
 | Un juego de Supercell aparece como "PRONTO" o no aparece | El servidor no tiene su key configurada (`/health` → `games`). Ponla en las variables de entorno |
 | Íconos de TFT con iniciales | Data Dragon solo trae los sets vigentes; las partidas de sets antiguos usan un placeholder |
 
@@ -357,5 +387,7 @@ Lee [CONTRIBUTING.md](CONTRIBUTING.md). Para vulnerabilidades o keys expuestas, 
 ## ⚖️ Aviso legal
 
 Kairo no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de sus propiedades. Riot Games y todas las propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.
+
+Dota 2 es marca de Valve Corporation, Fortnite de Epic Games, Apex Legends de Electronic Arts y PUBG de KRAFTON, Inc.; Kairo no está afiliada ni respaldada por ellas.
 
 Este contenido no está afiliado, respaldado, patrocinado ni aprobado específicamente por Supercell y Supercell no se hace responsable de él. Más información: [política de contenido de fans de Supercell](https://supercell.com/en/fan-content-policy/). Brawl Stars, Clash Royale y Clash of Clans son marcas de Supercell.

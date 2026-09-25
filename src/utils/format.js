@@ -8,6 +8,14 @@ export const tierLabel = (tier, rank) => (APEX_TIERS.includes(tier) ? tier : `${
 export const formatNumber = n =>
   String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, getLanguage(activeLanguage()).thousands);
 
+// Números grandes en poco espacio: 1900000 -> "1.9M", 310500 -> "310.5k"; los pequeños llevan separador de miles
+export function formatCompact(n) {
+  const v = n || 0;
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 100_000) return `${(v / 1_000).toFixed(1)}k`;
+  return formatNumber(v);
+}
+
 // Porcentaje de victorias sin dividir entre cero
 export function winrate(wins, losses) {
   const total = (wins || 0) + (losses || 0);

@@ -48,13 +48,16 @@ const files = [];
 })(path.join(root, "src"));
 files.push(path.join(root, "App.jsx"));
 
+const namespaces = [...new Set(Object.keys(es).map(k => k.split(".")[0]))];
+const NAMESPACE_RE = new RegExp('"((?:' + namespaces.join("|") + ")\\.[\\w.]+)\"", "g");
 const used = new Set();
 const addUsed = key => used.add(key);
 for (const file of files) {
   const src = fs.readFileSync(file, "utf8");
   for (const m of src.matchAll(/\bt\(\s*"([\w.]+)"/g)) addUsed(m[1]);
-  // claves guardadas en constantes para traducir después: "queue.normal", "tft.gray", "role.leader"…
-  for (const m of src.matchAll(/"((?:queue|tft|role|tabs|live|results|regions|cr\.kind|errors)\.[\w.]+)"/g)) addUsed(m[1]);
+  // claves guardadas en constantes o ternarios para traducir después ("queue.normal", "apex.kills"…):
+  // cualquier texto entre comillas que empiece por un espacio de nombres conocido
+  for (const m of src.matchAll(NAMESPACE_RE)) addUsed(m[1]);
 }
 // regiones del selector
 for (const m of read("src/constants/regions.js").matchAll(/id:\s*"(\w+)"/g)) addUsed(`regions.${m[1]}`);
@@ -71,6 +74,15 @@ if (kinds) for (const m of kinds[1].matchAll(/"(\w+)"/g)) addUsed(`cr.kind.${m[1
   }
 })(path.join(root, "server"));
 for (const key of ["errors.network", "errors.timeout", "errors.unexpected", "lol.streakWins", "lol.streakLosses"]) addUsed(key);
+
+// claves armadas al vuelo: medallas de Dota 2, rangos de Apex, modos de Fortnite y de PUBG
+for (let i = 1; i <= 8; i++) addUsed(`dota.medal.${i}`);
+const apexTiers = read("src/games/apex/utils.js").match(/const TIERS = \{([\s\S]*?)\};/);
+if (apexTiers) for (const m of apexTiers[1].matchAll(/:\s*"(\w+)"/g)) addUsed(`apex.tier.${m[1]}`);
+const fnModes = read("src/games/fortnite/ProfileBody.jsx").match(/const MODES = \[([^\]]*)\]/);
+if (fnModes) for (const m of fnModes[1].matchAll(/"(\w+)"/g)) addUsed(`fn.mode.${m[1]}`);
+const pubgModes = read("src/games/pubg/utils.js").match(/MODE_ORDER = \[([^\]]*)\]/);
+if (pubgModes) for (const m of pubgModes[1].matchAll(/"([\w-]+)"/g)) addUsed(`pubg.mode.${m[1].replace(/-(\w)/g, (_, c) => c.toUpperCase())}`);
 
 const exists = key => key in es || `${key}_one` in es || `${key}_other` in es;
 for (const key of used) if (!exists(key)) fail(`el código usa "${key}" pero no está en es.js`);

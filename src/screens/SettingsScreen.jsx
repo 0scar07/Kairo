@@ -113,6 +113,7 @@ export default function SettingsScreen({ navigation }) {
           <Text style={styles.rowHint}>{t("app.tagline")}</Text>
           <Text style={styles.legal}>{t("legal.riot", { app: APP_NAME })}</Text>
           <Text style={styles.legal}>{t("legal.supercell")}</Text>
+          <Text style={styles.legal}>{t("legal.games")}</Text>
         </Card>
       </Reveal>
     </ScrollView>

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ACTIVE_GAME_KEY, REGION_KEY, MY_PROFILE_KEY, HAPTICS_KEY } from "../constants/config";
+import { ACTIVE_GAME_KEY, REGION_KEY, MY_PROFILE_KEY, HAPTICS_KEY, PLATFORMS_KEY } from "../constants/config";
 import { DEFAULT_REGION, REGIONS } from "../constants/regions";
 
 export async function loadRegion() {
@@ -31,4 +31,19 @@ export async function loadMyProfiles() {
 export async function saveMyProfile(gameId, account) {
   const all = await loadMyProfiles();
   await AsyncStorage.setItem(MY_PROFILE_KEY, JSON.stringify({ ...all, [gameId]: account }));
+}
+
+// Plataforma elegida en los juegos que la piden (Fortnite, Apex, PUBG…): { gameId: "psn" }
+export async function loadPlatforms() {
+  try {
+    return JSON.parse((await AsyncStorage.getItem(PLATFORMS_KEY)) || "{}");
+  } catch (e) {
+    console.warn("Plataformas ilegibles:", e.message);
+    return {};
+  }
+}
+
+export async function savePlatform(gameId, platform) {
+  const all = await loadPlatforms();
+  await AsyncStorage.setItem(PLATFORMS_KEY, JSON.stringify({ ...all, [gameId]: platform }));
 }
