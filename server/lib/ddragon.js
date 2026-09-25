@@ -12,9 +12,9 @@ const inflight = new Map();
 async function load(locale) {
   const { data: versions } = await axios.get(`${BASE()}/api/versions.json`, { timeout: 6000 });
   const { data } = await axios.get(`${BASE()}/cdn/${versions[0]}/data/${LANG[locale] || LANG.es}/champion.json`, { timeout: 8000 });
-  const names = {};
-  for (const c of Object.values(data.data || {})) names[Number(c.key)] = c.name;
-  return names;
+  const names = {}, ids = {};
+  for (const c of Object.values(data.data || {})) { names[Number(c.key)] = c.name; ids[Number(c.key)] = c.id; }
+  return { names, ids };
 }
 
 async function championName(championId, locale = "es", now = Date.now()) {
@@ -23,7 +23,7 @@ async function championName(championId, locale = "es", now = Date.now()) {
   if (!entry || now - entry.at > TTL) {
     try {
       if (!inflight.has(locale)) inflight.set(locale, load(locale).finally(() => inflight.delete(locale)));
-      entry = { at: now, names: await inflight.get(locale) };
+      entry = { at: now, ...(await inflight.get(locale)) };
       cache.set(locale, entry);
     } catch (e) {
       if (!entry) return null;   // sin datos previos: sin nombre
@@ -32,6 +32,13 @@ async function championName(championId, locale = "es", now = Date.now()) {
   return entry.names[championId] || null;
 }
 
+// Nombre e id de imagen (el de las URLs de Data Dragon, p. ej. "MonkeyKing") de un campeón
+async function championInfo(championId, locale = "es", now = Date.now()) {
+  const name = await championName(championId, locale, now);
+  const entry = cache.get(locale);
+  return name ? { name, imageId: entry?.ids?.[championId] || null } : null;
+}
+
 const reset = () => cache.clear();
 
-module.exports = { championName, reset };
+module.exports = { championName, championInfo, reset };

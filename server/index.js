@@ -13,6 +13,12 @@ const { createStore } = require("./lib/store");
 const { createDevicesRouter } = require("./routes/devices");
 const push = require("./lib/push");
 const { Watcher } = require("./lib/watcher");
+let artRouter;
+try {
+  artRouter = require("./routes/art");
+} catch (e) {
+  artRouter = (_req, _res, next) => next();   // sin motor de imágenes: la ruta simplemente no existe (ver lib/artLoader.js)
+}
 
 if (!process.env.RIOT_API_KEY) {
   console.error("Falta RIOT_API_KEY (en server/.env o en las variables de entorno del hosting). Ver .env.example");
@@ -75,6 +81,9 @@ app.use("/devices", (_req, _res, next) => storeReady.then(() => next(), () => ne
 // Vigilante: revisa a los favoritos con alertas y manda las notificaciones (solo si el almacén arrancó)
 const watcher = new Watcher({ store, push, maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
 storeReady.then(() => { if (config.watcherEnabled) watcher.start(config.watchIntervalMs); }).catch(() => {});
+
+// Imágenes firmadas para las notificaciones (las descarga el celular)
+app.use("/art", artRouter);
 
 // Alias antiguos (/account, /summoner, /ranked, /matches, /match) = /lol/...
 // Se mantienen mientras alguna versión de la app los use; avisan una vez por ruta.

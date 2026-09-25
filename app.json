@@ -3,7 +3,7 @@
     "name": "Kairo",
     "slug": "kairo",
     "scheme": "kairo",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "icon": "./assets/icon.png",
     "android": {
       "package": "com.camavingaaa.kairo",
@@ -28,7 +28,11 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#C89B3C",
-          "defaultChannel": "live"
+          "defaultChannel": "live_start",
+          "sounds": [
+            "./assets/sounds/live_start.wav",
+            "./assets/sounds/live_result.wav"
+          ]
         }
       ]
     ],

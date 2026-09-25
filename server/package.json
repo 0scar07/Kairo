@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@napi-rs/canvas": "^1.0.9",
     "axios": "^1.15.1",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",

@@ -41,7 +41,8 @@ async function setup({ devices = [], maxPerTick = 40 } = {}) {
     async receipts() { return world.receipts || {}; },
   };
   const names = async id => ({ 103: "Ahri", 157: "Yasuo" }[id] ?? null);
-  const make = (opts = {}) => new Watcher({ store, riot, push, names, now: () => clock.t, log: silent, maxPerTick, ...opts });
+  const art = { bannerUrl: p => (world.artBase ? `${world.artBase}/art/banner.png?k=${p.k}&n=${p.n}&c=${p.c}` : null) };
+  const make = (opts = {}) => new Watcher({ store, riot, push, names, art, now: () => clock.t, log: silent, maxPerTick, ...opts });
   return { store, world, sent, clock, make, watcher: make() };
 }
 
@@ -67,7 +68,8 @@ test("avisa una vez al entrar en partida y una vez al terminar con el resultado"
   assert.strictEqual(sent.length, 1);
   assert.strictEqual(sent[0].title, "Faker está en partida");
   assert.strictEqual(sent[0].body, "Ranked Solo/Duo · Ahri");
-  assert.strictEqual(sent[0].channelId, "live");
+  assert.strictEqual(sent[0].channelId, "live_start");
+  assert.ok(!("richContent" in sent[0]), "sin dirección pública no hay imagen");
   assert.strictEqual(sent[0].data.type, "live_start");
   assert.strictEqual(sent[0].data.gameId, 555);
   assert.ok(!/[\u{1F300}-\u{1FAFF}☀-➿]/u.test(sent[0].title + sent[0].body), "sin emojis");
@@ -92,6 +94,7 @@ test("avisa una vez al entrar en partida y una vez al terminar con el resultado"
   assert.strictEqual(sent[1].title, "Faker ganó con Ahri");
   assert.strictEqual(sent[1].body, "8/2/11 · Ranked Solo/Duo");
   assert.strictEqual(sent[1].data.type, "live_end");
+  assert.strictEqual(sent[1].channelId, "live_result", "el resultado suena distinto");
 
   for (let i = 0; i < 5; i++) { clock.t += 5 * MIN; await watcher.tick(); }
   assert.strictEqual(sent.length, 2, "nada más se repite");
@@ -323,4 +326,48 @@ test("POST /devices/me/test manda una notificación de prueba a este dispositivo
     const set = await fetch(`${base}/me/settings`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Device ${reg.deviceId}.${reg.secret}` }, body: JSON.stringify({ locale: "xx" }) });
     assert.strictEqual(set.status, 400);
   } finally { server.close(); await store.close(); }
+});
+
+// ---------- Banner firmado ----------
+test("con dirección pública, cada aviso lleva su banner en richContent (inicio y resultado)", async () => {
+  const { world, sent, clock, watcher } = await setup({ devices: [device("d1", [{ puuid: puuid(1) }])] });
+  world.artBase = "https://api.ejemplo.com";
+  world.live[puuid(1)] = inGame(70);
+  await watcher.tick();
+  assert.strictEqual(sent[0].richContent.image, "https://api.ejemplo.com/art/banner.png?k=start&n=Faker&c=103");
+  world.live[puuid(1)] = { inGame: false }; world.match[70] = result({ win: false });
+  clock.t += 2 * MIN; await watcher.tick();
+  clock.t += 3 * MIN; await watcher.tick();
+  assert.match(sent[1].richContent.image, /k=loss/);
+});
+
+test("banner: URL firmada, firma inválida rechazada y PNG de verdad", async () => {
+  process.env.PUBLIC_BASE_URL = "https://api.ejemplo.com";
+  const art = require("../lib/art");
+  const url = new URL(art.bannerUrl({ k: "win", n: "Faker con un nombre larguísimo que se recorta", q: 420, c: 103, l: "en", kda: "8/2/11" }));
+  assert.strictEqual(url.origin, "https://api.ejemplo.com");
+  const query = Object.fromEntries(url.searchParams);
+  assert.ok(art.verify(query), "la URL que generó el servidor es válida");
+  assert.strictEqual(art.verify({ ...query, n: "otro" }), null, "cambiar cualquier dato invalida la firma");
+  assert.strictEqual(art.verify({ ...query, sig: "0".repeat(24) }), null);
+  assert.strictEqual(art.verify({ k: "win" }), null);
+  delete process.env.PUBLIC_BASE_URL;
+  assert.strictEqual(art.bannerUrl({ k: "start", n: "X" }), null, "sin dirección pública no hay URL");
+
+  // la ruta sirve el PNG (sin red: Data Dragon puede fallar y el banner sale igual, con degradado)
+  const app = express();
+  app.use("/art", require("../routes/art"));
+  app.use(errorHandler);
+  const server = await new Promise(r => { const s = app.listen(0, () => r(s)); });
+  try {
+    const base = `http://127.0.0.1:${server.address().port}/art/banner.png`;
+    const ok = await fetch(`${base}?${url.searchParams.toString()}`);
+    assert.strictEqual(ok.status, 200);
+    assert.strictEqual(ok.headers.get("content-type"), "image/png");
+    const bytes = Buffer.from(await ok.arrayBuffer());
+    assert.deepStrictEqual([...bytes.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47], "empieza con la firma de un PNG");
+    const bad = await fetch(`${base}?k=win&n=Hack&sig=abc`);
+    assert.strictEqual(bad.status, 403);
+    assert.strictEqual((await bad.json()).code, "BAD_SIGNATURE");
+  } finally { server.close(); }
 });

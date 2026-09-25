@@ -2,6 +2,7 @@ const { riotGet } = require("./riot");
 const { platformHost, routingHost, platformId } = require("./regions");
 const { championName } = require("./ddragon");
 const text = require("./pushText");
+const defaultArt = require("./artLoader");
 
 /**
  * Vigilante de partidas (solo LoL): cada tanda revisa, sin repetir jugadores, a los favoritos con alertas de todos los
@@ -20,6 +21,8 @@ const text = require("./pushText");
 const RESULT_DELAYS_MS = [3, 5, 8, 12, 18, 25].map(m => m * 60_000);
 const RECEIPT_AFTER_MS = 15 * 60_000;
 const MAX_PENDING = 5;
+// Un canal por tipo de aviso: en Android el sonido se define en el canal (ver src/notifications/push.js en la app)
+const CHANNELS = { start: "live_start", end: "live_result" };
 
 // Aborta la tanda entera (la key no sirve o Riot está limitando): seguir solo empeoraría las cosas
 class StopTick extends Error {}
@@ -71,8 +74,8 @@ function isQuiet(settings, nowMs) {
 const newState = (puuid, region) => ({ puuid, region, current: null, pending: [], lastCheckedAt: 0, notifiedStart: null, notifiedEnd: [] });
 
 class Watcher {
-  constructor({ store, push, riot = defaultRiot, names = championName, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
-    Object.assign(this, { store, push, riot, names, now, maxPerTick, canWatch, log });
+  constructor({ store, push, riot = defaultRiot, names = championName, art = defaultArt, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
+    Object.assign(this, { store, push, riot, names, art, now, maxPerTick, canWatch, log });
     this.running = false;
     this.timer = null;
     this.receiptQueue = [];   // avisos enviados cuyo recibo falta por revisar (en memoria: si se pierde, no pasa nada grave)
@@ -212,8 +215,13 @@ class Watcher {
       const content = kind === "start"
         ? text.startText(locale, { name, queueId: data.queueId, champion, minutes: data.minutes })
         : text.endText(locale, { name, win: data.win, champion, kills: data.kills, deaths: data.deaths, assists: data.assists, queueId: data.queueId });
+      // Imagen ancha de la notificación (solo si el servidor conoce su dirección pública). El sonido va en el canal.
+      const image = this.art.bannerUrl(kind === "start"
+        ? { k: "start", n: name, q: data.queueId, c: data.championId, l: locale }
+        : { k: data.win ? "win" : "loss", n: name, q: data.queueId, c: data.championId, l: locale, kda: `${data.kills}/${data.deaths}/${data.assists}` });
       messages.push({
-        to: device.pushToken, ...content, sound: "default", priority: "high", channelId: "live", categoryId: "live_game",
+        to: device.pushToken, ...content, sound: "default", priority: "high", channelId: CHANNELS[kind], categoryId: "live_game",
+        ...(image ? { richContent: { image } } : {}),
         ttl: kind === "start" ? 600 : 3600,
         data: { type: `live_${kind}`, puuid: fav.puuid, region: fav.region, gameId: data.gameId, riotId: fav.riotId },
       });
@@ -260,4 +268,4 @@ class Watcher {
   status() { return { ...this.stats, running: this.timer !== null }; }
 }
 
-module.exports = { Watcher, isQuiet, RESULT_DELAYS_MS, defaultRiot };
+module.exports = { Watcher, isQuiet, RESULT_DELAYS_MS, defaultRiot, CHANNELS };

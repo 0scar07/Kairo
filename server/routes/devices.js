@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 const { handle } = require("../lib/riot");
 const { HttpError } = require("../lib/errors");
 const text = require("../lib/pushText");
+const defaultArt = require("../lib/artLoader");
 const {
   DEFAULT_SETTINGS, parsePushToken, parsePlatform, parseFavorites, parseSettings,
   newSecret, hashSecret, secretMatches, publicDevice,
@@ -24,7 +25,7 @@ const {
  *   Authorization: Device <deviceId>.<secret>
  * Registrar un token ya existente entrega un secreto nuevo (el token solo lo conocen el celular y este servidor).
  */
-function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20, push = null, testPerHour = 10 } = {}) {
+function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20, push = null, testPerHour = 10, art = defaultArt } = {}) {
   const router = Router();
 
   const registerLimiter = rateLimit({
@@ -118,7 +119,13 @@ function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20, p
     const content = type === "live_start" ? text.startText(locale, { name: "Kairo", queueId: 420, champion: "Ahri", minutes: 0 })
       : type === "live_end" ? text.endText(locale, { name: "Kairo", win: true, champion: "Ahri", kills: 8, deaths: 2, assists: 11, queueId: 420 })
       : text.testText(locale);
-    const [result] = await push.send([{ to: req.device.pushToken, ...content, sound: "default", priority: "high", channelId: "live", categoryId: "live_game", ttl: 300, data: { type: type === "test" ? "test" : type, test: true } }]);
+    const image = type === "live_end"
+      ? art.bannerUrl({ k: "win", n: "Kairo", q: 420, c: 111, l: locale, kda: "8/2/11" })
+      : art.bannerUrl({ k: "start", n: "Kairo", q: 420, c: 111, l: locale });
+    const [result] = await push.send([{
+      to: req.device.pushToken, ...content, sound: "default", priority: "high", channelId: type === "live_end" ? "live_result" : "live_start",
+      categoryId: "live_game", ttl: 300, data: { type: type === "test" ? "test" : type, test: true }, ...(image ? { richContent: { image } } : {}),
+    }]);
     if (!result.ok && result.error === "DeviceNotRegistered") await store.remove(req.device.id);
     res.json({ ok: result.ok, error: result.ok ? undefined : result.error });
   }));

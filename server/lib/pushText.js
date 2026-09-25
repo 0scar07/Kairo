@@ -60,6 +60,16 @@ function endText(locale, { name, win, champion, kills, deaths, assists, queueId 
   };
 }
 
+// Etiquetas de la imagen ancha (banner) de la notificación
+const ART = {
+  es: { live: "EN VIVO", victory: "VICTORIA", defeat: "DERROTA", inGame: "En partida ahora" },
+  en: { live: "LIVE", victory: "VICTORY", defeat: "DEFEAT", inGame: "In game now" },
+  pt: { live: "AO VIVO", victory: "VITÓRIA", defeat: "DERROTA", inGame: "Em partida agora" },
+  fr: { live: "EN DIRECT", victory: "VICTOIRE", defeat: "DÉFAITE", inGame: "En partie maintenant" },
+  de: { live: "LIVE", victory: "SIEG", defeat: "NIEDERLAGE", inGame: "Gerade im Spiel" },
+};
+const artText = locale => ART[locale] || ART.es;
+
 const testText = locale => ({ title: tr(locale).testTitle, body: tr(locale).testBody });
 
-module.exports = { LOCALES, queueName, startText, endText, testText };
+module.exports = { LOCALES, queueName, startText, endText, testText, artText };
