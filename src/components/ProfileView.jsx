@@ -11,6 +11,8 @@ import Icon from "./Icon";
 import { canAlert, hasAlerts, isFavoriteIn, loadFavorites, refreshFavorite, sameFavorite, toggleFavorite } from "../utils/favorites";
 import BellButton from "../notifications/BellButton";
 import ShareButton from "../share/ShareButton";
+import { useNavigation } from "@react-navigation/native";
+import { PressableScale } from "./ui";
 import { useNotifications } from "../notifications/NotificationsProvider";
 import { success } from "../utils/haptics";
 import { colors, sizes, spacing, useAccent } from "../theme";
@@ -24,6 +26,7 @@ import { colors, sizes, spacing, useAccent } from "../theme";
  */
 export default function ProfileView({ gameId, initialData, mine, headerAction, offlineAt, bottomSpace = spacing.xxxl }) {
   const t = useT();
+  const navigation = useNavigation();
   const game = getGame(gameId);
   const accent = useAccent(gameId);
   const [data, setData] = useState(initialData);
@@ -110,6 +113,15 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
           extraAction={(
             <>
               <ShareButton gameId={gameId} data={data} accent={accent} />
+              {game.compare ? (
+                <PressableScale
+                  haptic scaleTo={0.85} hitSlop={spacing.sm} style={styles.iconButton}
+                  accessibilityRole="button" accessibilityLabel={t("compare.button")}
+                  onPress={() => navigation.navigate("Compare", { a: { gameName: account.gameName, tagLine: account.tagLine, region } })}
+                >
+                  <Icon name="compare" size={sizes.item - spacing.xs} color={colors.textMuted} />
+                </PressableScale>
+              ) : null}
               {showBell ? <BellButton active={alerts} accent={accent} onPress={() => toggleAlerts({ ...me, alerts })} /> : null}
             </>
           )}
@@ -122,6 +134,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
 }
 
 const styles = StyleSheet.create({
+  iconButton: { padding: spacing.xs + spacing.xxs },
   container: { flex: 1, backgroundColor: colors.bg },
   content:   { padding: spacing.lg },
 });

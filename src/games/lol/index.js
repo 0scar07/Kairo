@@ -44,6 +44,8 @@ export default {
     ].filter(Boolean);
   },
 
+  compare: true,   // el perfil muestra el botón "Comparar" (ver CompareScreen)
+
   ProfileBody,
   HomeExtras,   // opcional: extras en Inicio (estado del servidor, rotación gratuita)
 };
