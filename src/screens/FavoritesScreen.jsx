@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
 import { View, Text, ScrollView, StyleSheet, Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -8,7 +8,8 @@ import GameLogo from "../components/GameLogo";
 import { Chip, EmptyState, ErrorBanner } from "../components/ui";
 import { GAMES } from "../games";
 import { errorMessage } from "../utils/format";
-import { loadFavorites, removeFavorite } from "../utils/favorites";
+import { canAlert, loadFavorites, removeFavorite } from "../utils/favorites";
+import { useNotifications } from "../notifications/NotificationsProvider";
 import { profileTarget } from "../utils/target";
 import { useBootData } from "../boot/BootContext";
 import { colors, spacing, sizes, fontSizes, type, tracking } from "../theme";
@@ -21,10 +22,16 @@ export default function FavoritesScreen({ navigation }) {
   const [favorites, setFavorites] = useState(bootFavorites);
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState(null);
+  const { supported, toggleAlerts, favoritesVersion } = useNotifications();
 
   useFocusEffect(useCallback(() => {
     loadFavorites().then(setFavorites).catch(e => setError(t("favorites.readError", { error: errorMessage(e) })));
   }, []));
+
+  // Una campanita tocada (o la hoja de permiso al terminar) cambia los favoritos guardados: se releen
+  useEffect(() => {
+    if (favoritesVersion > 0) loadFavorites().then(setFavorites).catch(e => console.warn("No se pudieron recargar los favoritos:", e.message));
+  }, [favoritesVersion]);
 
   const known = favorites.filter(f => availableGames.some(g => g.id === f.gameId));
   const visible = known.filter(f => filter === "all" || f.gameId === filter);
@@ -79,7 +86,7 @@ export default function FavoritesScreen({ navigation }) {
         <View style={styles.grid}>
           {visible.map((fav, i) => (
             <Reveal key={`${fav.gameId}-${fav.puuid}`} order={Math.min(i, 8) + 2} style={styles.cell}>
-              <FavoriteCard fav={fav} onPress={() => open(fav)} onRemove={() => remove(fav)} />
+              <FavoriteCard fav={fav} onPress={() => open(fav)} onRemove={() => remove(fav)} onToggleAlerts={supported && canAlert(fav) ? () => toggleAlerts(fav) : undefined} />
             </Reveal>
           ))}
         </View>

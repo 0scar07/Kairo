@@ -7,6 +7,7 @@ import { profileIconUrl } from "../api/ddragon";
 import RankEmblem from "./RankEmblem";
 import Icon from "./Icon";
 import GameLogo from "./GameLogo";
+import BellButton from "../notifications/BellButton";
 import { tierLabel, formatNumber } from "../utils/format";
 import { getRegion } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, withAlpha } from "../theme";
@@ -19,7 +20,8 @@ function favoriteStat(fav, t) {
 }
 
 // Tarjeta de favorito: ícono, nombre, región y rango con el color del tier
-export default function FavoriteCard({ fav, onPress, onRemove, style }) {
+// onToggleAlerts: si se pasa (solo LoL en Android) aparece la campanita de alertas de partida en vivo
+export default function FavoriteCard({ fav, onPress, onRemove, onToggleAlerts, style }) {
   const t = useT();
   const game = getGame(fav.gameId);
   const tierColor = colors.tier[fav.tier];
@@ -44,11 +46,14 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
             <GameLogo game={fav.gameId} size={sizes.item} color={tint} />
           </View>
         )}
-        {onRemove && (
-          <PressableScale onPress={onRemove} scaleTo={0.8} hitSlop={spacing.md} style={styles.remove} accessibilityLabel={t("favorites.remove")}>
-            <Icon name="close" size={fontSizes.base} color={colors.textFaint} />
-          </PressableScale>
-        )}
+        <View style={styles.actions}>
+          {onToggleAlerts && <BellButton active={fav.alerts === true} accent={game?.accent || colors.textMuted} onPress={onToggleAlerts} />}
+          {onRemove && (
+            <PressableScale onPress={onRemove} scaleTo={0.8} hitSlop={spacing.md} style={styles.remove} accessibilityLabel={t("favorites.remove")}>
+              <Icon name="close" size={fontSizes.base} color={colors.textFaint} />
+            </PressableScale>
+          )}
+        </View>
       </View>
 
       <Text style={styles.name} numberOfLines={1}>{fav.gameName}</Text>
@@ -72,6 +77,7 @@ const styles = StyleSheet.create({
   top:             { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: spacing.sm },
   icon:            { width: sizes.avatarLg + spacing.sm, height: sizes.avatarLg + spacing.sm, borderRadius: radii.pill, borderWidth: sizes.borderThick },
   iconPlaceholder: { backgroundColor: colors.surfaceHigh, alignItems: "center", justifyContent: "center" },
+  actions:         { flexDirection: "row", alignItems: "center", gap: spacing.xs },
   remove:          { padding: spacing.xs },
   name:            { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   tag:             { ...type.caption, color: colors.textMuted },

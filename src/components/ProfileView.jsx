@@ -7,7 +7,9 @@ import { getGame } from "../games";
 import RankEmblem from "./RankEmblem";
 import { errorMessage, tierLabel } from "../utils/format";
 import Icon from "./Icon";
-import { isFavoriteIn, loadFavorites, refreshFavorite, toggleFavorite } from "../utils/favorites";
+import { canAlert, hasAlerts, isFavoriteIn, loadFavorites, refreshFavorite, sameFavorite, toggleFavorite } from "../utils/favorites";
+import BellButton from "../notifications/BellButton";
+import { useNotifications } from "../notifications/NotificationsProvider";
 import { success } from "../utils/haptics";
 import { colors, sizes, spacing, useAccent } from "../theme";
 
@@ -26,6 +28,8 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [isFav, setIsFav] = useState(false);
+  const [alerts, setAlerts] = useState(false);
+  const { supported, toggleAlerts, favoritesVersion } = useNotifications();
 
   const { account, region } = data;
   const profile = game.getProfile(data);
@@ -41,6 +45,16 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
       })
       .catch(e => console.warn("No se pudieron leer los favoritos:", e.message));
   }, [gameId, account.puuid]);
+
+  // Estado de la campanita: sigue a los favoritos guardados (también cuando la hoja de permiso termina)
+  const me = { ...game.toFavorite(data), gameId, region };
+  const showBell = supported && isFav && !headerAction && canAlert(me);
+  useEffect(() => {
+    if (!showBell) return;
+    loadFavorites()
+      .then(list => setAlerts(hasAlerts(list.find(f => sameFavorite(f, me)))))
+      .catch(e => console.warn("No se pudieron leer las alertas:", e.message));
+  }, [showBell, favoritesVersion, account.puuid]);
 
   async function onToggleFavorite() {
     try {
@@ -88,6 +102,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
             <Icon name="star" size={sizes.avatarSm} color={isFav ? colors.gold : colors.textMuted} filled={isFav} />
           )}
           onAction={headerAction ? headerAction.onPress : onToggleFavorite}
+          extraAction={showBell ? <BellButton active={alerts} accent={accent} onPress={() => toggleAlerts({ ...me, alerts })} /> : null}
         />
       </Reveal>
 

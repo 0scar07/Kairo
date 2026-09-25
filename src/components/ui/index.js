@@ -17,3 +17,5 @@ export { default as ResultsStrip } from "./ResultsStrip";
 export { default as RowSkeleton } from "./RowSkeleton";
 export { default as StatGrid } from "./StatGrid";
 export { default as BattleRow } from "./BattleRow";
+export { default as SettingRow } from "./SettingRow";
+export { default as LiveDot } from "./LiveDot";

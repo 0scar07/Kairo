@@ -33,7 +33,32 @@ export async function loadFavorites() {
   return list;
 }
 
-export const saveFavorites = list => AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
+// Quien quiera enterarse de los cambios (la sincronización de notificaciones) se suscribe aquí:
+// saveFavorites es el único punto por el que se escriben los favoritos.
+const listeners = new Set();
+export function onFavoritesChanged(fn) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+export async function saveFavorites(list) {
+  await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
+  listeners.forEach(fn => { try { fn(list); } catch (e) { console.warn("Oyente de favoritos:", e.message); } });
+}
+
+// Alertas de partida en vivo: solo LoL, y el favorito lleva `alerts: true`
+export const ALERT_GAME = "lol";
+export const canAlert = fav => fav?.gameId === ALERT_GAME && Boolean(fav.puuid);
+export const hasAlerts = fav => canAlert(fav) && fav.alerts === true;
+export const alertFavorites = list => list.filter(hasAlerts);
+
+// Activa o desactiva las alertas de un favorito ya guardado; devuelve la lista nueva
+export async function setFavoriteAlerts(fav, on) {
+  const list = await loadFavorites();
+  const next = list.map(f => (sameFavorite(f, fav) ? { ...f, alerts: on } : f));
+  await saveFavorites(next);
+  return next;
+}
 
 // Añade o quita un favorito; devuelve la lista nueva y si quedó marcado
 export async function toggleFavorite(fav) {

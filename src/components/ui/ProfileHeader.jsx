@@ -7,7 +7,7 @@ import { colors, radii, sizes, spacing, type, fontSizes, glow, useAccent, withAl
 
 // Cabecera de perfil: avatar grande con resplandor del color del rango + nombre#tag + insignia + acción
 export default function ProfileHeader({
-  avatar, name, tag, badge, badgeIcon, subtitle, game, glowColor, action, onAction, avatarSize,
+  avatar, name, tag, badge, badgeIcon, subtitle, game, glowColor, action, onAction, extraAction, avatarSize,
 }) {
   const t = useT();
   const accent = useAccent(game);
@@ -26,10 +26,15 @@ export default function ProfileHeader({
           </View>
         ) : null}
       </View>
-      {action ? (
-        <PressableScale onPress={onAction} haptic scaleTo={0.85} style={styles.action} accessibilityLabel={t("favorites.favorite")}>
-          {typeof action === "string" ? <Text style={styles.actionText}>{action}</Text> : action}
-        </PressableScale>
+      {action || extraAction ? (
+        <View style={styles.actions}>
+          {action ? (
+            <PressableScale onPress={onAction} haptic scaleTo={0.85} style={styles.action} accessibilityLabel={t("favorites.favorite")}>
+              {typeof action === "string" ? <Text style={styles.actionText}>{action}</Text> : action}
+            </PressableScale>
+          ) : null}
+          {extraAction || null}
+        </View>
       ) : null}
     </Card>
   );
@@ -47,6 +52,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radii.pill,
   },
   badgeText: { ...type.smallStrong },
+  actions:   { alignItems: "center", gap: spacing.xs },
   action:    { padding: spacing.sm },
   actionText:{ fontSize: fontSizes.xxl },
 });

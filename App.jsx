@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
+import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer, DarkTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -19,6 +20,9 @@ import { getGame } from "./src/games";
 import { useBoot } from "./src/boot/useBoot";
 import { BootProvider } from "./src/boot/BootContext";
 import { I18nProvider, useT } from "./src/i18n/I18nProvider";
+import { NotificationsProvider } from "./src/notifications/NotificationsProvider";
+import PermissionSheet from "./src/notifications/PermissionSheet";
+import { navigationRef, flushNavigationQueue } from "./src/navigation/ref";
 import { colors, fonts, tracking, GameProvider, useAccent } from "./src/theme";
 
 // El splash nativo se queda visible hasta que la pantalla de carga animada esté montada
@@ -26,6 +30,12 @@ SplashScreen.preventAutoHideAsync().catch(e => console.warn("No se pudo retener 
 
 const Stack = createNativeStackNavigator();
 const Tab   = createBottomTabNavigator();
+
+// Enlaces profundos (kairo://live/la1/<puuid>): abren la partida en vivo. En la web la URL ya es la del navegador.
+const linking = Platform.OS === "web" ? undefined : {
+  prefixes: [Linking.createURL("/"), "kairo://"],
+  config: { screens: { LiveGame: "live/:region/:puuid", Tabs: { screens: { Inicio: "", Favoritos: "favoritos", Ajustes: "ajustes" } } } },
+};
 
 const navTheme = {
   ...DarkTheme,
@@ -83,9 +93,12 @@ export default function App() {
         {finished && result && (
           <BootProvider boot={result}>
             <GameProvider initialGame={result.prefs.activeGame}>
-              <NavigationContainer theme={navTheme}>
-                <RootStack />
-              </NavigationContainer>
+              <NotificationsProvider>
+                <NavigationContainer ref={navigationRef} onReady={flushNavigationQueue} linking={linking} theme={navTheme}>
+                  <RootStack />
+                </NavigationContainer>
+                <PermissionSheet />
+              </NotificationsProvider>
             </GameProvider>
           </BootProvider>
         )}

@@ -84,6 +84,9 @@ if (fnModes) for (const m of fnModes[1].matchAll(/"(\w+)"/g)) addUsed(`fn.mode.$
 const pubgModes = read("src/games/pubg/utils.js").match(/MODE_ORDER = \[([^\]]*)\]/);
 if (pubgModes) for (const m of pubgModes[1].matchAll(/"([\w-]+)"/g)) addUsed(`pubg.mode.${m[1].replace(/-(\w)/g, (_, c) => c.toUpperCase())}`);
 
+// permiso de notificaciones (notif.perm.<estado>)
+for (const state of ["granted", "denied", "undetermined"]) addUsed(`notif.perm.${state}`);
+
 const exists = key => key in es || `${key}_one` in es || `${key}_other` in es;
 for (const key of used) if (!exists(key)) fail(`el código usa "${key}" pero no está en es.js`);
 

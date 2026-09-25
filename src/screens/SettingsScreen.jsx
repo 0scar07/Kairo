@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, ScrollView, Switch, StyleSheet, Alert } from "react-native";
 import Constants from "expo-constants";
-import { Card, SectionLabel, PressableScale, Chip } from "../components/ui";
+import { Card, SectionLabel, SettingRow, Chip } from "../components/ui";
+import NotificationsSection from "../notifications/NotificationsSection";
 import { RegionChips } from "../components/RegionPicker";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
@@ -14,19 +15,6 @@ import { clearRecents } from "../utils/recents";
 import { select } from "../utils/haptics";
 import { useBootData } from "../boot/BootContext";
 import { colors, sizes, spacing, fontSizes, lineHeights, type, useActiveGame, withAlpha } from "../theme";
-
-function Row({ label, hint, right, onPress, danger }) {
-  const body = (
-    <View style={styles.row}>
-      <View style={styles.rowText}>
-        <Text style={[styles.rowLabel, danger && { color: colors.loss }]}>{label}</Text>
-        {hint ? <Text style={styles.rowHint}>{hint}</Text> : null}
-      </View>
-      {right}
-    </View>
-  );
-  return onPress ? <PressableScale scaleTo={0.985} onPress={onPress}>{body}</PressableScale> : body;
-}
 
 // Ajustes: mi perfil, región por defecto, vibración, búsquedas recientes y acerca de
 export default function SettingsScreen({ navigation }) {
@@ -55,7 +43,7 @@ export default function SettingsScreen({ navigation }) {
       <Reveal order={1}>
         <SectionLabel>{t("settings.account")}</SectionLabel>
         <Card padded={false}>
-          <Row
+          <SettingRow
             label={t("settings.myProfile", { game: game.short })}
             hint={game.tagSearch ? t("settings.myProfileHintTag") : t("settings.myProfileHintRiot")}
             onPress={() => navigation.navigate("MyProfile")}
@@ -87,9 +75,13 @@ export default function SettingsScreen({ navigation }) {
       </Reveal>
 
       <Reveal order={4}>
+        <NotificationsSection />
+      </Reveal>
+
+      <Reveal order={5}>
         <SectionLabel>{t("settings.preferences")}</SectionLabel>
         <Card padded={false}>
-          <Row
+          <SettingRow
             label={t("settings.haptics")}
             hint={t("settings.hapticsHint")}
             right={
@@ -102,11 +94,11 @@ export default function SettingsScreen({ navigation }) {
             }
           />
           <View style={styles.divider} />
-          <Row label={t("settings.clearRecents")} danger onPress={confirmClearRecents} />
+          <SettingRow label={t("settings.clearRecents")} danger onPress={confirmClearRecents} />
         </Card>
       </Reveal>
 
-      <Reveal order={5}>
+      <Reveal order={6}>
         <SectionLabel>{t("settings.about")}</SectionLabel>
         <Card>
           <Text style={styles.about}>{t("settings.version", { app: APP_NAME, version })}</Text>
@@ -125,8 +117,6 @@ const styles = StyleSheet.create({
   container:  { flex: 1, backgroundColor: colors.bg },
   content:    { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
   title:      { ...type.brand, fontSize: fontSizes.xxl, color: colors.text, marginBottom: spacing.xl },
-  row:        { flexDirection: "row", alignItems: "center", gap: spacing.md, padding: spacing.lg },
-  rowText:    { flex: 1 },
   rowLabel:   { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   rowHint:    { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
   regionHint: { marginBottom: spacing.md },

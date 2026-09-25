@@ -6,6 +6,9 @@ module.exports = ({ config }) => {
   // Subcarpeta donde se publica la versión web (GitHub Pages: /Kairo/app)
   if (process.env.EXPO_BASE_URL) config = { ...config, experiments: { ...config.experiments, baseUrl: process.env.EXPO_BASE_URL } };
   const apiUrl = process.env.EXPO_PUBLIC_API_URL || "";
+  // Firebase (notificaciones push en Android): en EAS el archivo llega como variable de archivo GOOGLE_SERVICES_JSON
+  // (no está en git). Sin ella la app compila igual, solo que sin push.
+  if (process.env.GOOGLE_SERVICES_JSON) config = { ...config, android: { ...config.android, googleServicesFile: process.env.GOOGLE_SERVICES_JSON } };
   const plugins = (config.plugins || []).filter(p => (Array.isArray(p) ? p[0] : p) !== "expo-build-properties");
 
   if (apiUrl.startsWith("http://")) {
