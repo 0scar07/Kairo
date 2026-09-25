@@ -4,8 +4,8 @@ import * as Notifications from "expo-notifications";
 import { useI18n } from "../i18n/I18nProvider";
 import { accents } from "../theme";
 import { errorMessage } from "../utils/format";
-import { alertFavorites, hasAlerts, loadFavorites, onFavoritesChanged, setFavoriteAlerts } from "../utils/favorites";
-import { navigateWhenReady } from "../navigation/ref";
+import { canAlert, hasAlerts, loadFavorites, onFavoritesChanged, setFavoriteAlerts } from "../utils/favorites";
+import { openFromNotification } from "./routes";
 import { PREVIEW, pushSupported } from "./env";
 import {
   ACTION_MUTE, getPermission, getPushToken, installForegroundHandler, requestPermission, setupChannel,
@@ -18,7 +18,7 @@ const MAX_ALERTS = 30;   // tope de favoritos con alertas (el servidor rechaza m
 
 const NotificationsContext = createContext({
   supported: false, permission: "undetermined", prefs: DEFAULT_PREFS, setPref: () => {}, toggleAlerts: async () => {},
-  sheet: null, confirmSheet: () => {}, closeSheet: () => {}, openSystemSettings: () => {}, sendTest: async () => {},
+  sheet: null, confirmSheet: () => {}, closeSheet: () => {}, openSystemSettings: () => {}, askPermission: async () => {}, sendTest: async () => {},
   favoritesVersion: 0, lastError: null,
 });
 
@@ -52,13 +52,15 @@ export function NotificationsProvider({ children }) {
   const queue = useRef(Promise.resolve());
 
   const buildPayload = useCallback(async () => {
-    const favorites = alertFavorites(await loadFavorites()).slice(0, MAX_ALERTS)
-      .map(f => ({ puuid: f.puuid, region: f.region, riotId: `${f.gameName}#${f.tagLine}`, muted: false }));
+    // Todos los favoritos de LoL: los de la campanita avisan en vivo; los demás (muted) solo cuentan para el historial,
+    // el resumen semanal y los cambios de rango
+    const favorites = (await loadFavorites()).filter(canAlert).slice(0, MAX_ALERTS)
+      .map(f => ({ puuid: f.puuid, region: f.region, riotId: `${f.gameName}#${f.tagLine}`, muted: !hasAlerts(f) }));
     const p = prefsRef.current;
     return {
       favorites,
       settings: {
-        enabled: p.enabled, notifyStart: p.notifyStart, notifyEnd: p.notifyEnd, locale: languageRef.current,
+        enabled: p.enabled, notifyStart: p.notifyStart, notifyEnd: p.notifyEnd, weekly: p.weekly, rankAlerts: p.rankAlerts, locale: languageRef.current,
         // hora local menos UTC en minutos (Bogotá = -300); getTimezoneOffset devuelve lo contrario
         quiet: { enabled: p.quiet.enabled, from: p.quiet.from, to: p.quiet.to, utcOffsetMinutes: -new Date().getTimezoneOffset() },
       },
@@ -145,7 +147,7 @@ export function NotificationsProvider({ children }) {
         }
         return;
       }
-      if (data.puuid && data.region) navigateWhenReady("LiveGame", { puuid: data.puuid, region: data.region, riotId: data.riotId });
+      openFromNotification(data);
     };
 
     const received = Notifications.addNotificationReceivedListener(n => {
@@ -197,6 +199,18 @@ export function NotificationsProvider({ children }) {
   }, [sheet]);
 
   const closeSheet = useCallback(() => setSheet(null), []);
+
+  // Pedir el permiso del sistema desde Ajustes (sin pasar por la campanita de un favorito)
+  const askPermission = useCallback(async () => {
+    try {
+      await setupChannel(tRef.current, accents.lol);
+      const result = await requestPermission();
+      setPermission(result);
+      if (result === "granted") scheduleSync(500);
+    } catch (e) {
+      setLastError(errorMessage(e));
+    }
+  }, [scheduleSync]);
   const openSystemSettings = useCallback(() => { Linking.openSettings().catch(e => console.warn("No se pudieron abrir los ajustes:", e.message)); }, []);
 
   // Manda una notificación de prueba a este celular (registra el dispositivo si hace falta)
@@ -211,9 +225,9 @@ export function NotificationsProvider({ children }) {
   }, [runSync]);
 
   const value = useMemo(() => ({
-    supported: pushSupported, permission, prefs, setPref, toggleAlerts, sheet, confirmSheet, closeSheet, openSystemSettings,
+    supported: pushSupported, permission, prefs, setPref, toggleAlerts, sheet, confirmSheet, closeSheet, openSystemSettings, askPermission,
     sendTest, favoritesVersion, lastError,
-  }), [permission, prefs, setPref, toggleAlerts, sheet, confirmSheet, closeSheet, openSystemSettings, sendTest, favoritesVersion, lastError]);
+  }), [permission, prefs, setPref, toggleAlerts, sheet, confirmSheet, closeSheet, openSystemSettings, askPermission, sendTest, favoritesVersion, lastError]);
 
   return <NotificationsContext.Provider value={value}>{children}</NotificationsContext.Provider>;
 }

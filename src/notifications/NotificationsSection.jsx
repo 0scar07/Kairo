@@ -12,7 +12,7 @@ import { accents, colors, sizes, spacing, type, withAlpha } from "../theme";
 // Ajustes > Notificaciones: interruptor general, qué avisar, horario silencioso, estado del permiso y una prueba
 export default function NotificationsSection() {
   const t = useT();
-  const { supported, permission, prefs, setPref, openSystemSettings, sendTest } = useNotifications();
+  const { supported, permission, prefs, setPref, openSystemSettings, askPermission, sendTest } = useNotifications();
   const [sending, setSending] = useState(false);
   const accent = accents.lol;
   const track = { false: colors.surfaceHigh, true: withAlpha(accent, 0.5) };
@@ -62,6 +62,10 @@ export default function NotificationsSection() {
         <View style={styles.divider} />
         <SettingRow label={t("notif.end")} disabled={off} right={toggle(prefs.notifyEnd, v => setPref({ notifyEnd: v }))} />
         <View style={styles.divider} />
+        <SettingRow label={t("notif.weekly")} hint={t("notif.weeklyHint")} disabled={off} right={toggle(prefs.weekly, v => setPref({ weekly: v }))} />
+        <View style={styles.divider} />
+        <SettingRow label={t("notif.rankAlerts")} hint={t("notif.rankAlertsHint")} disabled={off} right={toggle(prefs.rankAlerts, v => setPref({ rankAlerts: v }))} />
+        <View style={styles.divider} />
         <SettingRow
           label={t("notif.quiet")}
           hint={t("notif.quietHint")}
@@ -77,8 +81,8 @@ export default function NotificationsSection() {
         <View style={styles.divider} />
         <SettingRow
           label={t("notif.permission")}
-          hint={permission === "denied" ? t("notif.permissionDeniedHint") : undefined}
-          onPress={permission === "denied" ? openSystemSettings : undefined}
+          hint={permission === "denied" ? t("notif.permissionDeniedHint") : permission === "undetermined" ? t("notif.permissionAskHint") : undefined}
+          onPress={permission === "denied" ? openSystemSettings : permission === "undetermined" ? askPermission : undefined}
           right={
             <View style={styles.status}>
               <View style={[styles.dot, { backgroundColor: permission === "granted" ? colors.win : permission === "denied" ? colors.loss : colors.textFaint }]} />

@@ -19,6 +19,7 @@ export const PLATFORMS_KEY = "kairo_platforms";
 export const NOTIF_PREFS_KEY = "kairo_notifications";
 export const NOTIF_DEVICE_KEY = "kairo_notification_device";
 export const NOTIF_LAST_KEY = "kairo_notification_last";
+export const HISTORY_TOUCH_KEY = "kairo_history_touch";
 export const LEGACY_KEYS = {
   [FAVORITES_KEY]:  ["loltracker_favorites"],
   [MY_PROFILE_KEY]: ["ggtracker_my_profile"],

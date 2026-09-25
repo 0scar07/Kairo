@@ -6,6 +6,7 @@ import { useNotifications } from "./NotificationsProvider";
 import { onLive } from "./events";
 import { useT } from "../i18n/I18nProvider";
 import { navigateWhenReady } from "../navigation/ref";
+import { openFromNotification } from "./routes";
 import { loadFavorites } from "../utils/favorites";
 import { championByKey, championIcon, championLabel, profileIconUrl } from "../api/ddragon";
 import { getLive } from "../games/lol/api";
@@ -86,9 +87,7 @@ export default function BannerHost() {
     setCurrent(next);
   }, [current, queue]);
 
-  const open = useCallback(item => {
-    if (item.data?.puuid && item.data.puuid !== "demo") navigateWhenReady("LiveGame", { puuid: item.data.puuid, region: item.data.region, riotId: item.data.riotId });
-  }, []);
+  const open = useCallback(item => openFromNotification(item.data), []);
 
   const openFromList = useCallback(l => {
     setListOpen(false);

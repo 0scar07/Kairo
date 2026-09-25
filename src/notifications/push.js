@@ -6,6 +6,7 @@ import { PREVIEW } from "./env";
 // Un canal por tipo de aviso: en Android el sonido se define en el canal y no se puede cambiar después de crearlo
 export const CHANNEL_START = "live_start";
 export const CHANNEL_RESULT = "live_result";
+export const CHANNEL_PROGRESS = "progress";   // resumen semanal y cambios de rango (sonido por defecto)
 export const CATEGORY_ID = "live_game";
 export const ACTION_VIEW = "view";
 export const ACTION_MUTE = "mute";
@@ -38,6 +39,7 @@ export async function setupChannel(t, accent) {
   };
   await Notifications.setNotificationChannelAsync(CHANNEL_START, { ...base, name: t("notif.channelStart"), description: t("notif.channelStartDesc"), sound: "live_start.wav" });
   await Notifications.setNotificationChannelAsync(CHANNEL_RESULT, { ...base, name: t("notif.channelResult"), description: t("notif.channelResultDesc"), sound: "live_result.wav" });
+  await Notifications.setNotificationChannelAsync(CHANNEL_PROGRESS, { ...base, importance: Notifications.AndroidImportance.DEFAULT, vibrationPattern: undefined, name: t("notif.channelProgress"), description: t("notif.channelProgressDesc") });
   await Notifications.deleteNotificationChannelAsync("live").catch(() => {});   // el canal de la versión anterior (sin sonido propio)
   await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
     { identifier: ACTION_VIEW, buttonTitle: t("notif.view"), options: { opensAppToForeground: true } },

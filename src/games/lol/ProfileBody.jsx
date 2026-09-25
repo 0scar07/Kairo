@@ -17,6 +17,7 @@ import { findMe, getChampionStats, getOverallStats, getStreak } from "./utils";
 import { championIcon, championLabel } from "../../api/ddragon";
 import Icon from "../../components/Icon";
 import LiveBanner from "./components/LiveBanner";
+import RankHistoryCard from "./components/RankHistoryCard";
 import { errorMessage } from "../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../../theme";
 
@@ -105,6 +106,10 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
               <RankedCard entry={flex}  label={t("ranked.flex")} game={GAME} />
             </View>
           )}
+      </Reveal>
+
+      <Reveal order={2}>
+        <RankHistoryCard puuid={account.puuid} region={region} />
       </Reveal>
 
       {mastery && (

@@ -3,6 +3,7 @@ import { pingServer } from "../api/client";
 import { DEFAULT_REGION } from "../constants/regions";
 import { saveRegion, saveHaptics } from "../utils/prefs";
 import { setHapticsEnabled } from "../utils/haptics";
+import { touchFavoritesHistory } from "../utils/historyTouch";
 
 const BootContext = createContext({
   favorites: [], recents: [], region: DEFAULT_REGION, setRegion: () => {},
@@ -19,6 +20,7 @@ export function BootProvider({ boot, children }) {
   const [haptics, setHapticsState] = useState(boot.prefs?.haptics !== false);
 
   useEffect(() => { setHapticsEnabled(haptics); }, []);
+  useEffect(() => { touchFavoritesHistory().catch(e => console.warn("Historial de favoritos:", e.message)); }, []);
 
   const retryServer = useCallback(async () => {
     try {

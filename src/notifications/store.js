@@ -6,6 +6,8 @@ export const DEFAULT_PREFS = {
   enabled: true,        // interruptor general
   notifyStart: true,    // avisar cuando entra en partida
   notifyEnd: true,      // avisar el resultado al terminar
+  weekly: true,         // resumen semanal (domingo por la tarde)
+  rankAlerts: true,     // avisos de cambio de rango de los favoritos
   quiet: { enabled: false, from: "23:00", to: "07:00" },   // horario silencioso
 };
 
