@@ -11,7 +11,7 @@ const { createUpstream } = require("../lib/upstream");
 const upstream = createUpstream({
   id: "apex",
   name: "Apex Legends Status",
-  base: "https://api.mozambiquehe.re",
+  base: "https://api.apexlegendsstatus.com",   // antes mozambiquehe.re: el portal ahora documenta este host
   baseEnv: "APEX_API_BASE",
   keyEnv: "APEX_API_KEY",
   headers: key => ({ Authorization: key }),
