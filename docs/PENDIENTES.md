@@ -34,6 +34,12 @@
 - [ ] Notificaciones cuando un favorito sube o baja de rango.
 - [ ] Más regiones (SEA: `ph2`, `sg2`, `th2`, `tw2`, `vn2`) en el selector; el backend ya las acepta.
 - [ ] Traducir nombres de campeones/objetos (Data Dragon `es_MX`) y soporte de idioma.
+- [ ] **Notificaciones de partida en vivo (solo LoL, push solo Android por ahora).** Avisar cuando un favorito entra en partida y al terminar, con banner fluido dentro de la app. Decisiones tomadas:
+  - Banner: gooey real con Skia (versión Reanimated de reserva para la web).
+  - Sin login: cada dispositivo se identifica con su token push y un secreto propio.
+  - Infraestructura gratis: Render gratis + Neon (Postgres) + UptimeRobot llamando a `/health` cada 5 min, con un segundo pinger de respaldo (cron-job.org o GitHub Actions). Si falla mucho, Render Starter (~7 USD/mes) o Cloudflare Workers + D1.
+  - Fases: 1) backend y base, 2) vigilante y push con prueba real, 3) app y permisos, 4) banner, 5) gooey Skia, 6) pantalla en vivo, 7) cierre y privacidad.
+  - Necesita de ti: proyecto Firebase (FCM) subido a EAS, base en Neon y actualizar `privacy.html`.
 
 ## Calidad
 - [ ] Probar en dispositivos reales (Android 12+ recorta el ícono del splash nativo) y ajustar tamaños/animaciones.
