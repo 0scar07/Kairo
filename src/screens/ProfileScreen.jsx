@@ -7,6 +7,7 @@ import { ErrorState } from "../components/ui";
 import { getGame } from "../games";
 import { errorMessage } from "../utils/format";
 import { addRecent } from "../utils/recents";
+import { isOffline, loadCachedProfile, saveCachedProfile } from "../utils/profileCache";
 import { colors } from "../theme";
 
 /**
@@ -27,16 +28,26 @@ export default function ProfileScreen({ route }) {
       .then(data => {
         if (cancelled) return;
         setState({ status: "ready", data });
+        saveCachedProfile(gameId, region, data.account.gameName, data.account.tagLine, data)
+          .catch(e => console.warn("No se pudo guardar la copia local del perfil:", e.message));
         addRecent({ gameId, region, gameName: data.account.gameName, tagLine: data.account.tagLine, lookup: data.account.lookup })
           .catch(e => console.warn("No se pudo guardar la búsqueda reciente:", e.message));
       })
-      .catch(e => { if (!cancelled) setState({ status: "error", message: errorMessage(e, t("profile.loadError")) }); });
+      .catch(async e => {
+        if (cancelled) return;
+        // Sin conexión: se muestra lo último que se guardó de este jugador, si lo hay
+        if (isOffline(e)) {
+          const cached = await loadCachedProfile(gameId, region, gameName, tagLine);
+          if (cached && !cancelled) { setState({ status: "ready", data: cached.data, offlineAt: cached.at }); return; }
+        }
+        setState({ status: "error", message: errorMessage(e, t("profile.loadError")) });
+      });
     return () => { cancelled = true; };
   }, [gameId, gameName, tagLine, region, attempt]);
 
   const retry = useCallback(() => setAttempt(n => n + 1), []);
 
-  if (state.status === "ready") return <ProfileView gameId={gameId} initialData={state.data} />;
+  if (state.status === "ready") return <ProfileView gameId={gameId} initialData={state.data} offlineAt={state.offlineAt} />;
   if (state.status === "error") {
     return <View style={styles.center}><ErrorState message={state.message} onRetry={retry} /></View>;
   }

@@ -511,4 +511,9 @@ export default {
   "notif.permissionAskHint": "Tippe, um sie jetzt anzufragen",
   "notif.channelProgress": "Fortschritt und Zusammenfassungen",
   "notif.channelProgressDesc": "Wochenübersicht und Rangänderungen deiner Favoriten",
+  "offline.notice": "Offline: Du siehst den letzten gespeicherten Stand vom {date}. Zum Aktualisieren nach unten ziehen.",
+  "share.button": "Profil teilen",
+  "share.title": "Kairo-Profil teilen",
+  "share.error": "Teilen fehlgeschlagen: {error}",
+  "share.unavailable": "Dieses Gerät kann keine Dateien teilen",
 };

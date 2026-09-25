@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
 import { ScrollView, StyleSheet, RefreshControl } from "react-native";
 import Reveal from "./Reveal";
-import { ErrorBanner, ProfileHeader } from "./ui";
+import { ErrorBanner, Notice, ProfileHeader } from "./ui";
+import { activeLanguage } from "../i18n";
 import { getGame } from "../games";
 import RankEmblem from "./RankEmblem";
 import { errorMessage, tierLabel } from "../utils/format";
 import Icon from "./Icon";
 import { canAlert, hasAlerts, isFavoriteIn, loadFavorites, refreshFavorite, sameFavorite, toggleFavorite } from "../utils/favorites";
 import BellButton from "../notifications/BellButton";
+import ShareButton from "../share/ShareButton";
 import { useNotifications } from "../notifications/NotificationsProvider";
 import { success } from "../utils/haptics";
 import { colors, sizes, spacing, useAccent } from "../theme";
@@ -20,7 +22,7 @@ import { colors, sizes, spacing, useAccent } from "../theme";
  *  - gameId, initialData: qué juego y datos iniciales (los que devolvió game.api.search)
  *  - mine: perfil propio (el juego puede mostrar extras); headerAction sustituye a la estrella de favorito
  */
-export default function ProfileView({ gameId, initialData, mine, headerAction, bottomSpace = spacing.xxxl }) {
+export default function ProfileView({ gameId, initialData, mine, headerAction, offlineAt, bottomSpace = spacing.xxxl }) {
   const t = useT();
   const game = getGame(gameId);
   const accent = useAccent(gameId);
@@ -28,6 +30,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [isFav, setIsFav] = useState(false);
+  const [offline, setOffline] = useState(offlineAt || null);   // fecha de la copia local que se está mostrando sin conexión
   const [alerts, setAlerts] = useState(false);
   const { supported, toggleAlerts, favoritesVersion } = useNotifications();
 
@@ -71,6 +74,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
     setError(null);
     try {
       setData(await game.api.search(account.lookup ?? account.gameName, account.tagLine, region));
+      setOffline(null);
     } catch (e) {
       setError(t("profile.refreshError", { error: errorMessage(e) }));
     }
@@ -87,6 +91,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
+      {offline ? <Notice tone="warn" icon="alert">{t("offline.notice", { date: new Date(offline).toLocaleString(activeLanguage(), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) })}</Notice> : null}
 
       <Reveal order={0}>
         <ProfileHeader
@@ -102,7 +107,12 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
             <Icon name="star" size={sizes.avatarSm} color={isFav ? colors.gold : colors.textMuted} filled={isFav} />
           )}
           onAction={headerAction ? headerAction.onPress : onToggleFavorite}
-          extraAction={showBell ? <BellButton active={alerts} accent={accent} onPress={() => toggleAlerts({ ...me, alerts })} /> : null}
+          extraAction={(
+            <>
+              <ShareButton gameId={gameId} data={data} accent={accent} />
+              {showBell ? <BellButton active={alerts} accent={accent} onPress={() => toggleAlerts({ ...me, alerts })} /> : null}
+            </>
+          )}
         />
       </Reveal>
 

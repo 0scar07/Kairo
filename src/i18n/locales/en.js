@@ -509,4 +509,9 @@ export default {
   "notif.permissionAskHint": "Tap to ask now",
   "notif.channelProgress": "Progress and summaries",
   "notif.channelProgressDesc": "Weekly summary and rank changes of your favorites",
+  "offline.notice": "Offline: you're seeing what was last saved on {date}. Pull down to refresh.",
+  "share.button": "Share profile",
+  "share.title": "Share Kairo profile",
+  "share.error": "Couldn't share: {error}",
+  "share.unavailable": "This device can't share files",
 };

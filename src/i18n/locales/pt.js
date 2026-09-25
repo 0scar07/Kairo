@@ -511,4 +511,9 @@ export default {
   "notif.permissionAskHint": "Toque para pedir agora",
   "notif.channelProgress": "Progresso e resumos",
   "notif.channelProgressDesc": "Resumo semanal e mudanças de elo dos seus favoritos",
+  "offline.notice": "Sem conexão: você está vendo o que foi salvo por último em {date}. Puxe para baixo para atualizar.",
+  "share.button": "Compartilhar perfil",
+  "share.title": "Compartilhar perfil do Kairo",
+  "share.error": "Não foi possível compartilhar: {error}",
+  "share.unavailable": "Este dispositivo não permite compartilhar arquivos",
 };
