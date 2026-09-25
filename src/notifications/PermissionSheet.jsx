@@ -30,7 +30,7 @@ export default function PermissionSheet() {
 
           <Text style={styles.title}>{denied ? t("notif.sheet.deniedTitle") : t("notif.sheet.title")}</Text>
           <Text style={styles.body}>
-            {denied ? t("notif.sheet.deniedBody") : t("notif.sheet.body", { name: fav?.gameName || "" })}
+            {denied ? t("notif.sheet.deniedBody") : t(fav?.gameId === "lol" ? "notif.sheet.body" : "notif.sheet.bodyTrophy", { name: fav?.gameName || "" })}
           </Text>
 
           {!denied && (

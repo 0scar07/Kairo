@@ -33,6 +33,11 @@ class PostgresStore {
         PRIMARY KEY (puuid, day)
       )`);
     await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS kv (
+        key text PRIMARY KEY,
+        doc jsonb NOT NULL
+      )`);
+    await this.pool.query(`
       CREATE TABLE IF NOT EXISTS rank_track (
         puuid     text PRIMARY KEY,
         region    text NOT NULL,
@@ -120,6 +125,15 @@ class PostgresStore {
   async latestRank(puuid) {
     const { rows } = await this.pool.query("SELECT doc FROM rank_history WHERE puuid = $1 ORDER BY day DESC LIMIT 1", [puuid]);
     return rows[0]?.doc ?? null;
+  }
+
+  async getKV(key) {
+    const { rows } = await this.pool.query("SELECT doc FROM kv WHERE key = $1", [key]);
+    return rows[0]?.doc ?? null;
+  }
+
+  async putKV(key, doc) {
+    await this.pool.query("INSERT INTO kv (key, doc) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET doc = EXCLUDED.doc", [key, JSON.stringify(doc)]);
   }
 
   async touchTrack(items, now) {

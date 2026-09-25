@@ -528,4 +528,7 @@ export default {
   "compare.level": "Niveau",
   "compare.mastery": "Maîtrise totale",
   "compare.loadError": "Impossible de charger {name} : {error}",
+  "notif.trophyAlerts": "Records de trophées",
+  "notif.trophyAlertsHint": "Brawl Stars et Clash Royale : quand un favori bat son record",
+  "notif.sheet.bodyTrophy": "Nous vous prévenons quand {name} bat son record de trophées. Vous pouvez changer cela à tout moment dans Réglages.",
 };

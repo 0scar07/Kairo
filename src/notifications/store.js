@@ -8,6 +8,7 @@ export const DEFAULT_PREFS = {
   notifyEnd: true,      // avisar el resultado al terminar
   weekly: true,         // resumen semanal (domingo por la tarde)
   rankAlerts: true,     // avisos de cambio de rango de los favoritos
+  trophyAlerts: true,   // Brawl Stars y Clash Royale: récords de trofeos de los favoritos
   quiet: { enabled: false, from: "23:00", to: "07:00" },   // horario silencioso
 };
 

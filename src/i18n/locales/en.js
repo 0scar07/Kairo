@@ -526,4 +526,7 @@ export default {
   "compare.level": "Level",
   "compare.mastery": "Total mastery",
   "compare.loadError": "Couldn't load {name}: {error}",
+  "notif.trophyAlerts": "Trophy records",
+  "notif.trophyAlertsHint": "Brawl Stars and Clash Royale: when a favorite beats their record",
+  "notif.sheet.bodyTrophy": "We'll let you know when {name} beats their trophy record. You can change this anytime in Settings.",
 };

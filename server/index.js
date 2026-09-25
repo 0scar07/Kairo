@@ -14,6 +14,7 @@ const { createDevicesRouter } = require("./routes/devices");
 const push = require("./lib/push");
 const { Watcher } = require("./lib/watcher");
 const { RankTracker } = require("./lib/rankTracker");
+const { TrophyTracker } = require("./lib/trophyTracker");
 const storeRef = require("./lib/storeRef");
 let artRouter;
 try {
@@ -82,7 +83,7 @@ app.use("/devices", (_req, _res, next) => storeReady.then(() => next(), () => ne
   createDevicesRouter(store, { maxDevices: config.maxDevices, push }));
 
 // Vigilante: revisa a los favoritos con alertas y manda las notificaciones (solo si el almacén arrancó)
-const watcher = new Watcher({ store, push, rank: new RankTracker({ store, push }), maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
+const watcher = new Watcher({ store, push, rank: new RankTracker({ store, push }), trophies: new TrophyTracker({ store, push }), maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
 storeReady.then(() => { if (config.watcherEnabled) watcher.start(config.watchIntervalMs); }).catch(() => {});
 
 // Imágenes firmadas para las notificaciones (las descarga el celular)

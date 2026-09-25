@@ -84,6 +84,16 @@ for (const kind of ["json", "postgres"]) {
     await store.close();
   });
 
+  test(`almacén ${kind}: estado suelto (getKV/putKV)`, async () => {
+    const store = stores[kind]();
+    await store.init();
+    assert.strictEqual(await store.getKV("trophy:x"), null);
+    await store.putKV("trophy:x", { record: 100 });
+    await store.putKV("trophy:x", { record: 150 });
+    assert.deepStrictEqual(await store.getKV("trophy:x"), { record: 150 });
+    await store.close();
+  });
+
   test(`almacén ${kind}: un token pertenece a un solo dispositivo`, async () => {
     const store = stores[kind]();
     await store.init();

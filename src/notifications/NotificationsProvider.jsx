@@ -4,7 +4,7 @@ import * as Notifications from "expo-notifications";
 import { useI18n } from "../i18n/I18nProvider";
 import { accents } from "../theme";
 import { errorMessage } from "../utils/format";
-import { canAlert, hasAlerts, loadFavorites, onFavoritesChanged, setFavoriteAlerts } from "../utils/favorites";
+import { canAlert, hasAlerts, isSupercellAlert, loadFavorites, onFavoritesChanged, setFavoriteAlerts } from "../utils/favorites";
 import { openFromNotification } from "./routes";
 import { PREVIEW, pushSupported } from "./env";
 import {
@@ -54,13 +54,16 @@ export function NotificationsProvider({ children }) {
   const buildPayload = useCallback(async () => {
     // Todos los favoritos de LoL: los de la campanita avisan en vivo; los demás (muted) solo cuentan para el historial,
     // el resumen semanal y los cambios de rango
-    const favorites = (await loadFavorites()).filter(canAlert).slice(0, MAX_ALERTS)
-      .map(f => ({ puuid: f.puuid, region: f.region, riotId: `${f.gameName}#${f.tagLine}`, muted: !hasAlerts(f) }));
+    // Los de Brawl Stars / Clash Royale se mandan solo con la campanita activa (su puuid es el tag y no hay región)
+    const favorites = (await loadFavorites()).filter(f => canAlert(f) && (!isSupercellAlert(f) || hasAlerts(f))).slice(0, MAX_ALERTS)
+      .map(f => (isSupercellAlert(f)
+        ? { game: f.gameId, puuid: f.puuid, region: "global", riotId: `${f.gameName}#${f.tagLine}`, muted: false }
+        : { puuid: f.puuid, region: f.region, riotId: `${f.gameName}#${f.tagLine}`, muted: !hasAlerts(f) }));
     const p = prefsRef.current;
     return {
       favorites,
       settings: {
-        enabled: p.enabled, notifyStart: p.notifyStart, notifyEnd: p.notifyEnd, weekly: p.weekly, rankAlerts: p.rankAlerts, locale: languageRef.current,
+        enabled: p.enabled, notifyStart: p.notifyStart, notifyEnd: p.notifyEnd, weekly: p.weekly, rankAlerts: p.rankAlerts, trophyAlerts: p.trophyAlerts, locale: languageRef.current,
         // hora local menos UTC en minutos (Bogotá = -300); getTimezoneOffset devuelve lo contrario
         quiet: { enabled: p.quiet.enabled, from: p.quiet.from, to: p.quiet.to, utcOffsetMinutes: -new Date().getTimezoneOffset() },
       },

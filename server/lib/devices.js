@@ -2,6 +2,7 @@ const crypto = require("node:crypto");
 const { HttpError } = require("./errors");
 const { isRegion } = require("./regions");
 const { LOCALES } = require("./pushText");
+const { TAG_RE } = require("./supercell");
 
 // Un dispositivo = un celular con la app: su token de notificaciones, sus favoritos vigilados y sus ajustes.
 // Sin cuentas: al registrarse recibe un secreto propio (que el servidor guarda con hash) y con él se identifica.
@@ -11,6 +12,10 @@ const PUSH_TOKEN_RE = /^Expo(?:nent)?PushToken\[[A-Za-z0-9_-]{10,80}\]$/;
 const PUUID_RE = /^[A-Za-z0-9_-]{20,100}$/;
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const PLATFORMS = ["android", "ios"];
+// Juegos con avisos: LoL (partida en vivo, rango) y los de Supercell con trofeos (el `puuid` del favorito es su tag)
+const SC_GAMES = ["brawlstars", "clashroyale"];
+const FAV_GAMES = ["lol", ...SC_GAMES];
+const isLolFav = f => (f.game || "lol") === "lol";
 
 const DEFAULT_SETTINGS = Object.freeze({
   enabled: true,        // interruptor general
@@ -18,6 +23,7 @@ const DEFAULT_SETTINGS = Object.freeze({
   notifyEnd: true,      // avisar el resultado al terminar
   locale: "es",          // idioma de los textos de las notificaciones
   weekly: true,         // resumen semanal (domingo por la tarde)
+  trophyAlerts: true,   // Brawl Stars y Clash Royale: aviso cuando un favorito bate su récord de trofeos
   rankAlerts: true,     // avisar cuando un favorito sube o baja de rango, o entra en promoción
   quiet: { enabled: false, from: "23:00", to: "07:00", utcOffsetMinutes: 0 },   // horario silencioso (hora local del celular)
 });
@@ -43,13 +49,19 @@ function parseFavorites(list) {
   const seen = new Set();
   const out = [];
   for (const f of list) {
-    if (!f || typeof f !== "object" || typeof f.puuid !== "string" || !PUUID_RE.test(f.puuid)) throw bad("Favorito no válido: puuid incorrecto", "INVALID_FAVORITES");
-    if (!isRegion(f.region)) throw bad("Favorito no válido: región desconocida", "INVALID_FAVORITES");
+    if (!f || typeof f !== "object") throw bad("Favorito no válido", "INVALID_FAVORITES");
+    const game = f.game === undefined ? "lol" : f.game;
+    if (!FAV_GAMES.includes(game)) throw bad("Favorito no válido: juego desconocido", "INVALID_FAVORITES");
+    const supercell = game !== "lol";
+    if (typeof f.puuid !== "string" || !(supercell ? TAG_RE.test(f.puuid) : PUUID_RE.test(f.puuid))) throw bad("Favorito no válido: identificador incorrecto", "INVALID_FAVORITES");
+    if (!supercell && !isRegion(f.region)) throw bad("Favorito no válido: región desconocida", "INVALID_FAVORITES");
     const riotId = typeof f.riotId === "string" ? f.riotId.trim().slice(0, 40) : "";
     if (f.muted !== undefined && !isBool(f.muted)) throw bad("Favorito no válido: muted debe ser verdadero o falso", "INVALID_FAVORITES");
-    if (seen.has(f.puuid)) continue;
-    seen.add(f.puuid);
-    out.push({ puuid: f.puuid, region: f.region, riotId, muted: f.muted === true });
+    const key = `${game}:${f.puuid}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    // LoL no lleva `game` (así se guardó siempre); los de Supercell sí, y no tienen región
+    out.push(supercell ? { game, puuid: f.puuid, region: "global", riotId, muted: f.muted === true } : { puuid: f.puuid, region: f.region, riotId, muted: f.muted === true });
   }
   return out;
 }
@@ -58,7 +70,7 @@ function parseFavorites(list) {
 function parseSettings(input, current = DEFAULT_SETTINGS) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw bad("Ajustes no válidos", "INVALID_SETTINGS");
   const next = { ...current, quiet: { ...current.quiet } };
-  for (const key of ["enabled", "notifyStart", "notifyEnd", "weekly", "rankAlerts"]) {
+  for (const key of ["enabled", "notifyStart", "notifyEnd", "weekly", "rankAlerts", "trophyAlerts"]) {
     if (input[key] === undefined) continue;
     if (!isBool(input[key])) throw bad(`Ajuste no válido: ${key}`, "INVALID_SETTINGS");
     next[key] = input[key];
@@ -96,7 +108,7 @@ const secretMatches = (secret, hash) => {
 const publicDevice = d => ({ id: d.id, platform: d.platform, favorites: d.favorites, settings: d.settings, createdAt: d.createdAt, updatedAt: d.updatedAt });
 
 module.exports = {
-  MAX_FAVORITES, DEFAULT_SETTINGS,
+  MAX_FAVORITES, DEFAULT_SETTINGS, SC_GAMES, isLolFav,
   parsePushToken, parsePlatform, parseFavorites, parseSettings,
   newSecret, hashSecret, secretMatches, publicDevice,
 };

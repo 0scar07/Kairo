@@ -66,6 +66,15 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 **Notificaciones de partida en vivo (LoL, Android):** toca la campanita de un favorito y Kairo te avisa cuando entra en partida y cuando termina, con el resultado, aunque la app esté cerrada. Con la app abierta el aviso aparece como un **banner fluido** (una gota de vidrio que se estira en cápsula, con efecto líquido dibujado con Skia) y queda un indicador «N en vivo». En Ajustes eliges qué avisar, el horario silencioso y puedes enviarte una prueba. Sin cuentas: cada celular se registra con su token y un secreto propio. Los detalles están en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
+**Más funciones (v1.4):**
+- **Historial de rango (LoL):** el servidor guarda una foto diaria del rango de cada jugador que consultas y el perfil dibuja el gráfico de LP (Solo/Dúo y Flex) con el cambio de 7 y 30 días. No hay historial anterior a la primera consulta: se va llenando cada día.
+- **Resumen semanal:** el domingo por la tarde (hora de tu celular) una notificación con tus partidas, victorias y LP de la semana.
+- **Avisos de progreso:** cuando un favorito de LoL sube o baja de rango o entra en promoción, y cuando un favorito de **Brawl Stars** o **Clash Royale** bate su récord de trofeos.
+- **Comparar dos jugadores** de LoL cara a cara (rango, winrate, KDA, nivel, maestría, campeón más jugado).
+- **Compartir el perfil como imagen** lista para redes (Android e iPhone nativo).
+- **Perfiles sin conexión:** la app guarda lo último que viste de cada jugador y lo abre aunque no haya internet.
+- **Actualizaciones sin reinstalar:** los cambios de pantallas y textos llegan al abrir la app (ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)); solo los cambios nativos piden un APK nuevo.
+
 TFT y LoL comparten la búsqueda por **Riot ID** con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada. **Valorant** llegará cuando Riot apruebe una *production key* (su API de partidas la exige).
 
 ### Supercell

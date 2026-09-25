@@ -87,10 +87,30 @@ Con el servidor encendido, un vigilante revisa cada 2 minutos a los favoritos co
 - **Probar sin esperar una partida:** `POST /devices/me/test` (con el encabezado del dispositivo) manda una notificación de prueba a ese celular; `{"type":"live_start"}` o `{"type":"live_end"}` muestran cómo se verían los avisos reales.
 - `/health` incluye el estado del vigilante (`watcher`). Se apaga con `WATCHER_ENABLED=false`.
 
+## Actualizaciones sin reinstalar (EAS Update)
+
+La app trae `expo-updates`: al abrirla busca una actualización de su canal (`preview` para el APK de GitHub Releases), la descarga en segundo plano y la aplica **en el siguiente arranque**. Solo cambia el JavaScript (pantallas, textos, lógica) y los recursos; el código nativo sigue siendo el del APK instalado.
+
+- **Automático:** `.github/workflows/update.yml` publica una actualización cada vez que llega a `main` un cambio en `src/`, `App.jsx`, `assets/`, `package.json`, `app.json` o `app.config.js`. Antes corre `npm run verify`: si algo está roto, no se publica. También se puede lanzar a mano desde *Actions*.
+- **Solo llega a la misma versión de app.** `runtimeVersion` es la versión de `app.json` (por ejemplo `1.4.0`): un APK 1.4.0 solo recibe actualizaciones de la 1.4.0. Cuando un cambio toque código nativo (una librería nueva, un permiso, un plugin), sube la versión en `app.json` y `package.json` y publica un APK nuevo; las actualizaciones de la versión nueva ya no llegan a los APK viejos, así que nadie recibe un paquete incompatible.
+- **Ver qué actualización corre:** Ajustes, *Acerca de*, muestra los 8 primeros caracteres del identificador de la actualización.
+- **Deshacer una actualización mala:** `npx eas-cli update:rollback --channel preview` (o publica otra encima). Quien ya la descargó la recibe la próxima vez que abra la app.
+- **Requisitos:** el secreto `EXPO_TOKEN` del repositorio y el proyecto de EAS de `app.json`.
+
+## Historial de rango, resumen semanal y récords de trofeos
+
+Todo lo hace el mismo vigilante del backend (`server/lib/`), usando la base de datos:
+
+- **Historial (`rankTracker.js`):** una foto diaria de Solo/Dúo y Flex por jugador en la tabla `rank_history`. Se rastrea a los favoritos de los dispositivos registrados (cada 6 h) y a cualquiera que alguien haya abierto en los últimos 30 días (una vez al día; la app avisa con `POST /lol/history/touch` y `GET /lol/history/:puuid`). Máximo 300 jugadores y 6 consultas a Riot por tanda.
+- **Avisos de rango y resumen semanal:** se calculan con esas fotos. El resumen sale el domingo entre las 18:00 y las 22:00 hora local del celular, una vez por semana, con el favorito que más cambió.
+- **Récords de trofeos (`trophyTracker.js`):** cada 6 h, para los favoritos de Brawl Stars y Clash Royale con la campanita. Usa las keys de Supercell ya configuradas; la primera lectura solo guarda la marca de partida.
+- Ajustes de cada dispositivo: `weekly`, `rankAlerts` y `trophyAlerts` (interruptores en Ajustes, *Notificaciones*).
+
 ## Publicar una versión (APK)
 
 Las versiones las publica el flujo [`.github/workflows/release.yml`](../.github/workflows/release.yml): al subir una etiqueta `v*` construye el APK con EAS y lo adjunta a una *release* de GitHub, que es de donde lo descargan el botón del README y [Obtainium](https://github.com/ImranR98/Obtainium).
 
+0. Un APK nuevo solo hace falta si cambió código nativo; para el resto basta la actualización automática de arriba.
 1. Crea un token en <https://expo.dev/settings/access-tokens> y guárdalo en el repositorio como secreto `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Nunca en el código.
 2. Sube la versión en `package.json` y `app.json`, haz commit y crea la etiqueta: `git tag v1.1.0 && git push origin v1.1.0`.
 3. El flujo espera a EAS (la cola gratuita puede tardar más de una hora) y publica `Kairo.apk` en *Releases* (el nombre es fijo para que el enlace de descarga directa, `releases/latest/download/Kairo.apk`, siempre baje la última versión).

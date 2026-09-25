@@ -46,9 +46,10 @@ export async function saveFavorites(list) {
   listeners.forEach(fn => { try { fn(list); } catch (e) { console.warn("Oyente de favoritos:", e.message); } });
 }
 
-// Alertas de partida en vivo: solo LoL, y el favorito lleva `alerts: true`
-export const ALERT_GAME = "lol";
-export const canAlert = fav => fav?.gameId === ALERT_GAME && Boolean(fav.puuid);
+// Alertas (campanita): LoL (partida en vivo, rango) y Brawl Stars / Clash Royale (récords de trofeos). El favorito lleva `alerts: true`
+export const ALERT_GAMES = ["lol", "brawlstars", "clashroyale"];
+export const canAlert = fav => ALERT_GAMES.includes(fav?.gameId) && Boolean(fav.puuid);
+export const isSupercellAlert = fav => fav?.gameId === "brawlstars" || fav?.gameId === "clashroyale";
 export const hasAlerts = fav => canAlert(fav) && fav.alerts === true;
 export const alertFavorites = list => list.filter(hasAlerts);
 

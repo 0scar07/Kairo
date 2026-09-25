@@ -32,6 +32,7 @@ class RankTracker {
     const map = new Map();
     for (const device of devices) {
       for (const fav of device.favorites || []) {
+        if ((fav.game || "lol") !== "lol") continue;
         if (!map.has(fav.puuid)) map.set(fav.puuid, { region: fav.region, subs: [] });
         map.get(fav.puuid).subs.push({ device, fav });
       }
@@ -115,7 +116,8 @@ class RankTracker {
   async weekly(devices, now) {
     for (const device of devices) {
       const s = device.settings || {};
-      if (!s.enabled || !s.weekly || !(device.favorites || []).length) continue;
+      const lolFavs = (device.favorites || []).filter(f => (f.game || "lol") === "lol");
+      if (!s.enabled || !s.weekly || !lolFavs.length) continue;
       const offset = s.quiet?.utcOffsetMinutes || 0;
       if (!rank.isWeeklyWindow(now, offset)) continue;
       const week = rank.isoWeek(now, offset);
@@ -123,7 +125,7 @@ class RankTracker {
 
       // Comparación: la foto más reciente frente a la de hace ~una semana (entre 5 y 9 días atrás)
       const results = [];
-      for (const fav of device.favorites) {
+      for (const fav of lolFavs) {
         const history = await this.store.listRank(fav.puuid, rank.dayKey(now - 9 * DAY));
         const latest = history[history.length - 1];
         const old = history.find(h => h.day >= rank.dayKey(now - 9 * DAY) && h.day <= rank.dayKey(now - 5 * DAY));

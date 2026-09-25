@@ -66,6 +66,8 @@ export default function NotificationsSection() {
         <View style={styles.divider} />
         <SettingRow label={t("notif.rankAlerts")} hint={t("notif.rankAlertsHint")} disabled={off} right={toggle(prefs.rankAlerts, v => setPref({ rankAlerts: v }))} />
         <View style={styles.divider} />
+        <SettingRow label={t("notif.trophyAlerts")} hint={t("notif.trophyAlertsHint")} disabled={off} right={toggle(prefs.trophyAlerts, v => setPref({ trophyAlerts: v }))} />
+        <View style={styles.divider} />
         <SettingRow
           label={t("notif.quiet")}
           hint={t("notif.quietHint")}

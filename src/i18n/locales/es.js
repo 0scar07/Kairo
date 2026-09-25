@@ -527,4 +527,7 @@ export default {
   "compare.level": "Nivel",
   "compare.mastery": "Maestría total",
   "compare.loadError": "No se pudo cargar a {name}: {error}",
+  "notif.trophyAlerts": "Récords de trofeos",
+  "notif.trophyAlertsHint": "Brawl Stars y Clash Royale: cuando un favorito bate su récord",
+  "notif.sheet.bodyTrophy": "Te avisamos cuando {name} bata su récord de trofeos. Puedes cambiarlo cuando quieras en Ajustes.",
 };

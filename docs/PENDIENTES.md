@@ -41,6 +41,15 @@
   - Fases: 1) backend y base, 2) vigilante y push con prueba real, 3) app y permisos, 4) banner, 5) gooey Skia, 6) pantalla en vivo, 7) cierre y privacidad.
   - Necesita de ti: proyecto Firebase (FCM) subido a EAS, base en Neon y actualizar `privacy.html`.
 
+## Hecho en la v1.4
+
+- [x] Actualizaciones sin reinstalar (EAS Update, automáticas al subir cambios a `main`).
+- [x] Historial de rango con gráfico, resumen semanal y avisos de cambio de rango.
+- [x] Récords de trofeos de Brawl Stars y Clash Royale.
+- [x] Comparar dos jugadores de LoL, compartir el perfil como imagen y ver perfiles sin conexión.
+- [ ] Ampliar "comparar" y el historial de rango a TFT y a los demás juegos.
+- [ ] Compartir una partida concreta (hoy solo el perfil).
+
 ## Calidad
 - [ ] Probar en dispositivos reales (Android 12+ recorta el ícono del splash nativo) y ajustar tamaños/animaciones.
 - [ ] Tests automáticos: hoy solo hay comprobaciones puntuales. Añadir Jest para `utils/`, `games/*/utils` y las rutas del backend.

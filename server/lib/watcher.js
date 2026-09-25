@@ -74,8 +74,8 @@ function isQuiet(settings, nowMs) {
 const newState = (puuid, region) => ({ puuid, region, current: null, pending: [], lastCheckedAt: 0, notifiedStart: null, notifiedEnd: [] });
 
 class Watcher {
-  constructor({ store, push, riot = defaultRiot, names = championName, art = defaultArt, rank = null, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
-    Object.assign(this, { store, push, riot, names, art, rank, now, maxPerTick, canWatch, log });
+  constructor({ store, push, riot = defaultRiot, names = championName, art = defaultArt, rank = null, trophies = null, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
+    Object.assign(this, { store, push, riot, names, art, rank, trophies, now, maxPerTick, canWatch, log });
     this.running = false;
     this.timer = null;
     this.receiptQueue = [];   // avisos enviados cuyo recibo falta por revisar (en memoria: si se pierde, no pasa nada grave)
@@ -89,7 +89,7 @@ class Watcher {
       const s = device.settings || {};
       if (!s.enabled || (!s.notifyStart && !s.notifyEnd)) continue;
       for (const fav of device.favorites || []) {
-        if (fav.muted) continue;
+        if (fav.muted || (fav.game || "lol") !== "lol") continue;
         if (!map.has(fav.puuid)) map.set(fav.puuid, { region: fav.region, subs: [] });
         map.get(fav.puuid).subs.push({ device, fav });
       }
@@ -133,6 +133,8 @@ class Watcher {
 
       // Historial de rango: usa lo que sobre del presupuesto (con un mínimo, para que no se quede sin turno)
       if (this.rank) await this.guard(() => this.rank.tick(Math.max(budget, 3)));
+
+      if (this.trophies) await this.trophies.tick().catch(e => this.log.warn("Trofeos:", e.message));
 
       await this.checkReceipts();
       this.stats.tracked = targets.size;

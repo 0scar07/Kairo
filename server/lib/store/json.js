@@ -16,6 +16,7 @@ class JsonStore {
     this.devices = new Map();
     this.watch = new Map();     // estado del vigilante por jugador (puuid)
     this.rank = new Map();      // historial de rango: puuid -> fotos diarias ordenadas por día
+    this.kv = new Map();        // estado suelto de los rastreadores (trofeos): clave -> documento
     this.track = new Map();     // a quién se le guarda el historial: puuid -> { puuid, region, lastSeen }
     this.timer = null;
     this.writing = Promise.resolve();
@@ -30,6 +31,7 @@ class JsonStore {
       for (const w of Array.isArray(data.watch) ? data.watch : []) this.watch.set(w.puuid, w);
       for (const r of Array.isArray(data.rank) ? data.rank : []) this.rank.set(r.puuid, (this.rank.get(r.puuid) || []).concat(r));
       for (const t of Array.isArray(data.track) ? data.track : []) this.track.set(t.puuid, t);
+      for (const k of Array.isArray(data.kv) ? data.kv : []) this.kv.set(k.key, k.doc);
     } catch (e) {
       const broken = `${this.file}.dañado-${Date.now()}`;
       fs.renameSync(this.file, broken);
@@ -74,6 +76,9 @@ class JsonStore {
   async listRank(puuid, sinceDay = "0000-00-00") { return (this.rank.get(puuid) || []).filter(r => r.day >= sinceDay).map(r => structuredClone(r)); }
   async latestRank(puuid) { const l = this.rank.get(puuid) || []; return l.length ? structuredClone(l[l.length - 1]) : null; }
 
+  async getKV(key) { const d = this.kv.get(key); return d ? structuredClone(d) : null; }
+  async putKV(key, doc) { this.kv.set(key, structuredClone(doc)); this.schedule(); }
+
   async touchTrack(items, now) {
     for (const { puuid, region } of items) this.track.set(puuid, { puuid, region, lastSeen: now });
     this.schedule();
@@ -88,7 +93,7 @@ class JsonStore {
 
   flush() {
     const tmp = `${this.file}.tmp`;
-    const body = JSON.stringify({ version: 1, devices: [...this.devices.values()], watch: [...this.watch.values()], rank: [...this.rank.values()].flat(), track: [...this.track.values()] });
+    const body = JSON.stringify({ version: 1, devices: [...this.devices.values()], watch: [...this.watch.values()], rank: [...this.rank.values()].flat(), track: [...this.track.values()], kv: [...this.kv].map(([key, doc]) => ({ key, doc })) });
     this.writing = this.writing
       .then(() => fs.promises.writeFile(tmp, body).then(() => fs.promises.rename(tmp, this.file)))
       .catch(e => console.error("No pude guardar los dispositivos:", e.message));

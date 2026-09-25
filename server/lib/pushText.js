@@ -114,6 +114,18 @@ function rankChangeText(locale, { name, kind, tier, rank }) {
   return { title: t[kind](name), body: kind === "promo" ? t.series(label) : t.now(label) };
 }
 
+const TROPHY = {
+  es: { title: n => `${n}: nuevo récord de trofeos`, body: (r, d) => `${r} trofeos (+${d})` },
+  en: { title: n => `${n}: new trophy record`, body: (r, d) => `${r} trophies (+${d})` },
+  pt: { title: n => `${n}: novo recorde de troféus`, body: (r, d) => `${r} troféus (+${d})` },
+  fr: { title: n => `${n} : nouveau record de trophées`, body: (r, d) => `${r} trophées (+${d})` },
+  de: { title: n => `${n}: neuer Trophäenrekord`, body: (r, d) => `${r} Trophäen (+${d})` },
+};
+const trophyText = (locale, { name, record, delta }) => {
+  const t = TROPHY[locale] || TROPHY.es;
+  return { title: t.title(name), body: t.body(record, delta) };
+};
+
 const testText = locale => ({ title: tr(locale).testTitle, body: tr(locale).testBody });
 
-module.exports = { LOCALES, queueName, startText, endText, testText, artText, weeklyText, rankChangeText, tierLabel };
+module.exports = { LOCALES, queueName, startText, endText, testText, artText, weeklyText, rankChangeText, tierLabel, trophyText };

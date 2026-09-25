@@ -18,5 +18,9 @@ export function openFromNotification(data) {
     if (id && data.region) navigateWhenReady("Profile", { gameId: "lol", gameName: id.gameName, tagLine: id.tagLine, region: data.region });
     return;
   }
+  if (data.type === "trophy_record") {
+    if (data.game && data.puuid) navigateWhenReady("Profile", { gameId: data.game, gameName: "", tagLine: data.puuid, region: "global" });
+    return;
+  }
   if (data.puuid && data.puuid !== "demo" && data.region) navigateWhenReady("LiveGame", { puuid: data.puuid, region: data.region, riotId: data.riotId });
 }
