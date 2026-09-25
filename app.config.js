@@ -10,5 +10,12 @@ module.exports = ({ config }) => {
     plugins.push(["expo-build-properties", { android: { usesCleartextTraffic: true } }]);
   }
 
+  // Vista previa en Expo Go sin iniciar sesión: con `owner` y el projectId de EAS, Expo Go pide la cuenta dueña del proyecto.
+  // Solo se quitan si se arranca con KAIRO_LOCAL_PREVIEW=1; los builds de EAS no lo usan.
+  if (process.env.KAIRO_LOCAL_PREVIEW) {
+    const { owner, extra, ...rest } = config;
+    return { ...rest, plugins, extra: { ...extra, eas: undefined } };
+  }
+
   return { ...config, plugins };
 };
