@@ -8,12 +8,17 @@
 
 Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale**, **Clash of Clans**, **Dota 2**, **Fortnite**, **Apex Legends** y **PUBG** en una app móvil premium, hecha con React Native y Expo.
 
+[![Versión](https://img.shields.io/github/package-json/v/0scar07/Kairo?label=versi%C3%B3n&color=35E0A1)](https://github.com/0scar07/Kairo/releases)
+[![CI](https://github.com/0scar07/Kairo/actions/workflows/ci.yml/badge.svg)](https://github.com/0scar07/Kairo/actions/workflows/ci.yml)
+![Android](https://img.shields.io/badge/Android-APK-3DDC84?logo=android&logoColor=white)
+![Juegos](https://img.shields.io/badge/juegos-9-C89B3C)
+![Idiomas](https://img.shields.io/badge/idiomas-5-0BC4E3)
+![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
+
 ![Expo SDK](https://img.shields.io/badge/Expo-SDK%2054-000020?logo=expo&logoColor=white)
 ![React Native](https://img.shields.io/badge/React%20Native-0.81-61DAFB?logo=react&logoColor=black)
 ![Node](https://img.shields.io/badge/Node-20%2B-339933?logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
-![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
-![Estado](https://img.shields.io/badge/estado-en%20desarrollo-C89B3C)
 
 [Capturas](#-capturas) · [Características](#-características) · [Puesta en marcha](#-puesta-en-marcha) · [Desplegar](#%EF%B8%8F-desplegar-en-la-nube) · [Arquitectura](#%EF%B8%8F-arquitectura) · [Roadmap](#%EF%B8%8F-roadmap)
 
@@ -24,6 +29,24 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 <sub>Capturas renderizadas en un navegador móvil contra el backend real. En un celular los brillos y la háptica se ven distintos.</sub>
 
 </div>
+
+---
+
+## 📲 Descargar
+
+<div align="center">
+
+[![Descargar APK](https://img.shields.io/badge/Descargar-APK-3DDC84?logo=android&logoColor=white&style=for-the-badge)](https://github.com/0scar07/Kairo/releases/latest)
+&nbsp;
+[<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Obtainium" height="54" />](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/0scar07/Kairo)
+
+</div>
+
+- **APK directo:** cada versión se publica en [GitHub Releases](https://github.com/0scar07/Kairo/releases). Al instalarlo, Android pedirá permitir instalar apps desde esa fuente.
+- **Obtainium:** añade el repositorio con el botón de arriba y la app se actualiza sola con cada versión nueva.
+- **Ahora mismo:** la primera versión pública todavía no está publicada; mientras tanto puedes [probarla con Expo Go](#3-probar-en-el-celular) o construir el APK tú mismo.
+
+> Las versiones las construye el flujo [`release.yml`](.github/workflows/release.yml) al subir una etiqueta `v*`; cómo se usa está en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md#publicar-una-versión-apk).
 
 ---
 
@@ -84,60 +107,75 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
 
 <table>
   <tr>
-    <td align="center"><img src="docs/screenshots/splash.png" width="200" /><br /><sub><b>Carga animada</b></sub></td>
-    <td align="center"><img src="docs/screenshots/home-lol.png" width="200" /><br /><sub><b>Inicio</b></sub></td>
-    <td align="center"><img src="docs/screenshots/region.png" width="200" /><br /><sub><b>Región</b></sub></td>
-    <td align="center"><img src="docs/screenshots/skeleton.png" width="200" /><br /><sub><b>Cargando</b></sub></td>
-  </tr>
-  <tr>
+    <td align="center"><img src="docs/screenshots/home-lol.png" width="200" /><br /><sub><b>Inicio y rotación</b></sub></td>
     <td align="center"><img src="docs/screenshots/profile-lol.png" width="200" /><br /><sub><b>Perfil de LoL</b></sub></td>
-    <td align="center"><img src="docs/screenshots/matches-lol.png" width="200" /><br /><sub><b>Partidas</b></sub></td>
-    <td align="center"><img src="docs/screenshots/match-detail-lol.png" width="200" /><br /><sub><b>Detalle con runas</b></sub></td>
-    <td align="center"><img src="docs/screenshots/champions-lol.png" width="200" /><br /><sub><b>Campeones</b></sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="docs/screenshots/mastery-lol.png" width="200" /><br /><sub><b>Maestría de campeones</b></sub></td>
-    <td align="center"><img src="docs/screenshots/rotation-lol.png" width="200" /><br /><sub><b>Rotación gratuita</b></sub></td>
-    <td align="center"><img src="docs/screenshots/status-lol.png" width="200" /><br /><sub><b>Aviso de mantenimiento*</b></sub></td>
-    <td align="center"><img src="docs/screenshots/favorites.png" width="200" /><br /><sub><b>Favoritos</b></sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="docs/screenshots/live-profile-lol.png" width="200" /><br /><sub><b>Aviso de partida en vivo</b></sub></td>
     <td align="center"><img src="docs/screenshots/live-blue-lol.png" width="200" /><br /><sub><b>Partida en vivo</b></sub></td>
-    <td align="center"><img src="docs/screenshots/live-red-lol.png" width="200" /><br /><sub><b>Equipo rojo y baneos</b></sub></td>
-    <td align="center"><img src="docs/screenshots/matches-flex-lol.png" width="200" /><br /><sub><b>Historial de Flex</b></sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="docs/screenshots/brawlstars-profile.png" width="200" /><br /><sub><b>Brawl Stars</b></sub></td>
-    <td align="center"><img src="docs/screenshots/brawlstars-battles.png" width="200" /><br /><sub><b>Batallas de Brawl Stars</b></sub></td>
-    <td align="center"><img src="docs/screenshots/clashroyale-profile.png" width="200" /><br /><sub><b>Clash Royale</b></sub></td>
-    <td align="center"><img src="docs/screenshots/clashofclans-profile.png" width="200" /><br /><sub><b>Clash of Clans</b></sub></td>
+    <td align="center"><img src="docs/screenshots/mastery-lol.png" width="200" /><br /><sub><b>Maestría</b></sub></td>
   </tr>
   <tr>
     <td align="center"><img src="docs/screenshots/dota2-profile.png" width="200" /><br /><sub><b>Dota 2</b></sub></td>
-    <td align="center"><img src="docs/screenshots/dota2-matches.png" width="200" /><br /><sub><b>Partidas de Dota 2</b></sub></td>
-    <td align="center"><img src="docs/screenshots/lol-english.png" width="200" /><br /><sub><b>LoL en English</b></sub></td>
-    <td align="center"><img src="docs/screenshots/clashroyale-portugues.png" width="200" /><br /><sub><b>Clash Royale en Português</b></sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="docs/screenshots/clashofclans-heroes.png" width="200" /><br /><sub><b>Héroes y clan</b></sub></td>
-    <td align="center"><img src="docs/screenshots/home-tft.png" width="200" /><br /><sub><b>Inicio en TFT</b></sub></td>
-    <td align="center"><img src="docs/screenshots/profile-tft.png" width="200" /><br /><sub><b>Perfil de TFT</b></sub></td>
-    <td align="center"><img src="docs/screenshots/matches-tft.png" width="200" /><br /><sub><b>Posiciones y unidades</b></sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="docs/screenshots/match-detail-tft.png" width="200" /><br /><sub><b>Los 8 jugadores</b></sub></td>
-    <td align="center"><img src="docs/screenshots/favorite.png" width="200" /><br /><sub><b>Favorito marcado</b></sub></td>
-    <td align="center"><img src="docs/screenshots/home-recents.png" width="200" /><br /><sub><b>Recientes</b></sub></td>
-    <td align="center"><img src="docs/screenshots/settings.png" width="200" /><br /><sub><b>Ajustes</b></sub></td>
+    <td align="center"><img src="docs/screenshots/brawlstars-profile.png" width="200" /><br /><sub><b>Brawl Stars</b></sub></td>
+    <td align="center"><img src="docs/screenshots/clashroyale-profile.png" width="200" /><br /><sub><b>Clash Royale</b></sub></td>
+    <td align="center"><img src="docs/screenshots/settings.png" width="200" /><br /><sub><b>Ajustes e idiomas</b></sub></td>
   </tr>
 </table>
 
-<sub>Las capturas de Dota 2 usan datos reales de OpenDota (una cuenta de un jugador profesional público). Fortnite, Apex Legends y PUBG aún no tienen captura: se añadirán con sus keys puestas. Las de Brawl Stars, Clash Royale y Clash of Clans usan datos reales de la API de Supercell. Las de TFT son anteriores al rediseño de íconos.</sub>
+<details>
+<summary><b>Ver todas las capturas</b></summary>
 
-<sub>La partida en vivo es de una partida real de Flex, con los nombres tal como los muestra la app.</sub>
+**League of Legends**
 
-<sub>* El aviso de mantenimiento se muestra solo cuando Riot reporta uno activo; en la captura se simuló uno para enseñar el diseño. Las demás son datos reales de la API.</sub>
+<p>
+  <img src="docs/screenshots/splash.png" width="170" title="Carga animada" alt="Carga animada" />
+  <img src="docs/screenshots/region.png" width="170" title="Región" alt="Región" />
+  <img src="docs/screenshots/skeleton.png" width="170" title="Cargando" alt="Cargando" />
+  <img src="docs/screenshots/profile-lol.png" width="170" title="Perfil" alt="Perfil" />
+  <img src="docs/screenshots/matches-lol.png" width="170" title="Partidas" alt="Partidas" />
+  <img src="docs/screenshots/match-detail-lol.png" width="170" title="Detalle con runas" alt="Detalle con runas" />
+  <img src="docs/screenshots/champions-lol.png" width="170" title="Campeones" alt="Campeones" />
+  <img src="docs/screenshots/status-lol.png" width="170" title="Aviso de mantenimiento*" alt="Aviso de mantenimiento*" />
+  <img src="docs/screenshots/rotation-lol.png" width="170" title="Rotación gratuita" alt="Rotación gratuita" />
+  <img src="docs/screenshots/live-profile-lol.png" width="170" title="Aviso de partida en vivo" alt="Aviso de partida en vivo" />
+  <img src="docs/screenshots/live-red-lol.png" width="170" title="Equipo rojo y baneos" alt="Equipo rojo y baneos" />
+  <img src="docs/screenshots/matches-flex-lol.png" width="170" title="Historial de Flex" alt="Historial de Flex" />
+</p>
+
+**Supercell**
+
+<p>
+  <img src="docs/screenshots/brawlstars-battles.png" width="170" title="Batallas de Brawl Stars" alt="Batallas de Brawl Stars" />
+  <img src="docs/screenshots/clashofclans-profile.png" width="170" title="Clash of Clans" alt="Clash of Clans" />
+  <img src="docs/screenshots/clashofclans-heroes.png" width="170" title="Héroes y clan" alt="Héroes y clan" />
+</p>
+
+**Dota 2 y otros idiomas**
+
+<p>
+  <img src="docs/screenshots/dota2-matches.png" width="170" title="Partidas de Dota 2" alt="Partidas de Dota 2" />
+  <img src="docs/screenshots/lol-english.png" width="170" title="LoL en English" alt="LoL en English" />
+  <img src="docs/screenshots/clashroyale-portugues.png" width="170" title="Clash Royale en Português" alt="Clash Royale en Português" />
+</p>
+
+**Teamfight Tactics**
+
+<p>
+  <img src="docs/screenshots/home-tft.png" width="170" title="Inicio en TFT" alt="Inicio en TFT" />
+  <img src="docs/screenshots/profile-tft.png" width="170" title="Perfil de TFT" alt="Perfil de TFT" />
+  <img src="docs/screenshots/matches-tft.png" width="170" title="Posiciones y unidades" alt="Posiciones y unidades" />
+  <img src="docs/screenshots/match-detail-tft.png" width="170" title="Los 8 jugadores" alt="Los 8 jugadores" />
+</p>
+
+**Favoritos y recientes**
+
+<p>
+  <img src="docs/screenshots/favorite.png" width="170" title="Favorito marcado" alt="Favorito marcado" />
+  <img src="docs/screenshots/favorites.png" width="170" title="Favoritos" alt="Favoritos" />
+  <img src="docs/screenshots/home-recents.png" width="170" title="Recientes" alt="Recientes" />
+</p>
+
+</details>
+
+<sub>Las capturas de LoL, Supercell y Dota 2 usan datos reales de sus APIs. Fortnite, Apex Legends y PUBG aún no tienen captura: se añadirán con sus keys puestas. Las de TFT son anteriores al rediseño de íconos. * El aviso de mantenimiento se simuló para enseñar el diseño.</sub>
 
 ## 🧱 Stack
 

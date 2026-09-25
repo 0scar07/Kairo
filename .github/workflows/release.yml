@@ -1,0 +1,52 @@
+name: Publicar versión (APK)
+
+# Al subir una etiqueta v* (por ejemplo v1.1.0) se construye el APK con EAS y se publica en GitHub Releases,
+# de donde lo descargan el botón del README y Obtainium. Requiere el secreto EXPO_TOKEN (Settings > Secrets > Actions).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Etiqueta de la versión (ej. v1.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120   # la cola gratuita de EAS puede tardar más de una hora
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Comprobar el secreto de Expo
+        run: test -n "$EXPO_TOKEN" || (echo "Falta el secreto EXPO_TOKEN" && exit 1)
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Construir el APK en EAS
+        run: npx --yes eas-cli@latest build --platform android --profile preview --non-interactive --wait --json > build.json
+
+      - name: Descargar el APK
+        run: |
+          URL=$(jq -r '.[0].artifacts.buildUrl' build.json)
+          test "$URL" != "null" && test -n "$URL"
+          curl -fsSL -o "Kairo-${TAG}.apk" "$URL"
+          ls -lh "Kairo-${TAG}.apk"
+
+      - name: Publicar en GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$TAG" "Kairo-${TAG}.apk" --title "Kairo ${TAG}" --generate-notes || \
+            gh release upload "$TAG" "Kairo-${TAG}.apk" --clobber

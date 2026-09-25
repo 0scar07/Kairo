@@ -60,6 +60,16 @@ Para evitarlo:
 - Usa un monitor gratuito (por ejemplo UptimeRobot) que llame a `https://TU-URL.onrender.com/health` cada 5 minutos, o
 - pasa a un plan de pago (el más barato no se duerme).
 
+## Publicar una versión (APK)
+
+Las versiones las publica el flujo [`.github/workflows/release.yml`](../.github/workflows/release.yml): al subir una etiqueta `v*` construye el APK con EAS y lo adjunta a una *release* de GitHub, que es de donde lo descargan el botón del README y [Obtainium](https://github.com/ImranR98/Obtainium).
+
+1. Crea un token en <https://expo.dev/settings/access-tokens> y guárdalo en el repositorio como secreto `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Nunca en el código.
+2. Sube la versión en `package.json` y `app.json`, haz commit y crea la etiqueta: `git tag v1.1.0 && git push origin v1.1.0`.
+3. El flujo espera a EAS (la cola gratuita puede tardar más de una hora) y publica `Kairo-v1.1.0.apk` en *Releases*.
+
+También puedes lanzarlo a mano desde la pestaña *Actions* con la etiqueta que quieras. Mientras no exista ninguna release, el botón "Descargar APK" del README no tiene a dónde apuntar.
+
 ## Generar el APK con EAS
 
 Hazlo **después** de desplegar el backend, para que el APK ya apunte a la nube.
