@@ -4,6 +4,5 @@ export default {
   name: "League of Legends",
   short: "LoL",
   accent: "#C89B3C",
-  placeholder: "Nombre#TAG",
   available: true,
 };

@@ -48,7 +48,7 @@ const TAG_RE = /^[0289PYLQGRJCUV]{3,15}$/;
 /** "#2pp0", "2PP0" u "2ppo" -> "2PP0". Lanza 400 si no es un tag válido. */
 function normalizeTag(raw) {
   const tag = String(raw || "").trim().replace(/^#/, "").toUpperCase().replace(/O/g, "0");
-  if (!TAG_RE.test(tag)) throw new HttpError(400, "Tag no válido: usa letras y números como #2PP0");
+  if (!TAG_RE.test(tag)) throw new HttpError(400, "Tag no válido: usa letras y números como #2PP0", { code: "INVALID_TAG" });
   return tag;
 }
 
@@ -59,27 +59,28 @@ const baseOf = id => (process.env[GAMES[id].baseEnv] || GAMES[id].base).replace(
 function toHttpError(id, e) {
   if (e instanceof HttpError) return e;
   const { name } = GAMES[id];
+  const provider = name;
   const status = e.response?.status;
   const reason = e.response?.data?.reason;
 
-  if (status === 404) return new HttpError(404, "Jugador no encontrado: revisa el tag");
-  if (status === 400) return new HttpError(400, "Tag no válido");
+  if (status === 404) return new HttpError(404, "Jugador no encontrado: revisa el tag", { code: "TAG_NOT_FOUND" });
+  if (status === 400) return new HttpError(400, "Tag no válido", { code: "INVALID_TAG" });
   if (status === 401 || status === 403) {
     // 403 "accessDenied.invalidIp": la key no permite la IP desde la que sale la petición
     console.error(`⚠ ${name} respondió ${status}${reason ? ` (${reason})` : ""}: revisa la key y sus IP permitidas`);
-    return new HttpError(503, `${name} rechazó la consulta: la key no es válida o no permite la IP del servidor`, { code: "KEY_INVALID" });
+    return new HttpError(503, `${name} rechazó la consulta: la key no es válida o no permite la IP del servidor`, { code: "KEY_INVALID", provider });
   }
-  if (status === 429) return new HttpError(429, `${name} limitó las solicitudes, reintenta en unos segundos`, { retryAfter: 5 });
-  if (status === 503) return new HttpError(503, `${name} está en mantenimiento, vuelve a intentarlo más tarde`, { code: "MAINTENANCE" });
-  if (e.code === "ECONNABORTED" || e.code === "ETIMEDOUT") return new HttpError(504, `${name} tardó demasiado en responder`);
-  if (status >= 500) return new HttpError(502, `${name} tuvo un problema, intenta de nuevo`);
-  return new HttpError(502, `No se pudo contactar a ${name}`);
+  if (status === 429) return new HttpError(429, `${name} limitó las solicitudes, reintenta en unos segundos`, { retryAfter: 5, code: "RATE_LIMITED", provider });
+  if (status === 503) return new HttpError(503, `${name} está en mantenimiento, vuelve a intentarlo más tarde`, { code: "MAINTENANCE", provider });
+  if (e.code === "ECONNABORTED" || e.code === "ETIMEDOUT") return new HttpError(504, `${name} tardó demasiado en responder`, { code: "TIMEOUT", provider });
+  if (status >= 500) return new HttpError(502, `${name} tuvo un problema, intenta de nuevo`, { code: "UPSTREAM_ERROR", provider });
+  return new HttpError(502, `No se pudo contactar a ${name}`, { code: "UPSTREAM_UNREACHABLE", provider });
 }
 
 /** GET a una ruta de la API del juego con caché y errores normalizados. */
 async function apiGet(id, path, ttl) {
   if (!configured(id)) {
-    throw new HttpError(503, `${GAMES[id].name} no está configurado en el servidor`, { code: "NOT_CONFIGURED" });
+    throw new HttpError(503, `${GAMES[id].name} no está configurado en el servidor`, { code: "NOT_CONFIGURED", provider: GAMES[id].name });
   }
   const url = `${baseOf(id)}${path}`;
   try {

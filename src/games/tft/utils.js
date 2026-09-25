@@ -1,10 +1,11 @@
+import { t } from "../../i18n";
 import { colors } from "../../theme";
 
 const QUEUES = {
-  1090: "Normal", 1100: "Ranked", 1130: "Hyper Roll", 1160: "Double Up",
-  1170: "Fortune's Favor", 1210: "Modo especial", 1220: "Modo especial",
+  1090: "tft.normal", 1100: "tft.ranked", 1130: "tft.hyperRoll", 1160: "tft.doubleUp",
+  1170: "tft.fortunesFavor", 1210: "tft.special", 1220: "tft.special",
 };
-export const queueLabel = id => QUEUES[id] || "Otro modo";
+export const queueLabel = id => t(QUEUES[id] || "queue.other");
 
 // Posición final 1-8: podio, top 4 (verde) y eliminado antes (rojo)
 export function placementColor(p) {
@@ -16,9 +17,9 @@ export function placementColor(p) {
 }
 
 export function placementLabel(p) {
-  if (p === 1) return "1er lugar";
-  if (p <= 4)  return `Top ${p}`;
-  return `${p}° lugar`;
+  if (p === 1) return t("tft.first");
+  if (p <= 4)  return t("tft.top", { n: p });
+  return t("tft.place", { n: p });
 }
 
 // style: 0 inactivo, 1 bronce, 2 plata, 3 oro, 4 cromático
@@ -45,7 +46,7 @@ export const findMe = (match, puuid) => match.info?.participants?.find(p => p.pu
 
 export function participantName(p) {
   if (p.riotIdGameName) return `${p.riotIdGameName}#${p.riotIdTagline || "?"}`;
-  return `Jugador ${p.placement}`;
+  return t("tft.player", { n: p.placement });
 }
 
 export function getTftStats(matches, puuid) {

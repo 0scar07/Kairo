@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useT } from "../i18n/I18nProvider";
 import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert } from "react-native";
 import ProfileView from "../components/ProfileView";
 import Icon from "../components/Icon";
@@ -16,6 +17,7 @@ import {
 } from "../theme";
 
 function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
+  const t = useT();
   const accent = useAccent(game.id);
   const [name, setName]     = useState("");
   const [tag, setTag]       = useState("");
@@ -26,12 +28,12 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <Text style={styles.modalTitle}>Mi perfil de {game.short}</Text>
-          <Text style={styles.modalSubtitle}>{tagOnly ? "Ingresa tu tag (ej: #2PP0) para configurar tu perfil personal" : "Ingresa tu Riot ID para configurar tu perfil personal"}</Text>
+          <Text style={styles.modalTitle}>{t("settings.myProfile", { game: game.short })}</Text>
+          <Text style={styles.modalSubtitle}>{tagOnly ? t("myProfile.subtitleTag") : t("myProfile.subtitleRiot")}</Text>
           {!tagOnly && <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="Nombre (ej: Hide on bush)"
+            placeholder={t("myProfile.namePlaceholder")}
             placeholderTextColor={colors.textFaint}
             style={styles.input}
             autoCapitalize="none"
@@ -40,7 +42,7 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
           <TextInput
             value={tag}
             onChangeText={setTag}
-            placeholder={tagOnly ? "#TAG (ej: #2PP0)" : "TAG (ej: KR1)"}
+            placeholder={tagOnly ? t("myProfile.tagOnlyPlaceholder") : t("myProfile.tagPlaceholder")}
             placeholderTextColor={colors.textFaint}
             style={styles.input}
             autoCapitalize="none"
@@ -51,16 +53,16 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
             style={[styles.btn, { backgroundColor: accent }, glow(accent, spacing.md, 0.4)]}
             onPress={() => {
               if ((!tagOnly && !name.trim()) || !tag.trim()) {
-                Alert.alert("Faltan datos", tagOnly ? "Ingresa tu tag" : "Ingresa tu nombre y TAG");
+                Alert.alert(t("myProfile.missingTitle"), tagOnly ? t("myProfile.missingTag") : t("myProfile.missingNameTag"));
                 return;
               }
               onSave(name.trim(), tag.trim().replace(/^#/, ""), tagOnly ? GLOBAL_REGION : region);
             }}
           >
-            <Text style={styles.btnText}>Guardar perfil</Text>
+            <Text style={styles.btnText}>{t("myProfile.save")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelBtn} onPress={onCancel}>
-            <Text style={styles.cancelText}>Cancelar</Text>
+            <Text style={styles.cancelText}>{t("common.cancel")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -70,6 +72,7 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
 
 // Perfil propio del juego activo: guarda tu Riot ID por juego y muestra el perfil con extras
 export default function MyProfileScreen() {
+  const t = useT();
   const { gameId } = useActiveGame();
   const game = getGame(gameId);
   const accent = useAccent(gameId);
@@ -103,7 +106,7 @@ export default function MyProfileScreen() {
       await saveMyProfile(gameId, { gameName: data.account.gameName, tagLine: data.account.tagLine, region });
       setState({ status: "ready", data });
     } catch (e) {
-      Alert.alert("No se pudo cargar el perfil", errorMessage(e));
+      Alert.alert(t("profile.loadError"), errorMessage(e));
       setState({ status: "setup" });
     }
   }
@@ -141,9 +144,9 @@ export default function MyProfileScreen() {
       {setup}
       {state.status === "setup" && (
         <>
-          <Text style={styles.message}>Aún no configuras tu perfil de {game.name}</Text>
+          <Text style={styles.message}>{t("myProfile.notSet", { game: game.name })}</Text>
           <TouchableOpacity style={[styles.btn, styles.centerBtn, { backgroundColor: accent }]} onPress={() => setShowSetup(true)}>
-            <Text style={styles.btnText}>Configurar mi perfil</Text>
+            <Text style={styles.btnText}>{t("myProfile.setup")}</Text>
           </TouchableOpacity>
         </>
       )}
@@ -151,7 +154,7 @@ export default function MyProfileScreen() {
         <>
           <ErrorState message={state.message} onRetry={() => setReload(n => n + 1)} />
           <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowSetup(true)}>
-            <Text style={styles.cancelText}>Cambiar de cuenta</Text>
+            <Text style={styles.cancelText}>{t("myProfile.change")}</Text>
           </TouchableOpacity>
         </>
       )}

@@ -36,15 +36,20 @@ router.get("/rotation", handle(async (req, res) => {
 }));
 
 // Estado del servidor: solo mantenimientos e incidencias, con el título en español si existe
-const pickTitle = (titles = []) =>
-  (titles.find(t => t.locale === "es_MX") || titles.find(t => t.locale === "es_ES") || titles.find(t => t.locale === "en_US") || titles[0] || {}).content || "";
+// Idioma pedido por la app (?lang=es|en|pt|fr|de) -> locales de Riot por orden de preferencia
+const STATUS_LOCALES = { es: ["es_MX", "es_ES"], en: ["en_US"], pt: ["pt_BR"], fr: ["fr_FR"], de: ["de_DE"] };
+const pickTitle = (titles = [], lang = "es") => {
+  const wanted = [...(STATUS_LOCALES[lang] || STATUS_LOCALES.es), "en_US"];
+  const found = wanted.map(locale => titles.find(t => t.locale === locale)).find(Boolean);
+  return (found || titles[0] || {}).content || "";
+};
 
 router.get("/status", handle(async (req, res) => {
   const data = await riotGet(`${platformHost(regionOf(req))}/lol/status/v4/platform-data`, { ttl: 2 * MIN });
   res.json({
     name: data.name,
-    maintenances: (data.maintenances || []).map(m => ({ id: m.id, status: m.maintenance_status, title: pickTitle(m.titles) })),
-    incidents: (data.incidents || []).map(i => ({ id: i.id, severity: i.incident_severity, title: pickTitle(i.titles) })),
+    maintenances: (data.maintenances || []).map(m => ({ id: m.id, status: m.maintenance_status, title: pickTitle(m.titles, req.query.lang) })),
+    incidents: (data.incidents || []).map(i => ({ id: i.id, severity: i.incident_severity, title: pickTitle(i.titles, req.query.lang) })),
   });
 }));
 
@@ -56,7 +61,7 @@ router.get("/live/:puuid", handle(async (req, res) => {
 
   let game;
   try {
-    game = await riotGet(`${host}/lol/spectator/v5/active-games/by-summoner/${puuid}`, { ttl: 15_000, notFound: "No está en partida" });
+    game = await riotGet(`${host}/lol/spectator/v5/active-games/by-summoner/${puuid}`, { ttl: 15_000, notFound: { message: "No está en partida", code: "NOT_IN_GAME" } });
   } catch (e) {
     if (e instanceof HttpError && e.status === 404) return res.json({ inGame: false });
     throw e;

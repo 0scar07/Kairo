@@ -6,6 +6,7 @@ import ProfileBody from "./ProfileBody";
 import AvatarImage from "../../components/AvatarImage";
 import { formatNumber } from "../../utils/format";
 import { tagOf } from "../../utils/supercell";
+import { t } from "../../i18n";
 
 // Módulo de Brawl Stars: lo que las pantallas genéricas necesitan saber del juego.
 export default {
@@ -16,9 +17,9 @@ export default {
     avatar: <AvatarImage uri={data.player.icon?.id != null ? profileIcon(data.player.icon.id) : null} level={data.player.expLevel} game={meta.id} />,
     name: data.account.gameName,
     tag: data.account.tagLine,
-    subtitle: data.player.club?.name || "Sin club",
+    subtitle: data.player.club?.name || t("sc.noClub"),
     ranked: null,
-    badge: `${formatNumber(data.player.trophies)} trofeos`,
+    badge: t("sc.trophiesBadge", { n: formatNumber(data.player.trophies) }),
   }),
 
   toFavorite: data => ({
@@ -28,7 +29,7 @@ export default {
     iconUrl: data.player.icon?.id != null ? profileIcon(data.player.icon.id) : null,
     tier: null,
     rank: null,
-    label: `${formatNumber(data.player.trophies)} trofeos`,
+    trophies: data.player.trophies,
   }),
 
   ProfileBody,

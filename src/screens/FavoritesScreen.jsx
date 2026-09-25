@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { useT } from "../i18n/I18nProvider";
 import { View, Text, ScrollView, StyleSheet, Alert } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import FavoriteCard from "../components/FavoriteCard";
@@ -13,6 +14,7 @@ import { colors, spacing, sizes, fontSizes, type, tracking } from "../theme";
 
 // Todos los favoritos, con filtro por juego
 export default function FavoritesScreen({ navigation }) {
+  const t = useT();
   const { favorites: bootFavorites, gameEnabled } = useBootData();
   const availableGames = GAMES.filter(g => gameEnabled(g.id));
   const [favorites, setFavorites] = useState(bootFavorites);
@@ -20,7 +22,7 @@ export default function FavoritesScreen({ navigation }) {
   const [error, setError] = useState(null);
 
   useFocusEffect(useCallback(() => {
-    loadFavorites().then(setFavorites).catch(e => setError("No se pudieron leer los favoritos: " + errorMessage(e)));
+    loadFavorites().then(setFavorites).catch(e => setError(t("favorites.readError", { error: errorMessage(e) })));
   }, []));
 
   const known = favorites.filter(f => availableGames.some(g => g.id === f.gameId));
@@ -35,7 +37,7 @@ export default function FavoritesScreen({ navigation }) {
     try {
       await removeFavorite(fav);
     } catch (e) {
-      Alert.alert("Error", "No se pudo guardar los cambios: " + errorMessage(e));
+      Alert.alert(t("common.error"), t("favorites.saveError", { error: errorMessage(e) }));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
     }
   }
@@ -43,8 +45,8 @@ export default function FavoritesScreen({ navigation }) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Reveal order={0}>
-        <Text style={styles.title}>FAVORITOS</Text>
-        <Text style={styles.subtitle}>{known.length} {known.length === 1 ? "jugador guardado" : "jugadores guardados"}</Text>
+        <Text style={styles.title}>{t("favorites.title").toUpperCase()}</Text>
+        <Text style={styles.subtitle}>{t("favorites.saved", { count: known.length })}</Text>
       </Reveal>
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
@@ -52,7 +54,7 @@ export default function FavoritesScreen({ navigation }) {
       {known.length > 0 && (
         <Reveal order={1}>
           <View style={styles.filters}>
-            <Chip label="Todos" active={filter === "all"} onPress={() => setFilter("all")} />
+            <Chip label={t("filters.allPlayers")} active={filter === "all"} onPress={() => setFilter("all")} />
             {availableGames.map(g => (
               <Chip key={g.id} label={g.short} icon={<GameLogo game={g.id} size={sizes.avatarXs} color={filter === g.id ? g.accent : colors.textMuted} muted={filter !== g.id} />} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
             ))}
@@ -64,14 +66,14 @@ export default function FavoritesScreen({ navigation }) {
         <Reveal order={1}>
           <EmptyState
             icon="star"
-            title="Aún no tienes favoritos"
-            text="Abre el perfil de un jugador y toca la estrella para guardarlo aquí."
-            actionLabel="Buscar un jugador"
+            title={t("favorites.emptyTitle")}
+            text={t("favorites.emptyText")}
+            actionLabel={t("favorites.search")}
             onAction={() => navigation.navigate("Inicio")}
           />
         </Reveal>
       ) : visible.length === 0 ? (
-        <EmptyState compact icon="search" title="Sin favoritos de este juego" />
+        <EmptyState compact icon="search" title={t("favorites.emptyGame")} />
       ) : (
         <View style={styles.grid}>
           {visible.map((fav, i) => (

@@ -1,12 +1,13 @@
 import React from "react";
+import { useT } from "../../../i18n/I18nProvider";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { ProgressBar } from "../../../components/ui";
-import { championIcon } from "../../../api/ddragon";
-import { plural } from "../../../utils/format";
+import { championIcon, championLabel } from "../../../api/ddragon";
 import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../../../theme";
 
 // Fila de estadísticas por campeón. `rank` (0,1,2…) muestra el puesto; `detail` reemplaza el subtítulo.
 export default function ChampionStatsRow({ champ, rank, detail, game = "lol" }) {
+  const t = useT();
   const accent = useAccent(game);
   const wrColor = winrateColor(champ.wr, accent);
   return (
@@ -16,8 +17,8 @@ export default function ChampionStatsRow({ champ, rank, detail, game = "lol" }) 
       )}
       <Image source={{ uri: championIcon(champ.name) }} style={styles.img} />
       <View style={styles.info}>
-        <Text style={styles.name}>{champ.name}</Text>
-        <Text style={styles.games}>{detail || plural(champ.games, "partida")}</Text>
+        <Text style={styles.name}>{championLabel(champ.name)}</Text>
+        <Text style={styles.games}>{detail || t("common.games", { count: champ.games })}</Text>
       </View>
       <View style={styles.kdaBlock}>
         <Text style={styles.kdaText}>{champ.kills}/{champ.deaths}/{champ.assists}</Text>

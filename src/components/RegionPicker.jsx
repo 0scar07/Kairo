@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useT } from "../i18n/I18nProvider";
 import { View, Text, Modal, Pressable, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Chip } from "./ui";
-import { REGIONS, getRegion } from "../constants/regions";
+import { REGIONS, getRegion, regionName } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../theme";
 
 // Botón con la región actual que abre una lista para elegir otra
 export function RegionButton({ value, onChange, disabled }) {
+  const t = useT();
   const accent = useAccent();
   const [open, setOpen] = useState(false);
 
@@ -16,7 +18,7 @@ export function RegionButton({ value, onChange, disabled }) {
         onPress={() => setOpen(true)}
         disabled={disabled}
         activeOpacity={0.8}
-        accessibilityLabel="Elegir región"
+        accessibilityLabel={t("region.choose")}
       >
         <Text style={[styles.buttonText, { color: accent }]}>{getRegion(value).label}</Text>
         <Text style={styles.caret}>▾</Text>
@@ -25,7 +27,7 @@ export function RegionButton({ value, onChange, disabled }) {
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
           <Pressable style={styles.sheet}>
-            <Text style={styles.title}>REGIÓN</Text>
+            <Text style={styles.title}>{t("region.title").toUpperCase()}</Text>
             {REGIONS.map(r => {
               const active = r.id === value;
               return (
@@ -35,7 +37,7 @@ export function RegionButton({ value, onChange, disabled }) {
                   onPress={() => { onChange(r.id); setOpen(false); }}
                 >
                   <Text style={[styles.optionLabel, active && { color: accent }]}>{r.label}</Text>
-                  <Text style={styles.optionName}>{r.name}</Text>
+                  <Text style={styles.optionName}>{regionName(r.id)}</Text>
                 </TouchableOpacity>
               );
             })}

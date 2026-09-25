@@ -1,4 +1,5 @@
 import React from "react";
+import { useT } from "../i18n/I18nProvider";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { PressableScale } from "./ui";
 import { getGame } from "../games";
@@ -6,12 +7,20 @@ import { profileIconUrl } from "../api/ddragon";
 import RankEmblem from "./RankEmblem";
 import Icon from "./Icon";
 import GameLogo from "./GameLogo";
-import { tierLabel } from "../utils/format";
+import { tierLabel, formatNumber } from "../utils/format";
 import { getRegion } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, withAlpha } from "../theme";
 
+// Texto de estado de un favorito de Supercell (trofeos o ayuntamiento), en el idioma activo; `label` es el formato antiguo
+function favoriteStat(fav, t) {
+  if (fav.trophies != null) return t("sc.trophiesBadge", { n: formatNumber(fav.trophies) });
+  if (fav.townHall != null) return t("coc.townHallLevel", { level: fav.townHall });
+  return fav.label || null;
+}
+
 // Tarjeta de favorito: ícono, nombre, región y rango con el color del tier
 export default function FavoriteCard({ fav, onPress, onRemove, style }) {
+  const t = useT();
   const game = getGame(fav.gameId);
   const tierColor = colors.tier[fav.tier];
   const tint = tierColor || game?.accent || colors.textMuted;
@@ -33,7 +42,7 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
           </View>
         )}
         {onRemove && (
-          <PressableScale onPress={onRemove} scaleTo={0.8} hitSlop={spacing.md} style={styles.remove} accessibilityLabel="Quitar de favoritos">
+          <PressableScale onPress={onRemove} scaleTo={0.8} hitSlop={spacing.md} style={styles.remove} accessibilityLabel={t("favorites.remove")}>
             <Icon name="close" size={fontSizes.base} color={colors.textFaint} />
           </PressableScale>
         )}
@@ -45,7 +54,7 @@ export default function FavoriteCard({ fav, onPress, onRemove, style }) {
       <View style={[styles.rank, { backgroundColor: withAlpha(tint, 0.14) }]}>
         {fav.tier ? <RankEmblem tier={fav.tier} size={sizes.item} /> : null}
         <Text style={[styles.rankText, { color: tierColor || colors.textMuted }]} numberOfLines={1}>
-          {fav.tier ? tierLabel(fav.tier, fav.rank) : fav.label || "Sin rango"}
+          {fav.tier ? tierLabel(fav.tier, fav.rank) : favoriteStat(fav, t) || t("common.noRank")}
         </Text>
       </View>
     </PressableScale>

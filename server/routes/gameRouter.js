@@ -10,12 +10,12 @@ const MATCH_ID_RE = /^[A-Za-z0-9]+_\d+$/;
 
 function regionOf(req) {
   const region = String(req.query.region || DEFAULT_REGION).toLowerCase();
-  if (!isRegion(region)) throw new HttpError(400, `Región no válida: ${region}`);
+  if (!isRegion(region)) throw new HttpError(400, `Región no válida: ${region}`, { code: "INVALID_REGION" });
   return region;
 }
 
 function puuidOf(req) {
-  if (!PUUID_RE.test(req.params.puuid)) throw new HttpError(400, "PUUID no válido");
+  if (!PUUID_RE.test(req.params.puuid)) throw new HttpError(400, "PUUID no válido", { code: "INVALID_PUUID" });
   return req.params.puuid;
 }
 
@@ -38,12 +38,12 @@ function createGameRouter(gameId, paths) {
   router.get("/account/:gameName/:tagLine", handle(async (req, res) => {
     const { gameName, tagLine } = req.params;
     const url = `${accountHost(regionOf(req))}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
-    res.json(await riotGet(url, { ttl: TTL.account, notFound: "Jugador no encontrado" }));
+    res.json(await riotGet(url, { ttl: TTL.account, notFound: { message: "Jugador no encontrado", code: "PLAYER_NOT_FOUND" } }));
   }));
 
   router.get("/summoner/:puuid", handle(async (req, res) => {
     const url = `${platformHost(regionOf(req))}${paths.summoner(puuidOf(req))}`;
-    res.json(ok(await riotGet(url, { ttl: TTL.summoner, notFound: "Este jugador no tiene perfil en este juego" })));
+    res.json(ok(await riotGet(url, { ttl: TTL.summoner, notFound: { message: "Este jugador no tiene perfil en este juego", code: "SUMMONER_NOT_FOUND" } })));
   }));
 
   router.get("/ranked/:puuid", handle(async (req, res) => {
@@ -59,11 +59,11 @@ function createGameRouter(gameId, paths) {
 
   router.get("/match/:matchId", handle(async (req, res) => {
     const { matchId } = req.params;
-    if (!MATCH_ID_RE.test(matchId)) throw new HttpError(400, "ID de partida no válido");
+    if (!MATCH_ID_RE.test(matchId)) throw new HttpError(400, "ID de partida no válido", { code: "INVALID_MATCH_ID" });
     // El prefijo del ID indica el clúster correcto aunque la región del cliente sea otra
     const region = regionFromMatchId(matchId) || regionOf(req);
     const url = `${routingHost(region)}${paths.match(matchId)}`;
-    res.json(ok(await riotGet(url, { ttl: TTL.match, notFound: "Partida no encontrada" })));
+    res.json(ok(await riotGet(url, { ttl: TTL.match, notFound: { message: "Partida no encontrada", code: "MATCH_NOT_FOUND" } })));
   }));
 
   return router;

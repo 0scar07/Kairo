@@ -35,6 +35,7 @@ const ICONS = {
   award:    { paths: ["M8.21 13.89L7 23l5-3 5 3-1.21-9.12"], circles: [[12, 8, 7]] },
   barChart: { paths: ["M18 20V10", "M12 20V4", "M6 20v-6"] },
   trending: { paths: ["M23 6l-9.5 9.5-5-5L1 18", "M17 6h6v6"] },
+  clock:    { paths: ["M12 6v6l4 2"], circles: [[12, 12, 10]] },
   coins:    { paths: ["M12 7v10", "M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"], circles: [[12, 12, 9]] },
 };
 

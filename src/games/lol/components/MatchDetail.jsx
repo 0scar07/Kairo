@@ -1,4 +1,5 @@
 import React from "react";
+import { useT } from "../../../i18n/I18nProvider";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { championIcon, itemIcon } from "../../../api/ddragon";
 import { spellIcon, perkIcon, perksOf } from "../assets";
@@ -65,6 +66,7 @@ function PlayerRow({ p, isMe, maxDmg, accent }) {
 }
 
 export default function MatchDetail({ match, myPuuid }) {
+  const t = useT();
   const accent = useAccent("lol");
   if (!match?.info) return null;
   const { participants, gameDuration } = match.info;
@@ -92,20 +94,28 @@ export default function MatchDetail({ match, myPuuid }) {
 
       {[{ team: team1, win: team1Win }, { team: team2, win: !team1Win }].map(({ team, win }, ti) => (
         <View key={ti} style={[styles.teamBlock, ti === 0 && styles.teamBorder]}>
-          <Text style={[styles.teamLabel, { color: resultColor(win) }]}>
-            {win ? "✓ VICTORIA" : "✗ DERROTA"} · Equipo {ti + 1}
-          </Text>
+          <View style={styles.teamLabelRow}>
+            <Icon name={win ? "check" : "close"} size={fontSizes.sm} color={resultColor(win)} />
+            <Text style={[styles.teamLabel, { color: resultColor(win) }]}>
+              {win ? t("results.victory") : t("results.defeat")} · {t("match.team", { n: ti + 1 })}
+            </Text>
+          </View>
           {team.map(p => (
             <PlayerRow key={p.puuid} p={p} isMe={p.puuid === myPuuid} maxDmg={maxDmg} accent={accent} />
           ))}
         </View>
       ))}
-      <Text style={styles.duration}>⏱ Duración: {formatDuration(gameDuration)}</Text>
+      <View style={styles.durationRow}>
+        <Icon name="clock" size={fontSizes.sm} color={colors.textMuted} />
+        <Text style={styles.duration}>{t("match.duration", { time: formatDuration(gameDuration) })}</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  teamLabelRow: { flexDirection: "row", alignItems: "center", gap: spacing.xs },
+  durationRow:  { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.xs },
   container:    {
     backgroundColor: colors.bg,
     borderWidth: sizes.hairline, borderColor: colors.border,

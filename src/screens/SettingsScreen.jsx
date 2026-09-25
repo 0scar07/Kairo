@@ -1,12 +1,14 @@
 import React from "react";
 import { View, Text, ScrollView, Switch, StyleSheet, Alert } from "react-native";
 import Constants from "expo-constants";
-import { Card, SectionLabel, PressableScale } from "../components/ui";
+import { Card, SectionLabel, PressableScale, Chip } from "../components/ui";
 import { RegionChips } from "../components/RegionPicker";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
 import { getGame } from "../games";
-import { APP_NAME, APP_TAGLINE } from "../constants/config";
+import { APP_NAME } from "../constants/config";
+import { LANGUAGES, AUTO } from "../i18n";
+import { useI18n } from "../i18n/I18nProvider";
 import { errorMessage } from "../utils/format";
 import { clearRecents } from "../utils/recents";
 import { select } from "../utils/haptics";
@@ -28,17 +30,18 @@ function Row({ label, hint, right, onPress, danger }) {
 
 // Ajustes: mi perfil, región por defecto, vibración, búsquedas recientes y acerca de
 export default function SettingsScreen({ navigation }) {
+  const { t, preference, setPreference } = useI18n();
   const { gameId, accent } = useActiveGame();
   const game = getGame(gameId);
   const { region, setRegion, haptics, setHaptics } = useBootData();
   const version = Constants.expoConfig?.version || "1.0.0";
 
   function confirmClearRecents() {
-    Alert.alert("Borrar búsquedas recientes", "Se quitarán de la pantalla de inicio. Tus favoritos no cambian.", [
-      { text: "Cancelar", style: "cancel" },
+    Alert.alert(t("settings.clearRecents"), t("settings.clearRecentsBody"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Borrar", style: "destructive",
-        onPress: () => clearRecents().catch(e => Alert.alert("Error", errorMessage(e))),
+        text: t("common.delete"), style: "destructive",
+        onPress: () => clearRecents().catch(e => Alert.alert(t("common.error"), errorMessage(e))),
       },
     ]);
   }
@@ -46,15 +49,15 @@ export default function SettingsScreen({ navigation }) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Reveal order={0}>
-        <Text style={styles.title}>AJUSTES</Text>
+        <Text style={styles.title}>{t("settings.title").toUpperCase()}</Text>
       </Reveal>
 
       <Reveal order={1}>
-        <SectionLabel>Cuenta</SectionLabel>
+        <SectionLabel>{t("settings.account")}</SectionLabel>
         <Card padded={false}>
           <Row
-            label={`Mi perfil de ${game.short}`}
-            hint={game.tagSearch ? "Tu tag, con tus estadísticas" : "Tu Riot ID, con estadísticas e insignias"}
+            label={t("settings.myProfile", { game: game.short })}
+            hint={game.tagSearch ? t("settings.myProfileHintTag") : t("settings.myProfileHintRiot")}
             onPress={() => navigation.navigate("MyProfile")}
             right={<Icon name="chevron" size={sizes.item - spacing.xs} color={colors.textMuted} />}
           />
@@ -62,20 +65,33 @@ export default function SettingsScreen({ navigation }) {
       </Reveal>
 
       <Reveal order={2}>
-        <SectionLabel>Búsqueda</SectionLabel>
+        <SectionLabel>{t("settings.search")}</SectionLabel>
         <Card>
-          <Text style={styles.rowLabel}>Región por defecto</Text>
-          <Text style={[styles.rowHint, styles.regionHint]}>Se usa al buscar jugadores</Text>
+          <Text style={styles.rowLabel}>{t("settings.defaultRegion")}</Text>
+          <Text style={[styles.rowHint, styles.regionHint]}>{t("settings.defaultRegionHint")}</Text>
           <RegionChips value={region} onChange={setRegion} />
         </Card>
       </Reveal>
 
       <Reveal order={3}>
-        <SectionLabel>Preferencias</SectionLabel>
+        <SectionLabel>{t("settings.language")}</SectionLabel>
+        <Card>
+          <Text style={styles.rowHint}>{t("settings.languageHint")}</Text>
+          <View style={styles.languages}>
+            <Chip label={t("settings.languageAuto")} active={preference === AUTO} onPress={() => setPreference(AUTO)} />
+            {LANGUAGES.map(l => (
+              <Chip key={l.id} label={l.label} active={preference === l.id} onPress={() => setPreference(l.id)} />
+            ))}
+          </View>
+        </Card>
+      </Reveal>
+
+      <Reveal order={4}>
+        <SectionLabel>{t("settings.preferences")}</SectionLabel>
         <Card padded={false}>
           <Row
-            label="Vibración"
-            hint="Respuesta háptica al tocar"
+            label={t("settings.haptics")}
+            hint={t("settings.hapticsHint")}
             right={
               <Switch
                 value={haptics}
@@ -86,25 +102,17 @@ export default function SettingsScreen({ navigation }) {
             }
           />
           <View style={styles.divider} />
-          <Row label="Borrar búsquedas recientes" danger onPress={confirmClearRecents} />
+          <Row label={t("settings.clearRecents")} danger onPress={confirmClearRecents} />
         </Card>
       </Reveal>
 
-      <Reveal order={4}>
-        <SectionLabel>Acerca de</SectionLabel>
+      <Reveal order={5}>
+        <SectionLabel>{t("settings.about")}</SectionLabel>
         <Card>
-          <Text style={styles.about}>{APP_NAME} · versión {version}</Text>
-          <Text style={styles.rowHint}>{APP_TAGLINE}</Text>
-          <Text style={styles.legal}>
-            {APP_NAME} no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie
-            involucrado oficialmente en la producción o gestión de sus propiedades. Riot Games y todas las
-            propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.
-          </Text>
-          <Text style={styles.legal}>
-            Este contenido no está afiliado, respaldado, patrocinado ni aprobado específicamente por Supercell y
-            Supercell no se hace responsable de él. Más información: la política de contenido de fans de Supercell
-            (supercell.com/fan-content-policy). Brawl Stars, Clash Royale y Clash of Clans son marcas de Supercell.
-          </Text>
+          <Text style={styles.about}>{t("settings.version", { app: APP_NAME, version })}</Text>
+          <Text style={styles.rowHint}>{t("app.tagline")}</Text>
+          <Text style={styles.legal}>{t("legal.riot", { app: APP_NAME })}</Text>
+          <Text style={styles.legal}>{t("legal.supercell")}</Text>
         </Card>
       </Reveal>
     </ScrollView>
@@ -112,6 +120,7 @@ export default function SettingsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  languages: { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.sm, marginTop: spacing.md },
   container:  { flex: 1, backgroundColor: colors.bg },
   content:    { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
   title:      { ...type.brand, fontSize: fontSizes.xxl, color: colors.text, marginBottom: spacing.xl },

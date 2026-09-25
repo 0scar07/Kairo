@@ -31,7 +31,7 @@ class RiotLimiter {
 
   schedule(task) {
     if (this.queue.length >= this.maxQueue) {
-      return Promise.reject(new HttpError(429, "El servidor está muy ocupado, reintenta en unos segundos", { retryAfter: 5 }));
+      return Promise.reject(new HttpError(429, "El servidor está muy ocupado, reintenta en unos segundos", { retryAfter: 5, code: "BUSY" }));
     }
     return new Promise((resolve, reject) => {
       this.queue.push({ task, resolve, reject, at: Date.now() });
@@ -51,7 +51,7 @@ class RiotLimiter {
       const head = this.queue[0];
       if (now - head.at > this.maxWaitMs) {
         this.queue.shift();
-        head.reject(new HttpError(429, "El servidor está muy ocupado, reintenta en unos segundos", { retryAfter: 5 }));
+        head.reject(new HttpError(429, "El servidor está muy ocupado, reintenta en unos segundos", { retryAfter: 5, code: "BUSY" }));
         continue;
       }
       const wait = this.waitTime(now);

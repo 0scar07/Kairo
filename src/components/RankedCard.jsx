@@ -1,4 +1,5 @@
 import React from "react";
+import { useT } from "../i18n/I18nProvider";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, ProgressBar, SectionLabel } from "./ui";
 import RankEmblem from "./RankEmblem";
@@ -8,6 +9,7 @@ import { colors, spacing, sizes, fontSizes, type, tracking, winrateColor, useAcc
 
 // Tarjeta de rango teñida con el color del tier. Sin `entry` muestra "Sin clasificar".
 export default function RankedCard({ entry, label, game = "lol" }) {
+  const t = useT();
   const accent = useAccent(game);
 
   if (!entry) {
@@ -15,8 +17,8 @@ export default function RankedCard({ entry, label, game = "lol" }) {
       <Card style={styles.card}>
         <SectionLabel>{label}</SectionLabel>
         <Icon name="shield" size={sizes.avatarMd} color={colors.textMuted} style={styles.unrankedIcon} />
-        <Text style={styles.unranked}>Sin clasificar</Text>
-        <Text style={styles.record}>Aún no juega partidas de este modo</Text>
+        <Text style={styles.unranked}>{t("ranked.unranked")}</Text>
+        <Text style={styles.record}>{t("ranked.unrankedHint")}</Text>
       </Card>
     );
   }

@@ -17,6 +17,7 @@ import FloatingTabBar from "./src/components/FloatingTabBar";
 import { getGame } from "./src/games";
 import { useBoot } from "./src/boot/useBoot";
 import { BootProvider } from "./src/boot/BootContext";
+import { I18nProvider, useT } from "./src/i18n/I18nProvider";
 import { colors, fonts, tracking, GameProvider, useAccent } from "./src/theme";
 
 // El splash nativo se queda visible hasta que la pantalla de carga animada esté montada
@@ -46,6 +47,7 @@ function Tabs() {
 
 function RootStack() {
   const accent = useAccent();
+  const t = useT();
   return (
     <Stack.Navigator screenOptions={{
       headerStyle:      { backgroundColor: colors.surface },
@@ -57,10 +59,10 @@ function RootStack() {
       <Stack.Screen
         name="Profile"
         component={ProfileScreen}
-        options={({ route }) => ({ title: getGame(route.params.gameId)?.name ?? "Perfil" })}
+        options={({ route }) => ({ title: getGame(route.params.gameId)?.name ?? t("screens.profile") })}
       />
-      <Stack.Screen name="MyProfile" component={MyProfileScreen} options={{ title: "Mi perfil" }} />
-      <Stack.Screen name="LiveGame" component={LiveGameScreen} options={{ title: "Partida en vivo" }} />
+      <Stack.Screen name="MyProfile" component={MyProfileScreen} options={{ title: t("screens.myProfile") }} />
+      <Stack.Screen name="LiveGame" component={LiveGameScreen} options={{ title: t("screens.live") }} />
     </Stack.Navigator>
   );
 }
@@ -71,6 +73,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <I18nProvider>
       <View style={{ flex: 1, backgroundColor: colors.bg }}>
         <StatusBar style="light" />
 
@@ -94,6 +97,7 @@ export default function App() {
           />
         )}
       </View>
+      </I18nProvider>
     </SafeAreaProvider>
   );
 }

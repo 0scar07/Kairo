@@ -1,10 +1,11 @@
+import { t } from "../../i18n";
 import { colors } from "../../theme";
 import { humanize, parseBattleTime, tagOf, titleCase } from "../../utils/supercell";
 
 const RESULT = {
-  victory: { label: "VICTORIA", color: colors.win },
-  defeat:  { label: "DERROTA",  color: colors.loss },
-  draw:    { label: "EMPATE",   color: colors.textSecondary },
+  victory: { label: "results.victory", color: colors.win },
+  defeat:  { label: "results.defeat",  color: colors.loss },
+  draw:    { label: "results.draw",    color: colors.textSecondary },
 };
 
 /**
@@ -20,16 +21,17 @@ export function battleView(item, myTag) {
   let result;
   let win = null;   // true / false / null (empate o sin dato)
   if (b.result) {
-    result = RESULT[b.result] || { label: b.result.toUpperCase(), color: colors.textSecondary };
+    const known = RESULT[b.result];
+    result = known ? { label: t(known.label), color: known.color } : { label: b.result.toUpperCase(), color: colors.textSecondary };
     win = b.result === "victory" ? true : b.result === "defeat" ? false : null;
   } else if (b.rank != null) {
     const groups = teams ? teams.length : players.length;
     // Si la API informa el cambio de trofeos, manda: se gana trofeos solo en la mitad de arriba
     const good = typeof b.trophyChange === "number" ? b.trophyChange > 0 : b.rank <= Math.ceil(groups / 2);
-    result = { label: `PUESTO ${b.rank}`, color: b.rank === 1 ? colors.gold : good ? colors.win : colors.loss };
+    result = { label: t("bs.place", { rank: b.rank }), color: b.rank === 1 ? colors.gold : good ? colors.win : colors.loss };
     win = good;
   } else {
-    result = { label: "PARTIDA", color: colors.textSecondary };
+    result = { label: t("bs.match"), color: colors.textSecondary };
   }
 
   return {

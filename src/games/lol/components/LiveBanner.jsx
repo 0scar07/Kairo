@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useT } from "../../../i18n/I18nProvider";
 import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PressableScale } from "../../../components/ui";
@@ -12,6 +13,7 @@ const RECHECK_MS = 60_000;
 // Aviso "En partida ahora" en el perfil: solo aparece si el jugador está jugando y abre la partida en vivo.
 // Es opcional: si la consulta falla (por ejemplo, la key no tiene esa API) simplemente no se muestra.
 export default function LiveBanner({ puuid, region }) {
+  const t = useT();
   const navigation = useNavigation();
   const [live, setLive] = useState(null);
 
@@ -32,12 +34,12 @@ export default function LiveBanner({ puuid, region }) {
       scaleTo={0.985}
       onPress={() => navigation.navigate("LiveGame", { puuid, region })}
       style={styles.banner}
-      accessibilityLabel="Ver partida en vivo"
+      accessibilityLabel={t("live.view")}
     >
       <View style={styles.dot} />
       <View style={styles.info}>
-        <Text style={styles.title}>EN PARTIDA AHORA</Text>
-        <Text style={styles.sub}>{queueLabel(live.queueId)} · toca para ver la partida</Text>
+        <Text style={styles.title}>{t("live.inGame")}</Text>
+        <Text style={styles.sub}>{t("live.bannerHint", { mode: queueLabel(live.queueId) })}</Text>
       </View>
       <Icon name="chevron" size={sizes.item - spacing.xs} color={colors.loss} />
     </PressableScale>

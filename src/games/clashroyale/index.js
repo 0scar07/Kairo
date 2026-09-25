@@ -6,6 +6,7 @@ import ProfileBody from "./ProfileBody";
 import AvatarImage from "../../components/AvatarImage";
 import { formatNumber } from "../../utils/format";
 import { clanRole, tagOf } from "../../utils/supercell";
+import { t } from "../../i18n";
 
 // Clash Royale no tiene foto de perfil: se usa la carta favorita del jugador
 const avatarUri = player => cardIcon(player.currentFavouriteCard);
@@ -21,9 +22,9 @@ export default {
       avatar: <AvatarImage uri={avatarUri(player)} level={player.expLevel} game={meta.id} />,
       name: data.account.gameName,
       tag: data.account.tagLine,
-      subtitle: player.clan ? [player.clan.name, clanRole(player.role)].filter(Boolean).join(" · ") : "Sin clan",
+      subtitle: player.clan ? [player.clan.name, clanRole(player.role)].filter(Boolean).join(" · ") : t("sc.noClan"),
       ranked: null,
-      badge: `${formatNumber(player.trophies)} trofeos`,
+      badge: t("sc.trophiesBadge", { n: formatNumber(player.trophies) }),
     };
   },
 
@@ -34,7 +35,7 @@ export default {
     iconUrl: avatarUri(data.player),
     tier: null,
     rank: null,
-    label: `${formatNumber(data.player.trophies)} trofeos`,
+    trophies: data.player.trophies,
   }),
 
   ProfileBody,

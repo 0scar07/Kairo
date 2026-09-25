@@ -4,6 +4,7 @@ import { searchPlayer } from "./api";
 import ProfileBody from "./ProfileBody";
 import AvatarImage from "../../components/AvatarImage";
 import { clanRole, tagOf } from "../../utils/supercell";
+import { t } from "../../i18n";
 
 // Clash of Clans no tiene foto de perfil: se usa el ícono de su liga
 // La API nueva trae `leagueTier` (small/large); la anterior, `league` (small/medium)
@@ -23,9 +24,9 @@ export default {
       avatar: <AvatarImage uri={leagueIcon(player)} level={player.expLevel} game={meta.id} />,
       name: data.account.gameName,
       tag: data.account.tagLine,
-      subtitle: player.clan ? [player.clan.name, clanRole(player.role)].filter(Boolean).join(" · ") : "Sin clan",
+      subtitle: player.clan ? [player.clan.name, clanRole(player.role)].filter(Boolean).join(" · ") : t("sc.noClan"),
       ranked: null,
-      badge: `Ayuntamiento ${player.townHallLevel}`,
+      badge: t("coc.townHallLevel", { level: player.townHallLevel }),
     };
   },
 
@@ -36,7 +37,7 @@ export default {
     iconUrl: leagueIcon(data.player),
     tier: null,
     rank: null,
-    label: `Ayuntamiento ${data.player.townHallLevel}`,
+    townHall: data.player.townHallLevel,
   }),
 
   ProfileBody,

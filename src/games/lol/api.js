@@ -1,5 +1,6 @@
 import { createGameClient, loadProfile, loadMatchPage } from "../../api/client";
 import { ensureLolAssets } from "./assets";
+import { activeLanguage } from "../../i18n";
 
 export const MATCH_PAGE = 10;
 
@@ -26,7 +27,7 @@ export const getMoreMatches = (puuid, start, region, count = MATCH_PAGE) =>
 export const getRotation = region => client.get("/rotation", region);
 
 // Estado del servidor: { name, maintenances: [{ title, status }], incidents: [{ title, severity }] }
-export const getStatus = region => client.get("/status", region);
+export const getStatus = region => client.get("/status", region, { lang: activeLanguage() });
 
 // Partida en curso: { inGame: false } o { inGame: true, queueId, startTime, bans, participants: [...] }
 export const getLive = (puuid, region) => client.get(`/live/${puuid}`, region);

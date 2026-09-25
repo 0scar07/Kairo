@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useT } from "../i18n/I18nProvider";
 import { ScrollView, StyleSheet, RefreshControl } from "react-native";
 import Reveal from "./Reveal";
 import { ErrorBanner, ProfileHeader } from "./ui";
@@ -18,6 +19,7 @@ import { colors, sizes, spacing, useAccent } from "../theme";
  *  - mine: perfil propio (el juego puede mostrar extras); headerAction sustituye a la estrella de favorito
  */
 export default function ProfileView({ gameId, initialData, mine, headerAction, bottomSpace = spacing.xxxl }) {
+  const t = useT();
   const game = getGame(gameId);
   const accent = useAccent(gameId);
   const [data, setData] = useState(initialData);
@@ -46,7 +48,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
       setIsFav(marked);
       if (marked) success();
     } catch (e) {
-      setError("No se pudo actualizar favoritos: " + errorMessage(e));
+      setError(t("profile.favoriteError", { error: errorMessage(e) }));
     }
   }
 
@@ -56,7 +58,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, b
     try {
       setData(await game.api.search(account.gameName, account.tagLine, region));
     } catch (e) {
-      setError("No se pudo actualizar: " + errorMessage(e));
+      setError(t("profile.refreshError", { error: errorMessage(e) }));
     }
     setRefreshing(false);
   }

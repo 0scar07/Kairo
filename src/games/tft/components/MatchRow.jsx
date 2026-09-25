@@ -1,4 +1,5 @@
 import React from "react";
+import { useT } from "../../../i18n/I18nProvider";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import UnitIcon from "./UnitIcon";
 import TraitBadge from "./TraitBadge";
@@ -21,6 +22,7 @@ function PlacementBox({ placement, size = sizes.placement }) {
 
 // Fila de una partida de TFT: posición final, cola, rasgos y unidades. Al tocarla muestra a los 8 jugadores.
 export default function TftMatchRow({ match, puuid, expanded, onPress }) {
+  const t = useT();
   const accent = useAccent("tft");
   const info = match?.info;
   const me = info?.participants?.find(p => p.puuid === puuid);
@@ -58,7 +60,7 @@ export default function TftMatchRow({ match, puuid, expanded, onPress }) {
 
       <Expandable open={expanded}>
         <View style={styles.detail}>
-          <SectionLabel>Todos los jugadores</SectionLabel>
+          <SectionLabel>{t("tft.allPlayers")}</SectionLabel>
           {[...info.participants].sort((a, b) => a.placement - b.placement).map(p => {
             const isMe = p.puuid === puuid;
             return (
@@ -66,10 +68,10 @@ export default function TftMatchRow({ match, puuid, expanded, onPress }) {
                 <PlacementBox placement={p.placement} size={sizes.avatarSm} />
                 <View style={styles.main}>
                   <Text style={[styles.playerName, isMe && { color: accent }]} numberOfLines={1}>
-                    {isMe ? "Tú · " : ""}{participantName(p)}
+                    {isMe ? `${t("tft.you")} · ` : ""}{participantName(p)}
                   </Text>
                   <Text style={styles.playerMeta}>
-                    Nivel {p.level} · {p.total_damage_to_players} dmg{p.augments?.length ? ` · ${p.augments.map(a => tftAugment(a).name).join(", ")}` : ""}
+                    {t("tft.playerMeta", { level: p.level, damage: p.total_damage_to_players })}{p.augments?.length ? ` · ${p.augments.map(a => tftAugment(a).name).join(", ")}` : ""}
                   </Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.strip}>
                     {[...(p.units || [])].sort((a, b) => b.tier - a.tier).map((u, i) => (

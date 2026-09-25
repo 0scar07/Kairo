@@ -126,6 +126,12 @@ La key tiene un cupo (por ejemplo 20 peticiones/s y 100 cada 2 min) compartido p
 
 En la app, estos juegos declaran `tagSearch: true` y `hasRegion: false` en su `meta.js`: la búsqueda de Inicio pide solo el `#TAG` y no muestra el selector de región. Para que las pantallas genéricas sigan sin conocer ningún juego, `search()` devuelve `{ region: "global", account: { gameName, tagLine, puuid } }` con el tag como identificador.
 
+### Idiomas
+
+`src/i18n/index.js` guarda los diccionarios y el idioma activo y expone `t(clave, params)` (con variables `{x}` y plurales `_one/_other`; si falta una clave usa el español). `I18nProvider` (en `App.jsx`) lee la preferencia (`auto` o un idioma) de AsyncStorage, la aplica durante el render y, al cambiarla, vuelve a pintar todo lo que use `useT()` y recarga los nombres de campeones de Data Dragon en ese idioma. Fuera de los componentes (formato, utilidades) se usa el `t` del módulo, que sigue el idioma activo. Los favoritos guardan datos (trofeos, nivel del ayuntamiento) y no texto, para que se vean en el idioma actual.
+
+Los errores del backend llevan `code` (y `provider` cuando aplica); `errorMessage()` los traduce con `errors.<CODE>`. La ruta `/lol/status` acepta `?lang=` para devolver los títulos de mantenimiento en el idioma del usuario.
+
 ### Partida en vivo (LoL)
 
 `GET /lol/live/:puuid` consulta Spectator-V5 y, en paralelo, el rango Solo/Dúo de cada jugador (league-v4, con la caché y la cola habituales). Que el jugador no esté jugando no es un error: responde `{ inGame: false }`. `lib/live.js` normaliza la respuesta y tiene pruebas. En la app, `LiveBanner` (en el perfil de LoL) comprueba cada minuto y abre `LiveGameScreen`, que se refresca sola cada 30 s y muestra el cronómetro.

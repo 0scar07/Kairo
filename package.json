@@ -7,7 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "icons": "node scripts/generate-icons.js",
-    "verify": "node scripts/verify-imports.js && node scripts/verify-tokens.js",
+    "verify": "node scripts/verify-imports.js && node scripts/verify-tokens.js && node scripts/verify-i18n.js",
     "web": "expo start --web",
     "phone": "expo start --offline"
   },
@@ -24,6 +24,7 @@
     "expo-constants": "~18.0.14",
     "expo-font": "~14.0.12",
     "expo-haptics": "~15.0.8",
+    "expo-localization": "~17.0.9",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",

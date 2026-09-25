@@ -1,10 +1,12 @@
 import React from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "../Icon";
 import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../../theme";
 
 // Botón "cargar más": se desactiva mientras carga o cuando ya no hay más
 export default function LoadMoreButton({ loading, hasMore, onPress, game }) {
+  const t = useT();
   const accent = useAccent(game);
   const disabled = loading || !hasMore;
   return (
@@ -16,7 +18,7 @@ export default function LoadMoreButton({ loading, hasMore, onPress, game }) {
     >
       {!loading && hasMore ? <Icon name="arrowDown" size={fontSizes.base} color={accent} /> : null}
       <Text style={[styles.text, { color: accent }]}>
-        {loading ? "Cargando..." : hasMore ? "Cargar más partidas" : "No hay más partidas"}
+        {loading ? t("matches.loading") : hasMore ? t("matches.loadMore") : t("matches.noMore")}
       </Text>
     </TouchableOpacity>
   );

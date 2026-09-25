@@ -10,7 +10,7 @@ import valorant from "./valorant/meta";
  * registrarlo en registry.js (metadatos) y aquí (módulo completo).
  *
  * Un módulo de juego exporta:
- *  - id, name, short, accent, placeholder            (de meta.js)
+ *  - id, name, short, accent            (de meta.js)
  *  - api.search(gameName, tagLine, region) -> data          datos del perfil (incluye account, region…)
  *  - getProfile(data) -> { avatar, name, tag, subtitle, ranked, badge? }   cabecera del perfil (badge: texto si no hay rango)
  *  - toFavorite(data) -> { puuid, gameName, tagLine, iconId | iconUrl, tier, rank, label? }

@@ -9,6 +9,8 @@ const CHAMPS_KEY   = "dd_champions_v2";   // v2: incluye la clave numérica de c
 let version = FALLBACK_VERSION;
 let champIds = {}; // nombre normalizado -> ID de Data Dragon
 let champKeys = {}; // clave numérica (championId de Riot) -> { id, name }
+let champEnNames = {}; // id de Data Dragon -> nombre en inglés
+let champLocalNames = {}; // id de Data Dragon -> nombre en el idioma activo
 
 const norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -54,7 +56,31 @@ async function loadChampions() {
   list.forEach(c => {
     champIds[norm(c.id)] = c.id; champIds[norm(c.name)] = c.id;
     champKeys[c.key] = { id: c.id, name: c.name };
+    champEnNames[c.id] = c.name;
   });
+}
+
+// Nombres de campeón en un idioma de Data Dragon (es_MX, pt_BR…). Se guardan por versión e idioma; si falla, se sigue en inglés.
+export async function loadChampionNames(locale) {
+  if (!locale || locale === "en_US") { champLocalNames = {}; return; }
+  const cacheKey = `dd_champion_names_${locale}_${version}`;
+  let names = null;
+  const cached = await storageGet(cacheKey);
+  if (cached) {
+    try { names = JSON.parse(cached); } catch (e) { console.warn("Caché de nombres ilegible:", e.message); }
+  }
+  if (!names) {
+    try {
+      const { data } = await axios.get(`${ddBase()}/data/${locale}/champion.json`, { timeout: 8000 });
+      names = Object.fromEntries(Object.values(data.data).map(c => [c.id, c.name]));
+      await storageSet(cacheKey, JSON.stringify(names));
+    } catch (e) {
+      console.warn("Data Dragon: sin nombres de campeones en", locale, "-", e.message);
+      champLocalNames = {};
+      return;
+    }
+  }
+  champLocalNames = names;
 }
 
 export async function initDataDragon() {
@@ -73,6 +99,12 @@ export const championByKey = key => champKeys[key] || null;
 export function championId(name) {
   if (!name) return "";
   return champIds[norm(name)] || String(name).replace(/[^A-Za-z0-9]/g, "");
+}
+
+// Nombre para mostrar de un campeón (id o nombre de la partida) en el idioma activo
+export function championLabel(name) {
+  const id = championId(name);
+  return champLocalNames[id] || champEnNames[id] || name;
 }
 
 export const championIcon    = name => `${ddBase()}/img/champion/${championId(name)}.png`;

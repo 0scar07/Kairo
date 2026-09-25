@@ -1,29 +1,32 @@
+import { t } from "../../i18n";
+
 // CS = súbditos + monstruos de la jungla
 export const csOf = p => (p.totalMinionsKilled || 0) + (p.neutralMinionsKilled || 0);
 
 // Riot ID (nombre#TAG) del participante; summonerName casi siempre viene vacío
 export function playerName(p) {
   if (p.riotIdGameName) return `${p.riotIdGameName}#${p.riotIdTagline || "?"}`;
-  return p.summonerName || p.championName || "Jugador";
+  return p.summonerName || p.championName || t("common.player");
 }
 
 // KDA como texto: "Perfect" si no hay muertes
 export const kdaRatio = (kills, deaths, assists) =>
-  deaths === 0 ? "Perfect" : ((kills + assists) / deaths).toFixed(2);
+  deaths === 0 ? t("match.perfect") : ((kills + assists) / deaths).toFixed(2);
 
+// idCola -> clave de traducción
 const QUEUES = {
-  400: "Normal", 430: "Normal", 490: "Normal", 480: "Swiftplay",
-  420: "Solo/Dúo", 440: "Flex",
-  450: "ARAM", 720: "ARAM Clash",
-  700: "Clash",
-  830: "Vs. IA", 840: "Vs. IA", 850: "Vs. IA",
-  900: "URF", 1900: "URF",
-  1020: "Un solo campeón", 1300: "Nexus Blitz", 1400: "Libro de hechizos",
-  1700: "Arena", 1710: "Arena",
+  400: "queue.normal", 430: "queue.normal", 490: "queue.normal", 480: "queue.swiftplay",
+  420: "queue.solo", 440: "queue.flex",
+  450: "queue.aram", 720: "queue.aramClash",
+  700: "queue.clash",
+  830: "queue.vsAi", 840: "queue.vsAi", 850: "queue.vsAi",
+  900: "queue.urf", 1900: "queue.urf",
+  1020: "queue.oneForAll", 1300: "queue.nexusBlitz", 1400: "queue.spellbook",
+  1700: "queue.arena", 1710: "queue.arena",
 };
 
 export function queueLabel(queueId) {
-  return QUEUES[queueId] || "Otro modo";
+  return t(QUEUES[queueId] || "queue.other");
 }
 
 // ─── Estadísticas de LoL a partir de las partidas ────────────────────────────

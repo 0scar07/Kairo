@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
 import RankedCard from "../../components/RankedCard";
 import Reveal from "../../components/Reveal";
@@ -13,7 +14,7 @@ import MineExtras from "./MineExtras";
 import MasteryCard from "./components/MasteryCard";
 import { getMoreMatches } from "./api";
 import { findMe, getChampionStats, getOverallStats, getStreak } from "./utils";
-import { championIcon } from "../../api/ddragon";
+import { championIcon, championLabel } from "../../api/ddragon";
 import Icon from "../../components/Icon";
 import LiveBanner from "./components/LiveBanner";
 import { errorMessage } from "../../utils/format";
@@ -22,20 +23,19 @@ import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor,
 const GAME = "lol";
 const STRIP_MAX = 20;
 
-const TABS = [
-  { key: "partidas",  label: "PARTIDAS",  icon: "gamepad" },
-  { key: "campeones", label: "CAMPEONES", icon: "trophy" },
-];
-
-const RESULT_FILTERS = [
-  { key: "all",  label: "Todas" },
-  { key: "win",  label: "Victorias" },
-  { key: "loss", label: "Derrotas" },
-];
-
 // Contenido del perfil de League of Legends (la cabecera, favoritos y refresco los pone el perfil genérico)
 export default function LolProfileBody({ data, setData, setError, mine }) {
+  const t = useT();
   const accent = useAccent(GAME);
+  const tabs = [
+    { key: "partidas",  label: t("lol.tabMatches").toUpperCase(), icon: "gamepad" },
+    { key: "campeones", label: t("lol.tabChampions").toUpperCase(), icon: "trophy" },
+  ];
+  const resultFilters = [
+    { key: "all",  label: t("filters.allMatches") },
+    { key: "win",  label: t("results.wins") },
+    { key: "loss", label: t("results.losses") },
+  ];
   const [activeMatch, setActiveMatch] = useState(null);
   const [activeTab,   setActiveTab]   = useState("partidas");
   const [filterWin,   setFilterWin]   = useState("all");
@@ -77,17 +77,17 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
         return { ...prev, matches: [...prev.matches, ...fresh], hasMore: page.hasMore, nextStart: page.nextStart };
       });
     } catch (e) {
-      setError("No se pudieron cargar más partidas: " + errorMessage(e));
+      setError(t("matches.moreError", { error: errorMessage(e) }));
     }
     setLoadingMore(false);
   }
 
   const summaryBlocks = overall && [
-    { title: "Winrate", value: `${overall.wr}%`, color: winrateColor(overall.wr, accent), sub: `${overall.wins}V ${overall.losses}D` },
-    { title: "KDA Prom.", value: overall.kda, color: kdaColor(overall.kda, colors.text), sub: `${overall.avgKills}/${overall.avgDeaths}/${overall.avgAssists}` },
+    { title: t("stats.winrate"), value: `${overall.wr}%`, color: winrateColor(overall.wr, accent), sub: `${overall.wins}V ${overall.losses}D` },
+    { title: t("stats.avgKda"), value: overall.kda, color: kdaColor(overall.kda, colors.text), sub: `${overall.avgKills}/${overall.avgDeaths}/${overall.avgAssists}` },
     ...(topChamp ? [{
-      title: "Más jugado",
-      sub: `${topChamp.games} partidas`,
+      title: t("stats.mostPlayed"),
+      sub: t("common.games", { count: topChamp.games }),
       node: <Image source={{ uri: championIcon(topChamp.name) }} style={styles.topChampImg} />,
     }] : []),
   ];
@@ -98,11 +98,11 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
 
       <Reveal order={1}>
         {rankedError
-          ? <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>
+          ? <Notice tone="warn">{t("ranked.error", { error: rankedError })}</Notice>
           : (
             <View style={styles.rankedRow}>
-              <RankedCard entry={soloQ} label="Solo / Dúo" game={GAME} />
-              <RankedCard entry={flex}  label="Flex 5v5"   game={GAME} />
+              <RankedCard entry={soloQ} label={t("ranked.solo")} game={GAME} />
+              <RankedCard entry={flex}  label={t("ranked.flex")} game={GAME} />
             </View>
           )}
       </Reveal>
@@ -121,7 +121,7 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
           }]}>
             <Icon name={streak.isWin ? "flame" : "snowflake"} size={fontSizes.lg} color={streak.isWin ? colors.win : colors.loss} />
             <Text style={[styles.streakText, { color: streak.isWin ? colors.win : colors.loss }]}>
-              Racha de {streak.count} {streak.isWin ? "victorias" : "derrotas"}
+              {t(streak.isWin ? "lol.streakWins" : "lol.streakLosses", { count: streak.count })}
             </Text>
           </View>
         </Reveal>
@@ -130,13 +130,13 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
       {overall && (
         <Reveal order={3}>
           <OverallCard
-            label={`Resumen — últimas ${overall.games} partidas`}
+            label={t("stats.summaryLast", { count: overall.games })}
             blocks={summaryBlocks}
             bar={{ value: overall.wr, color: winrateColor(overall.wr, accent) }}
           />
           <ResultsStrip
-            label="Resultados recientes"
-            summary={`${recent.filter(p => p.win).length}V · ${recent.filter(p => !p.win).length}D`}
+            label={t("results.recent")}
+            summary={t("results.summary", { wins: recent.filter(p => p.win).length, losses: recent.filter(p => !p.win).length })}
             items={stripItems}
           />
         </Reveal>
@@ -145,40 +145,40 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
       {mine && <MineExtras data={data} />}
 
       <Reveal order={4}>
-        <SegmentedTabs tabs={TABS} value={activeTab} onChange={setActiveTab} game={GAME} />
+        <SegmentedTabs tabs={tabs} value={activeTab} onChange={setActiveTab} game={GAME} />
       </Reveal>
 
       <Reveal order={5}>
         {activeTab === "campeones" && (
           champStats.length ? (
             <Card>
-              <SectionLabel>Más jugados (últimas {matches?.length} partidas)</SectionLabel>
+              <SectionLabel>{t("lol.mostPlayed", { count: matches?.length })}</SectionLabel>
               {champStats.map((c, i) => (
                 <ChampionStatsRow key={c.name} champ={c} game={GAME} rank={mine ? i : undefined} />
               ))}
             </Card>
           ) : (
-            <EmptyState icon="trophy" title="Sin campeones todavía" text="Cuando juegue partidas verás aquí sus campeones más jugados." />
+            <EmptyState icon="trophy" title={t("lol.noChampions")} text={t("lol.noChampionsText")} />
           )
         )}
 
         {activeTab === "partidas" && (
           !matches?.length ? (
-            <EmptyState icon="gamepad" title="Sin partidas recientes" text="Este jugador no tiene partidas registradas en este momento." />
+            <EmptyState icon="gamepad" title={t("matches.emptyTitle")} text={t("matches.emptyText")} />
           ) : (
             <>
               <View style={styles.filters}>
                 <View style={styles.filterRow}>
-                  {RESULT_FILTERS.map(f => (
+                  {resultFilters.map(f => (
                     <Chip key={f.key} label={f.label} active={filterWin === f.key} game={GAME} onPress={() => setFilterWin(f.key)} />
                   ))}
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <Chip label="Todos" active={filterChamp === "all"} game={GAME} onPress={() => setFilterChamp("all")} />
+                  <Chip label={t("filters.allChamps")} active={filterChamp === "all"} game={GAME} onPress={() => setFilterChamp("all")} />
                   {uniqueChamps.map(c => (
                     <Chip
                       key={c}
-                      label={c}
+                      label={championLabel(c)}
                       image={championIcon(c)}
                       active={filterChamp === c}
                       game={GAME}
@@ -188,12 +188,12 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
                 </ScrollView>
               </View>
 
-              <SectionLabel>{filteredMatches.length} partidas</SectionLabel>
+              <SectionLabel>{t("common.games", { count: filteredMatches.length })}</SectionLabel>
 
               {filteredMatches.length === 0 && (
                 <EmptyState
-                  compact icon="search" title="Nada con esos filtros"
-                  actionLabel="Quitar filtros"
+                  compact icon="search" title={t("filters.noResults")}
+                  actionLabel={t("filters.clear")}
                   onAction={() => { setFilterWin("all"); setFilterChamp("all"); }}
                 />
               )}

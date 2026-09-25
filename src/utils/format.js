@@ -1,12 +1,12 @@
+import { t, hasKey, activeLanguage, getLanguage } from "../i18n";
+
 // Master, Grandmaster y Challenger no tienen división (I-IV)
 export const APEX_TIERS = ["MASTER", "GRANDMASTER", "CHALLENGER"];
 export const tierLabel = (tier, rank) => (APEX_TIERS.includes(tier) ? tier : `${tier} ${rank || ""}`.trim());
 
-// 623792 -> "623.792"
-export const formatNumber = n => String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-// 1 partida / 2 partidas
-export const plural = (n, singular, plural = `${singular}s`) => `${n} ${n === 1 ? singular : plural}`;
+// 623792 -> "623.792" (es), "623,792" (en), "623 792" (fr)
+export const formatNumber = n =>
+  String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, getLanguage(activeLanguage()).thousands);
 
 // Porcentaje de victorias sin dividir entre cero
 export function winrate(wins, losses) {
@@ -14,13 +14,13 @@ export function winrate(wins, losses) {
   return total ? Math.round((wins / total) * 100) : 0;
 }
 
-// "hace 5m", "hace 3h"... a partir de un timestamp en ms
+// "5m", "3h"... a partir de un timestamp en ms (las unidades cambian con el idioma)
 export function timeSince(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
-  if (s < 60)    return `${s}s`;
-  if (s < 3600)  return `${Math.floor(s / 60)}m`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h`;
-  return `${Math.floor(s / 86400)}d`;
+  if (s < 60)    return `${s}${t("time.s")}`;
+  if (s < 3600)  return `${Math.floor(s / 60)}${t("time.m")}`;
+  if (s < 86400) return `${Math.floor(s / 3600)}${t("time.h")}`;
+  return `${Math.floor(s / 86400)}${t("time.d")}`;
 }
 
 // Segundos -> "m:ss"
@@ -29,10 +29,15 @@ export function formatDuration(seconds) {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-// Mensaje de error legible para mostrar en pantalla
-export function errorMessage(e, fallback = "Ocurrió un error inesperado") {
-  if (e?.response?.data?.error) return e.response.data.error;
-  if (e?.code === "ERR_NETWORK" || e?.message === "Network Error") return "Sin conexión con el servidor";
-  if (e?.code === "ECONNABORTED") return "El servidor tardó demasiado en responder";
-  return e?.message || fallback;
+/**
+ * Mensaje legible para mostrar en pantalla. Los errores del backend traen un `code`: si la app lo conoce,
+ * se muestra traducido; si no, se usa el mensaje que mandó el servidor.
+ */
+export function errorMessage(e, fallback) {
+  const data = e?.response?.data;
+  if (data?.code && hasKey(`errors.${data.code}`)) return t(`errors.${data.code}`, { seconds: data.retryAfter, provider: data.provider });
+  if (data?.error) return data.error;
+  if (e?.code === "ERR_NETWORK" || e?.message === "Network Error") return t("errors.network");
+  if (e?.code === "ECONNABORTED") return t("errors.timeout");
+  return e?.message || fallback || t("errors.unexpected");
 }

@@ -6,7 +6,8 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Defs, RadialGradient, Stop, Circle } from "react-native-svg";
 import * as SplashScreen from "expo-splash-screen";
-import { APP_NAME, APP_TAGLINE } from "../constants/config";
+import { APP_NAME } from "../constants/config";
+import { useI18n } from "../i18n/I18nProvider";
 import {
   accents, colors, fonts, fontSizes, radii, sizes, spacing, tracking, glow,
 } from "../theme";
@@ -33,7 +34,9 @@ function useEnter() {
  *  - textsReady: las fuentes ya cargaron (el texto espera a tenerlas para no parpadear)
  *  - finished: el arranque terminó; hace fade-out y avisa con onHidden
  */
-export default function LoadingScreen({ progress, textsReady, finished, onHidden }) {
+export default function LoadingScreen({ progress, textsReady: fontsReady, finished, onHidden }) {
+  const { t, ready: languageReady } = useI18n();
+  const textsReady = fontsReady && languageReady;
   const { width, height } = useWindowDimensions();
   const [pct, setPct] = useState(0);
   const started = useRef(false);
@@ -118,7 +121,7 @@ export default function LoadingScreen({ progress, textsReady, finished, onHidden
       {textsReady && (
         <View pointerEvents="none" style={[styles.textBlock, { top: centerY + sizes.splashLogo * 0.32 + spacing.xl }]}>
           <Animated.Text style={[styles.name, nameStyle]}>{APP_NAME.toUpperCase()}</Animated.Text>
-          <Animated.Text style={[styles.tagline, taglineStyle]}>{APP_TAGLINE.toUpperCase()}</Animated.Text>
+          <Animated.Text style={[styles.tagline, taglineStyle]}>{t("app.tagline").toUpperCase()}</Animated.Text>
 
           <Animated.View style={[styles.barBlock, barStyle]}>
             <View style={styles.track}>

@@ -3,6 +3,7 @@ import { View, Image, StyleSheet } from "react-native";
 import meta from "./meta";
 import { searchPlayer } from "./api";
 import ProfileBody from "./ProfileBody";
+import { t } from "../../i18n";
 import GameLogo from "../../components/GameLogo";
 import { profileIconUrl } from "../../api/ddragon";
 import { colors, sizes, accents } from "../../theme";
@@ -28,7 +29,7 @@ export default {
     avatar: <TftAvatar iconId={data.summoner?.profileIconId} />,
     name: data.account.gameName,
     tag: data.account.tagLine,
-    subtitle: data.summoner?.summonerLevel ? `Nivel ${data.summoner.summonerLevel}` : null,
+    subtitle: data.summoner?.summonerLevel ? t("tft.level", { level: data.summoner.summonerLevel }) : null,
     ranked: data.ranked?.find(r => r.queueType === "RANKED_TFT") || null,
   }),
 

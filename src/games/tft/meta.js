@@ -3,6 +3,5 @@ export default {
   name: "Teamfight Tactics",
   short: "TFT",
   accent: "#0BC4E3",
-  placeholder: "Nombre#TAG",
   available: true,
 };

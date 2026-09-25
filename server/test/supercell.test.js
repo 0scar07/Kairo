@@ -67,6 +67,7 @@ test("404, 403 y 503 de Supercell se traducen a mensajes en español", async () 
   const denied = await get("/brawlstars/player/LLLL");
   assert.strictEqual(denied.status, 503);
   assert.strictEqual(denied.body.code, "KEY_INVALID");
+  assert.strictEqual(denied.body.provider, "Brawl Stars");   // la app lo usa para traducir el mensaje
 
   const maintenance = await get("/brawlstars/player/JJJJ");
   assert.strictEqual(maintenance.body.code, "MAINTENANCE");

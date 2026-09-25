@@ -4,13 +4,16 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "./Icon";
 import { select } from "../utils/haptics";
+import { useT } from "../i18n/I18nProvider";
 import { colors, radii, sizes, spacing, fontSizes, type, glow, useAccent, withAlpha } from "../theme";
 
 const ICONS = { Inicio: "home", Favoritos: "heart", Ajustes: "settings" };
+const LABELS = { Inicio: "tabs.home", Favoritos: "tabs.favorites", Ajustes: "tabs.settings" };
 const SPRING = { damping: 18, stiffness: 200, mass: 0.8 };
 
 // Barra inferior flotante tipo "pill": el fondo del tab activo se desliza con el acento del juego
 export default function FloatingTabBar({ state, navigation }) {
+  const t = useT();
   const accent = useAccent();
   const insets = useSafeAreaInsets();
   const [width, setWidth] = useState(0);
@@ -38,7 +41,7 @@ export default function FloatingTabBar({ state, navigation }) {
               key={route.key}
               style={styles.item}
               accessibilityRole="button"
-              accessibilityLabel={route.name}
+              accessibilityLabel={t(LABELS[route.name])}
               accessibilityState={{ selected: focused }}
               onPress={() => {
                 const event = navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
@@ -46,7 +49,7 @@ export default function FloatingTabBar({ state, navigation }) {
               }}
             >
               <Icon name={ICONS[route.name]} size={sizes.item - spacing.xs} color={color} />
-              <Text style={[styles.label, { color }]}>{route.name}</Text>
+              <Text style={[styles.label, { color }]}>{t(LABELS[route.name])}</Text>
             </Pressable>
           );
         })}

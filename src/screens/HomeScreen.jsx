@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useT } from "../i18n/I18nProvider";
 import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { GAMES, UPCOMING_GAMES, getGame } from "../games";
-import { APP_NAME, APP_TAGLINE } from "../constants/config";
-import { getRegion } from "../constants/regions";
+import { APP_NAME } from "../constants/config";
+import { regionName } from "../constants/regions";
 import { errorMessage } from "../utils/format";
 import { GLOBAL_REGION, tagOf } from "../utils/supercell";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
@@ -25,6 +26,7 @@ const HANDOFF_MS = 250;
 const FAVORITES_PREVIEW = 4;
 
 export default function HomeScreen({ navigation }) {
+  const t = useT();
   const { gameId, accent, setGameId } = useActiveGame();
   const {
     favorites: bootFavorites, recents: bootRecents, region, setRegion, serverOnline, retryServer, gameEnabled,
@@ -60,7 +62,7 @@ export default function HomeScreen({ navigation }) {
     if (game.tagSearch) {
       const tag = tagOf(text);
       if (tag.length < 3) {
-        Alert.alert("Formato incorrecto", "Escribe el tag del jugador, por ejemplo #2PP0. Lo encuentras en su perfil dentro del juego.");
+        Alert.alert(t("home.badFormat"), t("home.badTag"));
         return;
       }
       openProfile({ gameId: game.id, gameName: "", tagLine: tag, region: GLOBAL_REGION });
@@ -72,7 +74,7 @@ export default function HomeScreen({ navigation }) {
     const tag  = cut < 0 ? "" : text.slice(cut + 1).trim();
 
     if (!name || !tag) {
-      Alert.alert("Formato incorrecto", "Escribe el Riot ID completo: Nombre#TAG\nEjemplo: Hide on bush#KR1");
+      Alert.alert(t("home.badFormat"), t("home.badRiotId"));
       return;
     }
     openProfile({ gameId: game.id, gameName: name, tagLine: tag, region });
@@ -83,7 +85,7 @@ export default function HomeScreen({ navigation }) {
     try {
       await removeFavorite(fav);
     } catch (e) {
-      Alert.alert("Error", "No se pudo guardar los cambios: " + errorMessage(e));
+      Alert.alert(t("common.error"), t("favorites.saveError", { error: errorMessage(e) }));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
     }
   }
@@ -93,7 +95,7 @@ export default function HomeScreen({ navigation }) {
     try {
       await clearRecents();
     } catch (e) {
-      Alert.alert("Error", "No se pudieron borrar las búsquedas: " + errorMessage(e));
+      Alert.alert(t("common.error"), t("home.clearError", { error: errorMessage(e) }));
     }
   }
 
@@ -108,7 +110,7 @@ export default function HomeScreen({ navigation }) {
           <Reveal order={0} baseDelay={HANDOFF_MS}>
             <TouchableOpacity style={styles.offline} onPress={retryServer} activeOpacity={0.8}>
               <View style={styles.offlineDot} />
-              <Text style={styles.offlineText}>Sin conexión con el servidor · toca para reintentar</Text>
+              <Text style={styles.offlineText}>{t("home.offline")}</Text>
             </TouchableOpacity>
           </Reveal>
         )}
@@ -116,20 +118,20 @@ export default function HomeScreen({ navigation }) {
         {/* Encabezado */}
         <Reveal order={0} baseDelay={HANDOFF_MS} style={styles.header}>
           <Text style={[styles.logoText, { color: accent }, textGlow(accent, spacing.lg)]}>{APP_NAME.toUpperCase()}</Text>
-          <Text style={styles.logoSub}>{APP_TAGLINE.toUpperCase()}</Text>
+          <Text style={styles.logoSub}>{t("app.tagline").toUpperCase()}</Text>
         </Reveal>
 
         {/* Buscador destacado */}
         <Reveal order={1} baseDelay={HANDOFF_MS}>
           <Card style={[styles.searchCard, { borderColor: withAlpha(accent, 0.45) }, glow(accent, spacing.xl, 0.18)]}>
-            <SectionLabel>Buscar en {game.name}</SectionLabel>
+            <SectionLabel>{t("home.searchIn", { game: game.name })}</SectionLabel>
             <View style={styles.searchRow}>
               {game.hasRegion === false ? null : <RegionButton value={region} onChange={setRegion} />}
               <TextInput
                 value={input}
                 onChangeText={setInput}
                 onSubmitEditing={handleSearch}
-                placeholder={game.placeholder}
+                placeholder={game.tagSearch ? t("home.placeholderTag") : t("home.placeholderRiotId")}
                 placeholderTextColor={colors.textFaint}
                 style={styles.input}
                 autoCapitalize="none"
@@ -141,7 +143,7 @@ export default function HomeScreen({ navigation }) {
                 onPress={handleSearch}
                 scaleTo={0.92}
                 style={[styles.go, { backgroundColor: accent }, glow(accent, spacing.md, 0.45)]}
-                accessibilityLabel={game.hasRegion === false ? `Buscar en ${game.name}` : `Buscar en ${getRegion(region).name}`}
+                accessibilityLabel={t("home.searchIn", { game: game.hasRegion === false ? game.name : regionName(region) })}
               >
                 <Icon name="search" size={sizes.item} color={colors.onAccent} />
               </PressableScale>
@@ -160,7 +162,7 @@ export default function HomeScreen({ navigation }) {
                   <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
                     <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} muted />
                     <Text style={styles.gameShort}>{g.short}</Text>
-                    <Text style={styles.soon}>PRONTO</Text>
+                    <Text style={styles.soon}>{t("home.soon")}</Text>
                   </View>
                 );
               }
@@ -180,7 +182,7 @@ export default function HomeScreen({ navigation }) {
               <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
                 <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} muted />
                 <Text style={styles.gameShort}>{g.short}</Text>
-                <Text style={styles.soon}>PRONTO</Text>
+                <Text style={styles.soon}>{t("home.soon")}</Text>
               </View>
             ))}
           </View>
@@ -197,9 +199,9 @@ export default function HomeScreen({ navigation }) {
         {recents.length > 0 && (
           <Reveal order={4} baseDelay={HANDOFF_MS}>
             <View style={styles.sectionHeader}>
-              <SectionLabel style={styles.sectionLabel}>Recientes</SectionLabel>
+              <SectionLabel style={styles.sectionLabel}>{t("home.recents")}</SectionLabel>
               <TouchableOpacity onPress={onClearRecents} hitSlop={spacing.md}>
-                <Text style={styles.link}>Borrar</Text>
+                <Text style={styles.link}>{t("home.clear")}</Text>
               </TouchableOpacity>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recents}>
@@ -222,10 +224,10 @@ export default function HomeScreen({ navigation }) {
         {/* Favoritos */}
         <Reveal order={5} baseDelay={HANDOFF_MS}>
           <View style={styles.sectionHeader}>
-            <SectionLabel style={styles.sectionLabel} icon="star" iconColor={colors.gold}>Favoritos — {game.short}</SectionLabel>
+            <SectionLabel style={styles.sectionLabel} icon="star" iconColor={colors.gold}>{t("home.favoritesOf", { game: game.short })}</SectionLabel>
             {gameFavs.length > 0 && (
               <TouchableOpacity onPress={() => navigation.navigate("Favoritos")} hitSlop={spacing.md}>
-                <Text style={styles.link}>Ver todos</Text>
+                <Text style={styles.link}>{t("home.seeAll")}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -245,8 +247,8 @@ export default function HomeScreen({ navigation }) {
             <EmptyState
               compact
               icon="star"
-              title="Sin favoritos en este juego"
-              text="Busca un jugador y toca la estrella de su perfil para tenerlo siempre a mano."
+              title={t("home.noFavorites")}
+              text={t("home.noFavoritesText")}
             />
           )}
         </Reveal>

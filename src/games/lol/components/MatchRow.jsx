@@ -1,13 +1,15 @@
 import React from "react";
+import { useT } from "../../../i18n/I18nProvider";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { PressableScale } from "../../../components/ui";
-import { championIcon } from "../../../api/ddragon";
+import { championIcon, championLabel } from "../../../api/ddragon";
 import { csOf, queueLabel, kdaRatio as calcKda } from "../utils";
 import { timeSince, formatDuration } from "../../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, tracking, kdaColor, useAccent } from "../../../theme";
 
 // Fila de una partida de LoL: resultado, campeón, cola, KDA y CS/daño. Al tocarla se expande el detalle.
 export default function MatchRow({ match, myPuuid, onPress, expanded }) {
+  const t = useT();
   const accent = useAccent("lol");
   if (!match?.info) return null;
   const me = match.info.participants.find(p => p.puuid === myPuuid);
@@ -35,8 +37,8 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
       </View>
 
       <View style={styles.info}>
-        <Text style={[styles.result, { color: resultColor }]}>{win ? "VICTORIA" : "DERROTA"}</Text>
-        <Text style={styles.champName} numberOfLines={1}>{me.championName}</Text>
+        <Text style={[styles.result, { color: resultColor }]}>{win ? t("results.victory") : t("results.defeat")}</Text>
+        <Text style={styles.champName} numberOfLines={1}>{championLabel(me.championName)}</Text>
         <Text style={styles.meta}>
           {queueLabel(match.info.queueId)} · {formatDuration(match.info.gameDuration)} · {timeSince(match.info.gameCreation)}
         </Text>

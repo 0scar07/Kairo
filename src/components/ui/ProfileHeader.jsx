@@ -1,4 +1,5 @@
 import React from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { View, Text, StyleSheet } from "react-native";
 import Card from "./Card";
 import PressableScale from "./PressableScale";
@@ -8,6 +9,7 @@ import { colors, radii, sizes, spacing, type, fontSizes, glow, useAccent, withAl
 export default function ProfileHeader({
   avatar, name, tag, badge, badgeIcon, subtitle, game, glowColor, action, onAction, avatarSize,
 }) {
+  const t = useT();
   const accent = useAccent(game);
   const tint = glowColor || accent;
   return (
@@ -25,7 +27,7 @@ export default function ProfileHeader({
         ) : null}
       </View>
       {action ? (
-        <PressableScale onPress={onAction} haptic scaleTo={0.85} style={styles.action} accessibilityLabel="Favorito">
+        <PressableScale onPress={onAction} haptic scaleTo={0.85} style={styles.action} accessibilityLabel={t("favorites.favorite")}>
           {typeof action === "string" ? <Text style={styles.actionText}>{action}</Text> : action}
         </PressableScale>
       ) : null}

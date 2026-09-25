@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { View, Text, StyleSheet } from "react-native";
 import RankedCard from "../../components/RankedCard";
 import Reveal from "../../components/Reveal";
@@ -19,21 +20,23 @@ const TURBO_COLORS = {
   GRAY: colors.textMuted, GREEN: colors.win, BLUE: colors.info,
   PURPLE: colors.cost[4], ORANGE: colors.cost[5],
 };
-const TURBO_NAMES = { GRAY: "Gris", GREEN: "Verde", BLUE: "Azul", PURPLE: "Morado", ORANGE: "Naranja" };
+const TURBO_NAMES = { GRAY: "tft.gray", GREEN: "tft.green", BLUE: "tft.blue", PURPLE: "tft.purple", ORANGE: "tft.orange" };
 
 function TurboCard({ entry }) {
+  const t = useT();
   const color = TURBO_COLORS[entry.ratedTier] || colors.textMuted;
   return (
     <Card accent={color}>
-      <SectionLabel>Hyper Roll</SectionLabel>
-      <Text style={[styles.turboTier, { color }]}>{TURBO_NAMES[entry.ratedTier] || entry.ratedTier}</Text>
-      <Text style={styles.turboMeta}>{entry.ratedRating} puntos · {entry.wins} partidas</Text>
+      <SectionLabel>{t("tft.hyperRoll")}</SectionLabel>
+      <Text style={[styles.turboTier, { color }]}>{TURBO_NAMES[entry.ratedTier] ? t(TURBO_NAMES[entry.ratedTier]) : entry.ratedTier}</Text>
+      <Text style={styles.turboMeta}>{t("tft.turboMeta", { points: entry.ratedRating, games: entry.wins })}</Text>
     </Card>
   );
 }
 
 // Contenido del perfil de Teamfight Tactics (cabecera, favoritos y refresco los pone el perfil genérico)
 export default function TftProfileBody({ data, setData, setError }) {
+  const t = useT();
   const accent = useAccent(GAME);
   const [activeMatch, setActiveMatch] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -58,7 +61,7 @@ export default function TftProfileBody({ data, setData, setError }) {
         return { ...prev, matches: [...prev.matches, ...fresh], hasMore: page.hasMore, nextStart: page.nextStart };
       });
     } catch (e) {
-      setError("No se pudieron cargar más partidas: " + errorMessage(e));
+      setError(t("matches.moreError", { error: errorMessage(e) }));
     }
     setLoadingMore(false);
   }
@@ -67,12 +70,12 @@ export default function TftProfileBody({ data, setData, setError }) {
     <>
       <Reveal order={1}>
         {rankedError
-          ? <Notice tone="warn">No se pudo cargar el rango: {rankedError}</Notice>
+          ? <Notice tone="warn">{t("ranked.error", { error: rankedError })}</Notice>
           : (
             <>
               <View style={styles.rankedRow}>
-                <RankedCard entry={rankedEntry} label="Ranked" game={GAME} />
-                <RankedCard entry={doubleUp}    label="Double Up" game={GAME} />
+                <RankedCard entry={rankedEntry} label={t("tft.ranked")} game={GAME} />
+                <RankedCard entry={doubleUp}    label={t("tft.doubleUp")} game={GAME} />
               </View>
               {turbo && <TurboCard entry={turbo} />}
             </>
@@ -82,19 +85,19 @@ export default function TftProfileBody({ data, setData, setError }) {
       {stats && (
         <Reveal order={2}>
           <OverallCard
-            label={`Resumen — últimas ${stats.games} partidas`}
+            label={t("stats.summaryLast", { count: stats.games })}
             blocks={[
-              { title: "Posición", value: stats.avg, sub: "promedio", color: parseFloat(stats.avg) <= 4 ? colors.win : colors.loss },
-              { title: "Top 4", value: `${stats.top4}%`, sub: "de las partidas", color: winrateColor(stats.top4, accent) },
-              { title: "Victorias", value: stats.wins, sub: "1er lugar", color: colors.placement.first },
+              { title: t("tft.position"), value: stats.avg, sub: t("tft.average"), color: parseFloat(stats.avg) <= 4 ? colors.win : colors.loss },
+              { title: t("tft.top4"), value: `${stats.top4}%`, sub: t("tft.ofGames"), color: winrateColor(stats.top4, accent) },
+              { title: t("results.wins"), value: stats.wins, sub: t("tft.first"), color: colors.placement.first },
             ]}
           />
-          <ResultsStrip label="Posiciones recientes" summary={`Top 4: ${stats.top4}%`} items={stripItems} />
+          <ResultsStrip label={t("tft.recentPlacements")} summary={t("tft.top4Summary", { pct: stats.top4 })} items={stripItems} />
         </Reveal>
       )}
 
       <Reveal order={3}>
-        <SectionLabel>{matches?.length || 0} partidas</SectionLabel>
+        <SectionLabel>{t("common.games", { count: matches?.length || 0 })}</SectionLabel>
         {matches?.length > 0 ? (
           <>
             {matches.map(m => (
@@ -110,7 +113,7 @@ export default function TftProfileBody({ data, setData, setError }) {
             <LoadMoreButton game={GAME} loading={loadingMore} hasMore={hasMore} onPress={loadMore} />
           </>
         ) : (
-          <EmptyState icon="gamepad" title="Sin partidas de TFT" text="Este jugador no tiene partidas de Teamfight Tactics registradas." />
+          <EmptyState icon="gamepad" title={t("tft.emptyTitle")} text={t("tft.emptyText")} />
         )}
       </Reveal>
     </>

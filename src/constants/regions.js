@@ -1,3 +1,5 @@
+import { t } from "../i18n";
+
 // Regiones (plataformas de Riot) disponibles en la búsqueda
 export const REGIONS = [
   { id: "la1",  label: "LAN",  name: "Latinoamérica Norte" },
@@ -13,5 +15,8 @@ export const REGIONS = [
 ];
 
 export const DEFAULT_REGION = "la1";
+
+// Nombre de la región en el idioma activo (los nombres fijos de REGIONS quedan como respaldo)
+export const regionName = id => t(`regions.${id}`);
 
 export const getRegion = id => REGIONS.find(r => r.id === id) || REGIONS[0];

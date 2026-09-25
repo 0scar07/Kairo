@@ -4,6 +4,5 @@ export default {
   name: "Valorant",
   short: "VAL",
   accent: "#FF4655",
-  placeholder: "Nombre#TAG",
   available: false,
 };

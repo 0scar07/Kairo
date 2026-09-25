@@ -1,3 +1,5 @@
+import { t } from "../i18n";
+
 // Utilidades comunes a los juegos de Supercell (Brawl Stars, Clash Royale y Clash of Clans)
 
 // Estos juegos no tienen regiones: se usa un valor fijo para favoritos y recientes
@@ -17,8 +19,8 @@ export const humanize = s =>
   String(s || "").replace(/([a-z])([A-Z])(?=[a-z])/g, "$1 $2").replace(/[_-]+/g, " ").replace(/^./, c => c.toUpperCase());
 
 // Rol dentro del clan (Clash Royale y Clash of Clans)
-const ROLES = { leader: "Líder", coLeader: "Colíder", admin: "Veterano", elder: "Veterano", member: "Miembro" };
-export const clanRole = role => ROLES[role] || null;
+const ROLES = { leader: "role.leader", coLeader: "role.coLeader", admin: "role.elder", elder: "role.elder", member: "role.member" };
+export const clanRole = role => (ROLES[role] ? t(ROLES[role]) : null);
 
 // Nombre en mayúsculas de la API ("SHELLY") -> "Shelly"
 export const titleCase = s => String(s || "").toLowerCase().replace(/(^|[\s-])(\w)/g, (_, a, b) => a + b.toUpperCase());

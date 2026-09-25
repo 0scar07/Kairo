@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { View, Text, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Card, SectionLabel, EmptyState, ErrorState, PressableScale, Skeleton } from "../../components/ui";
@@ -8,15 +9,15 @@ import Mini from "./components/Mini";
 import { getLive } from "./api";
 import { ensureLolAssets, spellIcon, perkIcon } from "./assets";
 import { queueLabel } from "./utils";
-import { championByKey, championIcon } from "../../api/ddragon";
+import { championByKey, championIcon, championLabel } from "../../api/ddragon";
 import { errorMessage, formatDuration, tierLabel, winrate } from "../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../../theme";
 
 const GAME = "lol";
 const REFRESH_MS = 30_000;
 const TEAMS = [
-  { id: 100, label: "Equipo azul", color: colors.info },
-  { id: 200, label: "Equipo rojo", color: colors.loss },
+  { id: 100, label: "live.blueTeam", color: colors.info },
+  { id: 200, label: "live.redTeam", color: colors.loss },
 ];
 
 const champIcon = id => {
@@ -31,6 +32,7 @@ function splitRiotId(riotId) {
 }
 
 function PlayerRow({ p, isMe, region, accent }) {
+  const t = useT();
   const navigation = useNavigation();
   const champ = championByKey(p.championId);
   const target = splitRiotId(p.riotId);
@@ -50,9 +52,9 @@ function PlayerRow({ p, isMe, region, accent }) {
       </View>
       <View style={styles.info}>
         <Text style={[styles.name, isMe && { color: accent }]} numberOfLines={1}>
-          {p.bot ? "Bot" : (target?.gameName || p.riotId || "Jugador")}
+          {p.bot ? t("live.bot") : (target?.gameName || p.riotId || t("common.player"))}
         </Text>
-        <Text style={styles.champName} numberOfLines={1}>{champ?.name || "Campeón"}</Text>
+        <Text style={styles.champName} numberOfLines={1}>{champ ? championLabel(champ.name) : t("live.champion")}</Text>
       </View>
       <View style={styles.rank}>
         {rank ? (
@@ -64,7 +66,7 @@ function PlayerRow({ p, isMe, region, accent }) {
             </View>
           </>
         ) : (
-          <Text style={styles.rankSub}>{p.bot ? "—" : "Sin rango"}</Text>
+          <Text style={styles.rankSub}>{p.bot ? "—" : t("common.noRank")}</Text>
         )}
       </View>
     </View>
@@ -99,6 +101,7 @@ function BanRow({ bans, color }) {
 // Partida en vivo de un jugador de LoL: los dos equipos con campeón, hechizos, runas y rango.
 // params: { puuid, region, name? }
 export default function LiveGameScreen({ route }) {
+  const t = useT();
   const { puuid, region } = route.params;
   const accent = useAccent(GAME);
   const [state, setState] = useState({ status: "loading" });   // loading | live | ended | error
@@ -111,7 +114,7 @@ export default function LiveGameScreen({ route }) {
       setState(live.inGame ? { status: "live", live } : { status: "ended" });
     } catch (e) {
       // Si ya había una partida en pantalla, se conserva y solo se avisa al recargar manualmente
-      setState(prev => (prev.status === "live" ? prev : { status: "error", message: errorMessage(e, "No se pudo cargar la partida") }));
+      setState(prev => (prev.status === "live" ? prev : { status: "error", message: errorMessage(e, t("live.loadError")) }));
     }
   }, [puuid, region]);
 
@@ -148,7 +151,7 @@ export default function LiveGameScreen({ route }) {
   if (state.status === "ended") {
     return (
       <View style={styles.center}>
-        <EmptyState icon="gamepad" title="Ya no está en partida" text="La partida terminó o el jugador no está jugando ahora mismo." />
+        <EmptyState icon="gamepad" title={t("live.endedTitle")} text={t("live.endedText")} />
       </View>
     );
   }
@@ -165,10 +168,10 @@ export default function LiveGameScreen({ route }) {
       <Card style={[styles.summary, { borderColor: withAlpha(colors.loss, 0.5) }]}>
         <View style={styles.liveBadge}>
           <View style={styles.liveDot} />
-          <Text style={styles.liveText}>EN VIVO</Text>
+          <Text style={styles.liveText}>{t("live.badge")}</Text>
         </View>
         <Text style={styles.mode}>{queueLabel(live.queueId)}</Text>
-        <Text style={styles.timer}>{elapsed == null ? "Cargando partida" : formatDuration(elapsed)}</Text>
+        <Text style={styles.timer}>{elapsed == null ? t("live.loading") : formatDuration(elapsed)}</Text>
       </Card>
 
       {TEAMS.map(team => {
@@ -177,7 +180,7 @@ export default function LiveGameScreen({ route }) {
         return (
           <Card key={team.id} accent={team.color}>
             <View style={styles.teamHeader}>
-              <SectionLabel style={styles.teamLabel}>{team.label}</SectionLabel>
+              <SectionLabel style={styles.teamLabel}>{t(team.label)}</SectionLabel>
               <BanRow bans={bans} color={team.color} />
             </View>
             {players.map((p, i) => (

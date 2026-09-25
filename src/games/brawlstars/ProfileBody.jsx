@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { View, Text, Image, StyleSheet } from "react-native";
 import Reveal from "../../components/Reveal";
 import { Card, SectionLabel, StatGrid, ResultsStrip, BattleRow, EmptyState, Chip } from "../../components/ui";
@@ -13,17 +14,18 @@ const BRAWLERS_PREVIEW = 5;
 const STRIP_MAX = 20;
 
 function BrawlerRow({ brawler }) {
+  const t = useT();
   const accent = useAccent(GAME);
   return (
     <View style={styles.brawler}>
       <Image source={{ uri: brawlerIcon(brawler.id) }} style={[styles.brawlerImg, { borderColor: accent }]} />
       <View style={styles.brawlerInfo}>
         <Text style={styles.brawlerName} numberOfLines={1}>{titleCase(brawler.name)}</Text>
-        <Text style={styles.brawlerSub}>Poder {brawler.power} · Rango {brawler.rank}</Text>
+        <Text style={styles.brawlerSub}>{t("bs.powerRank", { power: brawler.power, rank: brawler.rank })}</Text>
       </View>
       <View style={styles.brawlerTrophies}>
         <Text style={[styles.trophies, { color: accent }]}>{formatNumber(brawler.trophies)}</Text>
-        <Text style={styles.brawlerSub}>máx. {formatNumber(brawler.highestTrophies)}</Text>
+        <Text style={styles.brawlerSub}>{t("sc.max", { n: formatNumber(brawler.highestTrophies) })}</Text>
       </View>
     </View>
   );
@@ -31,6 +33,7 @@ function BrawlerRow({ brawler }) {
 
 // Contenido del perfil de Brawl Stars (la cabecera, favoritos y refresco los pone el perfil genérico)
 export default function BrawlStarsProfileBody({ data }) {
+  const t = useT();
   const accent = useAccent(GAME);
   const [showAll, setShowAll] = useState(false);
   const { player, battles } = data;
@@ -49,24 +52,24 @@ export default function BrawlStarsProfileBody({ data }) {
     <>
       <Reveal order={1}>
         <StatGrid
-          label="Resumen"
+          label={t("sc.summary")}
           icon="trophy"
           items={[
-            { label: "Trofeos", value: formatNumber(player.trophies), color: accent },
-            { label: "Récord", value: formatNumber(player.highestTrophies) },
-            { label: "Nivel", value: player.expLevel },
+            { label: t("sc.trophies"), value: formatNumber(player.trophies), color: accent },
+            { label: t("sc.record"), value: formatNumber(player.highestTrophies) },
+            { label: t("sc.level"), value: player.expLevel },
           ]}
         />
       </Reveal>
 
       <Reveal order={2}>
         <StatGrid
-          label="Victorias"
+          label={t("results.wins")}
           icon="award"
           items={[
-            { label: "3 vs 3", value: formatNumber(player["3vs3Victories"]) },
-            { label: "Solo", value: formatNumber(player.soloVictories) },
-            { label: "Dúo", value: formatNumber(player.duoVictories) },
+            { label: t("bs.threeVsThree"), value: formatNumber(player["3vs3Victories"]) },
+            { label: t("bs.solo"), value: formatNumber(player.soloVictories) },
+            { label: t("bs.duo"), value: formatNumber(player.duoVictories) },
           ]}
         />
       </Reveal>
@@ -74,11 +77,11 @@ export default function BrawlStarsProfileBody({ data }) {
       {brawlers.length > 0 && (
         <Reveal order={3}>
           <Card>
-            <SectionLabel icon="target">Brawlers ({brawlers.length})</SectionLabel>
+            <SectionLabel icon="target">{t("bs.brawlers", { count: brawlers.length })}</SectionLabel>
             {shownBrawlers.map(b => <BrawlerRow key={b.id} brawler={b} />)}
             {brawlers.length > BRAWLERS_PREVIEW && (
               <Chip
-                label={showAll ? "Ver menos" : `Ver todos (${brawlers.length})`}
+                label={showAll ? t("sc.seeLess") : t("sc.seeAll", { count: brawlers.length })}
                 active
                 game={GAME}
                 onPress={() => setShowAll(v => !v)}
@@ -90,11 +93,11 @@ export default function BrawlStarsProfileBody({ data }) {
 
       <Reveal order={4}>
         {views.length === 0 ? (
-          <EmptyState compact icon="gamepad" title="Sin batallas recientes" text="Cuando juegue verás aquí sus últimas partidas." />
+          <EmptyState compact icon="gamepad" title={t("sc.noBattles")} text={t("sc.noBattlesText")} />
         ) : (
           <>
-            <ResultsStrip label="Resultados recientes" summary={`${wins}V · ${losses}D`} items={stripItems} />
-            <SectionLabel style={styles.sectionLabel}>Últimas {views.length} batallas</SectionLabel>
+            <ResultsStrip label={t("results.recent")} summary={t("results.summary", { wins, losses })} items={stripItems} />
+            <SectionLabel style={styles.sectionLabel}>{t("sc.lastBattles", { count: views.length })}</SectionLabel>
             {views.map((v, i) => (
               <BattleRow
                 key={`${battles[i].battleTime}-${i}`}

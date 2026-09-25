@@ -66,7 +66,7 @@ app.use((req, _res, next) => {
   next();
 }, lolRouter);
 
-app.use((_req, _res, next) => next(new HttpError(404, "Ruta no encontrada")));
+app.use((_req, _res, next) => next(new HttpError(404, "Ruta no encontrada", { code: "ROUTE_NOT_FOUND" })));
 app.use(errorHandler);
 
 const server = app.listen(config.port, () => {

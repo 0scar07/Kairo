@@ -1,10 +1,12 @@
 import React from "react";
+import { useT } from "../../i18n/I18nProvider";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import Reveal from "../../components/Reveal";
 import Icon from "../../components/Icon";
 import { Card, SectionLabel } from "../../components/ui";
 import { findMe } from "./utils";
+import { t } from "../../i18n";
 import { winrate } from "../../utils/format";
 import {
   colors, accents, radii, sizes, spacing, fontSizes, type, winrateColor, useAccent, withAlpha,
@@ -24,12 +26,12 @@ function getBadges(me) {
   me.forEach(p => { (byChamp[p.championName] = byChamp[p.championName] || []).push(p.win); });
   const top        = Object.values(byChamp).sort((a, b) => b.length - a.length)[0];
   const topWr      = top ? (top.filter(Boolean).length / top.length) * 100 : 0;
-  if (avgKda >= 4)     badges.push({ icon: "zap", label: "KDA Machine",    color: colors.gold });
-  if (avgDmg >= 25000) badges.push({ icon: "target", label: "Damage Dealer",  color: colors.loss });
-  if (wr >= 60)        badges.push({ icon: "trophy", label: "Win Streak God", color: colors.win });
-  if (pentakills > 0)  badges.push({ icon: "crown", label: "Pentakill",      color: accents.lol });
-  if (topWr >= 65)     badges.push({ icon: "award",  label: "One Trick",      color: colors.info });
-  if (me.length >= 20) badges.push({ icon: "flame", label: "Grinder",        color: colors.orange });
+  if (avgKda >= 4)     badges.push({ icon: "zap", label: t("badges.kda"),    color: colors.gold });
+  if (avgDmg >= 25000) badges.push({ icon: "target", label: t("badges.damage"),  color: colors.loss });
+  if (wr >= 60)        badges.push({ icon: "trophy", label: t("badges.wins"), color: colors.win });
+  if (pentakills > 0)  badges.push({ icon: "crown", label: t("badges.penta"),      color: accents.lol });
+  if (topWr >= 65)     badges.push({ icon: "award",  label: t("badges.oneTrick"),      color: colors.info });
+  if (me.length >= 20) badges.push({ icon: "flame", label: t("badges.grinder"),        color: colors.orange });
   return badges;
 }
 
@@ -44,6 +46,7 @@ function Badge({ badge }) {
 
 // Extras de "Mi perfil" en LoL: insignias, estadísticas generales y gráfico de KDA
 export default function MineExtras({ data }) {
+  const t = useT();
   const accent = useAccent(GAME);
   const { account, matches } = data;
   const me     = (matches || []).map(m => findMe(m, account.puuid)).filter(Boolean);
@@ -67,12 +70,12 @@ export default function MineExtras({ data }) {
   };
 
   const statBoxes = [
-    { label: "Winrate",    value: `${wr}%`,                                             color: winrateColor(wr, accent) },
-    { label: "KDA Prom.",  value: `${avg("kills")}/${avg("deaths")}/${avg("assists")}`, color: colors.text },
-    { label: "Mejor KDA",  value: bestKda,                                              color: colors.gold },
-    { label: "Daño Prom.", value: `${avgDmg}k`,                                         color: colors.loss },
-    { label: "Victorias",  value: wins,                                                 color: colors.win },
-    { label: "Partidas",   value: me.length,                                            color: colors.text },
+    { label: t("stats.winrate"), value: `${wr}%`,                                             color: winrateColor(wr, accent) },
+    { label: t("stats.avgKda"), value: `${avg("kills")}/${avg("deaths")}/${avg("assists")}`, color: colors.text },
+    { label: t("stats.bestKda"), value: bestKda,                                              color: colors.gold },
+    { label: t("stats.avgDamage"), value: `${avgDmg}k`,                                         color: colors.loss },
+    { label: t("results.wins"), value: wins,                                                 color: colors.win },
+    { label: t("stats.matches"), value: me.length,                                            color: colors.text },
   ];
 
   return (
@@ -80,7 +83,7 @@ export default function MineExtras({ data }) {
       {badges.length > 0 && (
         <Reveal order={3}>
           <Card>
-            <SectionLabel icon="award">Insignias</SectionLabel>
+            <SectionLabel icon="award">{t("lol.badges")}</SectionLabel>
             <View style={styles.badgesRow}>
               {badges.map(b => <Badge key={b.label} badge={b} />)}
             </View>
@@ -90,7 +93,7 @@ export default function MineExtras({ data }) {
 
       <Reveal order={3}>
         <Card>
-          <SectionLabel icon="barChart">Estadísticas generales</SectionLabel>
+          <SectionLabel icon="barChart">{t("lol.generalStats")}</SectionLabel>
           <View style={styles.statsGrid}>
             {statBoxes.map(s => (
               <View key={s.label} style={styles.statBox}>
@@ -105,7 +108,7 @@ export default function MineExtras({ data }) {
       {me.length >= 3 && (
         <Reveal order={4}>
           <Card>
-            <SectionLabel icon="trending">KDA últimas {Math.min(me.length, 10)} partidas</SectionLabel>
+            <SectionLabel icon="trending">{t("lol.kdaLast", { count: Math.min(me.length, 10) })}</SectionLabel>
             <LineChart
               data={chartData}
               width={CHART_WIDTH}

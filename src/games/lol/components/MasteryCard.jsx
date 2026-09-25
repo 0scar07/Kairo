@@ -1,12 +1,14 @@
 import React from "react";
+import { useT } from "../../../i18n/I18nProvider";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { Card, SectionLabel } from "../../../components/ui";
-import { championByKey, championIcon } from "../../../api/ddragon";
+import { championByKey, championIcon, championLabel } from "../../../api/ddragon";
 import { formatNumber } from "../../../utils/format";
 import { colors, radii, sizes, spacing, type, useAccent, withAlpha } from "../../../theme";
 
 // Maestría de campeones: los 3 con más puntos (nivel y puntos) y el nivel total de maestría
 export default function MasteryCard({ mastery }) {
+  const t = useT();
   const accent = useAccent("lol");
   const top = (mastery?.top || []).map(m => ({ ...m, champ: championByKey(m.championId) })).filter(m => m.champ);
   if (!top.length) return null;
@@ -14,8 +16,8 @@ export default function MasteryCard({ mastery }) {
   return (
     <Card>
       <View style={styles.header}>
-        <SectionLabel style={styles.label}>Maestría de campeones</SectionLabel>
-        <Text style={styles.score}>{formatNumber(mastery.score)} nivel total</Text>
+        <SectionLabel style={styles.label}>{t("lol.mastery")}</SectionLabel>
+        <Text style={styles.score}>{t("lol.masteryTotal", { score: formatNumber(mastery.score) })}</Text>
       </View>
       <View style={styles.row}>
         {top.map(m => (
@@ -26,8 +28,8 @@ export default function MasteryCard({ mastery }) {
                 <Text style={styles.levelText}>{m.level}</Text>
               </View>
             </View>
-            <Text style={styles.name} numberOfLines={1}>{m.champ.name}</Text>
-            <Text style={styles.points}>{formatNumber(m.points)} pts</Text>
+            <Text style={styles.name} numberOfLines={1}>{championLabel(m.champ.name)}</Text>
+            <Text style={styles.points}>{t("lol.points", { points: formatNumber(m.points) })}</Text>
           </View>
         ))}
       </View>

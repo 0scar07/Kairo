@@ -43,7 +43,7 @@ const limiter = rateLimit({
   skip: req => req.path === "/health",
   handler(req, _res, next) {
     const retryAfter = Math.max(1, Math.ceil((req.rateLimit.resetTime - Date.now()) / 1000));
-    next(new HttpError(429, `Demasiadas solicitudes, reintenta en ${retryAfter} s`, { retryAfter }));
+    next(new HttpError(429, `Demasiadas solicitudes, reintenta en ${retryAfter} s`, { retryAfter, code: "RATE_LIMITED_IP" }));
   },
 });
 

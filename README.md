@@ -55,6 +55,7 @@ Se buscan por **`#TAG`** y no tienen regiones.
 
 ### En toda la app
 
+- **Cinco idiomas:** español, English, Português, Français y Deutsch. Se elige solo según el idioma del dispositivo o a mano en Ajustes, se recuerda, y cambia los textos, los nombres de los campeones de LoL (Data Dragon), los mensajes de error del servidor y el formato de los números.
 - **Multijuego:** cinco juegos con un módulo cada uno; las pantallas genéricas no conocen ninguno. Cada juego se activa solo si el servidor tiene su key, y lo que no esté disponible aparece como "PRONTO" en vez de dar errores.
 - **Favoritos** con tarjetas (ícono, rango o trofeos con el color del juego) y **búsquedas recientes**; funcionan igual en los cinco juegos.
 - **Identidad visual:** acento propio por juego con transición suave, logos e íconos oficiales de cada juego y **cero emojis** (íconos vectoriales propios en SVG que toman el color del juego).
@@ -298,9 +299,15 @@ Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** pa
 
 `splash-icon.png` se muestra a 260 dp: si cambias `imageWidth` en `app.json`, cambia también `sizes.splashLogo` en `src/theme/spacing.js`.
 
+## 🌐 Idiomas
+
+Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como referencia) y se piden con `t("clave", { variable })`; los plurales usan `clave_one` / `clave_other`. `npm run verify` comprueba que todos los idiomas tengan las mismas claves y variables, que el código no pida claves inexistentes y que no sobren textos.
+
+**Añadir un idioma:** copia `en.js` a `src/i18n/locales/<id>.js` y tradúcelo, impórtalo en `src/i18n/index.js` (añádelo a `LANGUAGES` con su idioma de Data Dragon y su separador de miles y a `DICTS`) y ejecuta `npm run verify`. Los errores del backend llevan un `code` (por ejemplo `PLAYER_NOT_FOUND`) que la app traduce con las claves `errors.*`; el mensaje en español que envía el servidor queda como respaldo.
+
 ## ➕ Añadir un juego
 
-1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento…) e `index.js` (`api.search`, `getProfile`, `toFavorite`, `ProfileBody`). Si el juego se busca solo por tag y no tiene regiones, añade `tagSearch: true` y `hasRegion: false` al `meta.js`.
+1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento…; los textos van en `src/i18n/locales/`) e `index.js` (`api.search`, `getProfile`, `toFavorite`, `ProfileBody`). Si el juego se busca solo por tag y no tiene regiones, añade `tagSearch: true` y `hasRegion: false` al `meta.js`.
 2. Regístralo en `src/games/registry.js` (metadatos) y `src/games/index.js` (módulo completo).
 3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`. Si es de Supercell, añádelo a `GAMES` en `server/lib/supercell.js` y móntalo con `createSupercellRouter`.
 

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useT } from "../i18n/I18nProvider";
 import { View, StyleSheet } from "react-native";
 import ProfileView from "../components/ProfileView";
 import ProfileSkeleton from "../components/ProfileSkeleton";
@@ -13,6 +14,7 @@ import { colors } from "../theme";
  * Muestra un esqueleto animado mientras carga y un error con botón de reintentar si falla.
  */
 export default function ProfileScreen({ route }) {
+  const t = useT();
   const { gameId, gameName, tagLine, region } = route.params;
   const game = getGame(gameId);
   const [state, setState] = useState({ status: "loading" });   // loading | ready | error
@@ -28,7 +30,7 @@ export default function ProfileScreen({ route }) {
         addRecent({ gameId, region, gameName: data.account.gameName, tagLine: data.account.tagLine })
           .catch(e => console.warn("No se pudo guardar la búsqueda reciente:", e.message));
       })
-      .catch(e => { if (!cancelled) setState({ status: "error", message: errorMessage(e, "No se pudo cargar el perfil") }); });
+      .catch(e => { if (!cancelled) setState({ status: "error", message: errorMessage(e, t("profile.loadError")) }); });
     return () => { cancelled = true; };
   }, [gameId, gameName, tagLine, region, attempt]);
 
