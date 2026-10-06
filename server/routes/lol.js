@@ -6,7 +6,8 @@ const { HttpError } = require("../lib/errors");
 const { normalizeLive, soloEntry } = require("../lib/live");
 const storeRef = require("../lib/storeRef");
 const rank = require("../lib/rank");
-const { isRegion } = require("../lib/regions");
+const { isRegion, accountHost } = require("../lib/regions");
+const leaderboard = require("../lib/leaderboard");
 
 // League of Legends: summoner-v4, league-v4, match-v5 + maestría, rotación, estado del servidor y partida en vivo
 const router = createGameRouter("lol", PATHS.lol);
@@ -78,6 +79,21 @@ router.get("/live/:puuid", handle(async (req, res) => {
   players.forEach((p, i) => { ranks[p.puuid] = results[i].status === "fulfilled" ? soloEntry(results[i].value) : null; });
 
   res.json(normalizeLive(game, ranks));
+}));
+
+// Clasificación Challenger de una región (la usa la web): los N mejores por LP con su Riot ID.
+// La liga se guarda 10 min y cada cuenta 24 h, así que una región cuesta 1 + N consultas a Riot como mucho cada 10 min.
+// Si una cuenta falla, ese jugador sale sin nombre en vez de romper la lista.
+router.get("/leaderboard", handle(async (req, res) => {
+  const region = regionOf(req);
+  const queue = leaderboard.queueOf(req.query.queue);
+  const limit = leaderboard.limitOf(req.query.limit);
+  const league = await riotGet(`${platformHost(region)}/lol/league/v4/challengerleagues/by-queue/${queue}`, { ttl: 10 * MIN });
+  const top = leaderboard.topEntries(league.entries, limit);
+  const accounts = await Promise.allSettled(
+    top.map(e => riotGet(`${accountHost(region)}/riot/account/v1/accounts/by-puuid/${e.puuid}`, { ttl: 24 * 60 * MIN }))
+  );
+  res.json(leaderboard.withRiotIds(top, accounts.map(r => (r.status === "fulfilled" ? r.value : null))));
 }));
 
 // Historial de rango: fotos diarias de Solo/Dúo y Flex. Pedirlo también le dice al servidor que siga guardando a ese

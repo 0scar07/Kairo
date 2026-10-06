@@ -310,6 +310,7 @@ Todas las rutas aceptan `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1
 | `GET /lol/rotation` | Rotación semanal gratuita (IDs de campeón) |
 | `GET /lol/status` | Mantenimientos e incidencias del servidor de la región |
 | `GET /lol/live/:puuid` | Partida en curso con el rango Solo/Dúo de cada jugador (`{ inGame: false }` si no está jugando) |
+| `GET /lol/leaderboard?region=&queue=&limit=` | Clasificación Challenger (Solo/Dúo o Flex): los N mejores por LP con su Riot ID (máx. 50; liga 10 min y cuentas 24 h en caché). La usa [Kairo Web](https://github.com/0scar07/kairo-web) |
 
 Supercell (sin región; el tag se acepta con o sin `#`):
 
