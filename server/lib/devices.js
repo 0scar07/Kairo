@@ -11,7 +11,7 @@ const MAX_FAVORITES = 30;
 const PUSH_TOKEN_RE = /^Expo(?:nent)?PushToken\[[A-Za-z0-9_-]{10,80}\]$/;
 const PUUID_RE = /^[A-Za-z0-9_-]{20,100}$/;
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
-const PLATFORMS = ["android", "ios"];
+const PLATFORMS = ["android", "ios", "web"];   // web = navegador de Kairo Web (Web Push, ver lib/webpush.js)
 // Juegos con avisos: LoL (partida en vivo, rango) y los de Supercell con trofeos (el `puuid` del favorito es su tag)
 const SC_GAMES = ["brawlstars", "clashroyale"];
 const FAV_GAMES = ["lol", ...SC_GAMES];

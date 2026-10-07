@@ -11,6 +11,7 @@ const { createUpstream } = require("../lib/upstream");
  *   GET /player/:id           perfil (ID de cuenta o Steam64) con victorias, partidas recientes y héroes
  *   GET /match/:id            detalle de una partida: los 10 jugadores con objetos, oro, daño y la ventaja de oro
  *   GET /items                objetos: id -> { key, name, cost } (la imagen sale del CDN de Steam con `key`)
+ *   GET /herostats            héroes con partidas y victorias por medalla (1 Heraldo … 8 Inmortal) y en partidas pro
  */
 const upstream = createUpstream({
   id: "dota2",
@@ -103,6 +104,23 @@ router.get("/items", handle(async (_req, res) => {
   res.json({ items: out });
 }));
 
+/** heroStats de OpenDota reducido: por héroe, partidas y victorias de cada medalla y de las partidas profesionales */
+function reduceHeroStats(list) {
+  return (list || []).map(h => ({
+    id: h.id,
+    name: String(h.name || "").replace("npc_dota_hero_", ""),
+    label: h.localized_name,
+    attr: h.primary_attr,
+    roles: h.roles || [],
+    brackets: Array.from({ length: 8 }, (_, i) => ({ pick: h[`${i + 1}_pick`] || 0, win: h[`${i + 1}_win`] || 0 })),
+    pro: { pick: h.pro_pick || 0, win: h.pro_win || 0, ban: h.pro_ban || 0 },
+  }));
+}
+
+router.get("/herostats", handle(async (_req, res) => {
+  res.json({ items: reduceHeroStats(await upstream.get("/heroStats", { ttl: 60 * MIN })) });
+}));
+
 const ITEM_SLOTS = ["item_0", "item_1", "item_2", "item_3", "item_4", "item_5"];
 const BACKPACK = ["backpack_0", "backpack_1", "backpack_2"];
 
@@ -146,4 +164,4 @@ router.get("/match/:id", handle(async (req, res) => {
   res.json(reduceMatch(match));
 }));
 
-module.exports = { router, upstream, accountIdOf, reduceMatch };
+module.exports = { router, upstream, accountIdOf, reduceMatch, reduceHeroStats };

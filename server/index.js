@@ -11,8 +11,13 @@ const { createSupercellRouter } = require("./routes/supercell");
 const extra = require("./lib/extra");
 const { createStore } = require("./lib/store");
 const { createDevicesRouter } = require("./routes/devices");
-const push = require("./lib/push");
+const expoPush = require("./lib/push");
+const webpush = require("./lib/webpush");
+const { createPushRouter } = require("./lib/pushRouter");
 const { Watcher } = require("./lib/watcher");
+const { BuildsJob } = require("./lib/buildsJob");
+const { createBuildsRouter } = require("./routes/builds");
+const { createSyncRouter } = require("./routes/sync");
 const { RankTracker } = require("./lib/rankTracker");
 const { TrophyTracker } = require("./lib/trophyTracker");
 const storeRef = require("./lib/storeRef");
@@ -60,6 +65,14 @@ app.get("/health", (_req, res) => res.json({
   defaultRegion: DEFAULT_REGION,
 }));
 
+// Builds de los Challenger (se juntan solas en segundo plano; ver lib/buildsJob.js). Se registran antes que /lol para
+// que /lol/builds no lo tome el router del juego.
+const store = createStore();
+// Avisos: a Expo (la app) o a Web Push (Kairo Web), según el token de cada dispositivo
+const push = createPushRouter({ expo: expoPush, web: webpush, store });
+const buildsJob = new BuildsJob({ store });
+app.use("/lol/builds", createBuildsRouter(buildsJob));
+
 // Rutas por juego: /lol/... y /tft/...  (todas aceptan ?region=la1|la2|na1|br1|euw1|kr...)
 app.use("/lol", lolRouter);
 app.use("/tft", tftRouter);
@@ -72,19 +85,25 @@ for (const [id, module] of Object.entries(extra.ROUTES)) app.use(`/${id}`, modul
 
 // Dispositivos para las notificaciones (Postgres si hay DATABASE_URL; si no, un archivo JSON local).
 // Si el almacén no arranca, el resto de la API sigue funcionando y solo /devices responde 503.
-const store = createStore();
 storeRef.set(store);
 const storeReady = store.init().then(() => console.log(`   dispositivos: almacén ${store.kind}`)).catch(e => {
   console.error("No pude iniciar el almacén de dispositivos:", e.message);
   throw e;
 });
 storeReady.catch(() => {});
+buildsJob.ready = storeReady;
 app.use("/devices", (_req, _res, next) => storeReady.then(() => next(), () => next(new HttpError(503, "Las notificaciones no están disponibles ahora", { code: "DEVICES_UNAVAILABLE" }))),
   createDevicesRouter(store, { maxDevices: config.maxDevices, push }));
+
+// Favoritos sincronizados entre dispositivos de Kairo Web (códigos de 12 caracteres, sin cuentas)
+app.use("/sync", (_req, _res, next) => storeReady.then(() => next(), () => next(new HttpError(503, "La sincronización no está disponible ahora", { code: "SYNC_UNAVAILABLE" }))),
+  createSyncRouter(store));
 
 // Vigilante: revisa a los favoritos con alertas y manda las notificaciones (solo si el almacén arrancó)
 const watcher = new Watcher({ store, push, rank: new RankTracker({ store, push }), trophies: new TrophyTracker({ store, push }), maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
 storeReady.then(() => { if (config.watcherEnabled) watcher.start(config.watchIntervalMs); }).catch(() => {});
+// BUILDS_ENABLED=false lo apaga (por ejemplo, para no gastar cupo de Riot en local)
+storeReady.then(() => { if (process.env.BUILDS_ENABLED !== "false") buildsJob.start(); }).catch(() => {});
 
 // Imágenes firmadas para las notificaciones (las descarga el celular)
 app.use("/art", artRouter);
@@ -115,6 +134,7 @@ const server = app.listen(config.port, () => {
 function shutdown(signal) {
   console.log(`${signal} recibido: cerrando…`);
   watcher.stop();
+  buildsJob.stop();
   server.close(() => store.close().catch(() => {}).finally(() => process.exit(0)));
   setTimeout(() => process.exit(1), 10_000).unref();
 }

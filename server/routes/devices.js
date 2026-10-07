@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 const { handle } = require("../lib/riot");
 const { HttpError } = require("../lib/errors");
 const text = require("../lib/pushText");
+const webpush = require("../lib/webpush");
 const defaultArt = require("../lib/artLoader");
 const {
   DEFAULT_SETTINGS, parsePushToken, parsePlatform, parseFavorites, parseSettings,
@@ -14,6 +15,9 @@ const {
  * Registro de dispositivos para las notificaciones (sin cuentas).
  *
  *   POST   /devices                 { pushToken, platform?, favorites?, settings? } -> { deviceId, secret, device }
+ *                                    navegador (Kairo Web): { platform: "web", webPush: <PushSubscription>, ... }
+ *   GET    /devices/webpush-key     -> { publicKey } (clave VAPID para suscribirse; 503 si no está configurado)
+ *   PUT    /devices/me/webpush      { webPush }  (el navegador renovó su suscripción)
  *   GET    /devices/me              -> device
  *   PUT    /devices/me/favorites    { favorites: [{ puuid, region, riotId, muted? }] }   (reemplaza la lista)
  *   PUT    /devices/me/settings     { enabled?, notifyStart?, notifyEnd?, quiet? }        (cambia solo lo enviado)
@@ -59,10 +63,18 @@ function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20, p
     return next;
   };
 
+  router.get("/webpush-key", (_req, res, next) => {
+    if (!webpush.configured()) return next(new HttpError(503, "Los avisos en el navegador no están configurados en el servidor", { code: "WEBPUSH_NOT_CONFIGURED" }));
+    res.json({ publicKey: webpush.publicKey() });
+  });
+
   router.post("/", registerLimiter, handle(async (req, res) => {
     const body = req.body || {};
-    const pushToken = parsePushToken(body.pushToken);
     const platform = parsePlatform(body.platform);
+    // Un navegador se identifica por su suscripción de Web Push; la app, por su token de Expo
+    const subscription = platform === "web" ? webpush.parseSubscription(body.webPush) : null;
+    if (platform === "web" && !webpush.configured()) throw new HttpError(503, "Los avisos en el navegador no están configurados en el servidor", { code: "WEBPUSH_NOT_CONFIGURED" });
+    const pushToken = subscription ? webpush.tokenFor(subscription) : parsePushToken(body.pushToken);
     const favorites = body.favorites !== undefined ? parseFavorites(body.favorites) : undefined;
     const settings = body.settings !== undefined ? parseSettings(body.settings) : undefined;
 
@@ -75,6 +87,7 @@ function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20, p
     const device = await save(existing || { id: crypto.randomUUID(), pushToken, createdAt: now, favorites: [], settings: structuredClone(DEFAULT_SETTINGS) }, {
       secretHash: hashSecret(secret),
       platform,
+      ...(subscription ? { webPush: subscription } : {}),
       ...(favorites ? { favorites } : {}),
       ...(settings ? { settings } : {}),
     });
@@ -91,6 +104,12 @@ function createDevicesRouter(store, { maxDevices = 5000, registerPerHour = 20, p
   router.put("/me/settings", auth, handle(async (req, res) => {
     const settings = parseSettings(req.body, req.device.settings);
     res.json(publicDevice(await save(req.device, { settings })));
+  }));
+
+  router.put("/me/webpush", auth, handle(async (req, res) => {
+    if (req.device.platform !== "web") throw new HttpError(400, "Este dispositivo no es un navegador", { code: "INVALID_PLATFORM" });
+    const subscription = webpush.parseSubscription(req.body?.webPush);
+    res.json(publicDevice(await save(req.device, { webPush: subscription, pushToken: webpush.tokenFor(subscription) })));
   }));
 
   router.put("/me/token", auth, handle(async (req, res) => {

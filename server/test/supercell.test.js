@@ -15,6 +15,7 @@ const upstream = http.createServer((req, res) => {
   if (req.url.startsWith("/v1/rankings/co/players")) return send(200, { items: [{ tag: "#CO", name: "Colombia" }] });
   if (req.url.startsWith("/v1/rankings/global/brawlers/16000001")) return send(200, { items: [{ tag: "#B1", name: "Colt" }] });
   if (req.url === "/v1/brawlers") return send(200, { items: [{ id: 16000000, name: "SHELLY" }] });
+  if (req.url === "/v1/events/rotation") return send(200, [{ startTime: "20261007T080000.000Z", endTime: "20261008T080000.000Z", slotId: 1, event: { id: 15000026, mode: "gemGrab", map: "Hard Rock Mine" } }]);
   if (req.url === "/v1/clubs/%232222") return send(404, { reason: "notFound" });
   if (req.url === "/v1/clubs/%232CLQ") return send(200, { tag: "#2CLQ", name: "Club", members: [{ tag: "#A" }] });
   if (req.url.endsWith("/battlelog")) return send(200, req.url.includes("%239999") ? [{ battleTime: "a" }] : { items: [{ battleTime: "b" }] });
@@ -94,6 +95,12 @@ test("club con miembros, mensaje propio si no existe, y lista de brawlers", asyn
   assert.strictEqual(missing.status, 404);
   assert.match(missing.body.error, /Club no encontrado/);
   assert.deepStrictEqual((await get("/brawlstars/brawlers")).body, { items: [{ id: 16000000, name: "SHELLY" }] });
+});
+
+test("eventos de Brawl Stars con su modo y mapa", async () => {
+  const { body } = await get("/brawlstars/events");
+  assert.deepStrictEqual(body.items[0].event, { id: 15000026, mode: "gemGrab", map: "Hard Rock Mine", modifiers: [] });
+  assert.strictEqual(body.items[0].slotId, 1);
 });
 
 test("un tag inválido responde 400 sin llamar a Supercell", async () => {

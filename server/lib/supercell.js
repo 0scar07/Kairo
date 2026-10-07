@@ -44,7 +44,7 @@ const GAMES = {
 };
 
 // TTL (ms) por tipo de dato
-const TTL = { player: 60_000, battles: 30_000, top: 10 * 60_000, club: 2 * 60_000, brawlers: 24 * 60 * 60_000 };
+const TTL = { player: 60_000, battles: 30_000, top: 10 * 60_000, club: 2 * 60_000, brawlers: 24 * 60 * 60_000, events: 10 * 60_000 };
 
 const cache = new TtlCache({ max: 300 });
 

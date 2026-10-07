@@ -11,6 +11,7 @@ const { GAMES, TTL, normalizeTag, countryOf, brawlerIdOf, apiGet, playerGet } = 
  *        Brawl Stars además: &country=co (ranking de un país) y &brawler=16000000 (ranking de un brawler)
  *   GET /club/:tag     club (Brawl Stars) o clan (Clash Royale, Clash of Clans) con sus miembros y la guerra actual
  *   GET /brawlers      lista de brawlers con sus habilidades estelares y gadgets (solo Brawl Stars)
+ *   GET /events        eventos activos y próximos con su modo y mapa (solo Brawl Stars)
  * El tag se acepta con o sin "#".
  */
 function createSupercellRouter(gameId) {
@@ -50,6 +51,18 @@ function createSupercellRouter(gameId) {
     router.get("/brawlers", handle(async (_req, res) => {
       const data = await apiGet(gameId, "/brawlers", TTL.brawlers);
       res.json({ items: data.items || [] });
+    }));
+
+    // Rotación de eventos: la API responde una lista con startTime, endTime y event { id (mapa), mode, map }
+    router.get("/events", handle(async (_req, res) => {
+      const data = await apiGet(gameId, "/events/rotation", TTL.events);
+      const list = Array.isArray(data) ? data : data.items || [];
+      res.json({
+        items: list.map(e => ({
+          startTime: e.startTime, endTime: e.endTime, slotId: e.slotId ?? null,
+          event: { id: e.event?.id ?? null, mode: e.event?.mode ?? null, map: e.event?.map ?? null, modifiers: e.event?.modifiers || [] },
+        })),
+      });
     }));
   }
 
