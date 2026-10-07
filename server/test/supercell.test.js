@@ -12,6 +12,11 @@ const upstream = http.createServer((req, res) => {
   if (req.url === "/v1/players/%23LLLL") return send(403, { reason: "accessDenied.invalidIp" });
   if (req.url === "/v1/players/%23JJJJ") return send(503, { reason: "inMaintenance" });
   if (req.url.startsWith("/v1/rankings/global/players")) return send(200, { items: [{ tag: "#2PP", name: "Top" }] });
+  if (req.url.startsWith("/v1/rankings/co/players")) return send(200, { items: [{ tag: "#CO", name: "Colombia" }] });
+  if (req.url.startsWith("/v1/rankings/global/brawlers/16000001")) return send(200, { items: [{ tag: "#B1", name: "Colt" }] });
+  if (req.url === "/v1/brawlers") return send(200, { items: [{ id: 16000000, name: "SHELLY" }] });
+  if (req.url === "/v1/clubs/%232222") return send(404, { reason: "notFound" });
+  if (req.url === "/v1/clubs/%232CLQ") return send(200, { tag: "#2CLQ", name: "Club", members: [{ tag: "#A" }] });
   if (req.url.endsWith("/battlelog")) return send(200, req.url.includes("%239999") ? [{ battleTime: "a" }] : { items: [{ battleTime: "b" }] });
   return send(200, { tag: "#2PP0", name: "Prueba" });
 });
@@ -71,6 +76,24 @@ test("404, 403 y 503 de Supercell se traducen a mensajes en español", async () 
 
   const maintenance = await get("/brawlstars/player/JJJJ");
   assert.strictEqual(maintenance.body.code, "MAINTENANCE");
+});
+
+test("ranking de Brawl Stars por país y por brawler", async () => {
+  assert.strictEqual((await get("/brawlstars/top?country=CO")).body.items[0].name, "Colombia");
+  assert.strictEqual((await get("/brawlstars/top?brawler=16000001")).body.items[0].name, "Colt");
+  assert.strictEqual((await get("/brawlstars/top?country=colombia")).status, 400);
+  assert.strictEqual((await get("/brawlstars/top?brawler=abc")).status, 400);
+});
+
+test("club con miembros, mensaje propio si no existe, y lista de brawlers", async () => {
+  const ok = await get("/brawlstars/club/%232clq");
+  assert.strictEqual(ok.status, 200);
+  assert.strictEqual(ok.body.club.members.length, 1);
+  assert.strictEqual(ok.body.war, null);   // Brawl Stars no tiene guerra
+  const missing = await get("/brawlstars/club/2222");
+  assert.strictEqual(missing.status, 404);
+  assert.match(missing.body.error, /Club no encontrado/);
+  assert.deepStrictEqual((await get("/brawlstars/brawlers")).body, { items: [{ id: 16000000, name: "SHELLY" }] });
 });
 
 test("un tag inválido responde 400 sin llamar a Supercell", async () => {

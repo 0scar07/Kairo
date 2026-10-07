@@ -9,6 +9,8 @@ const { createUpstream } = require("../lib/upstream");
  *   GET /search?q=nombre      jugadores con ese nombre de Steam
  *   GET /heroes               héroes (id, nombre interno, nombre visible)
  *   GET /player/:id           perfil (ID de cuenta o Steam64) con victorias, partidas recientes y héroes
+ *   GET /match/:id            detalle de una partida: los 10 jugadores con objetos, oro, daño y la ventaja de oro
+ *   GET /items                objetos: id -> { key, name, cost } (la imagen sale del CDN de Steam con `key`)
  */
 const upstream = createUpstream({
   id: "dota2",
@@ -92,4 +94,56 @@ router.get("/player/:id", handle(async (req, res) => {
   });
 }));
 
-module.exports = { router, upstream, accountIdOf };
+router.get("/items", handle(async (_req, res) => {
+  const items = await upstream.get("/constants/items", { ttl: 24 * 60 * MIN });
+  const out = {};
+  for (const [key, it] of Object.entries(items || {})) {
+    if (it && Number.isFinite(it.id)) out[it.id] = { key, name: it.dname || key, cost: it.cost ?? null };
+  }
+  res.json({ items: out });
+}));
+
+const ITEM_SLOTS = ["item_0", "item_1", "item_2", "item_3", "item_4", "item_5"];
+const BACKPACK = ["backpack_0", "backpack_1", "backpack_2"];
+
+/** Detalle de partida de OpenDota reducido a lo que muestra la web */
+function reduceMatch(m) {
+  return {
+    matchId: m.match_id,
+    radiantWin: Boolean(m.radiant_win),
+    duration: m.duration,
+    startTime: m.start_time,
+    gameMode: m.game_mode,
+    lobbyType: m.lobby_type,
+    radiantScore: m.radiant_score ?? null,
+    direScore: m.dire_score ?? null,
+    // Ventaja de oro del Radiant minuto a minuto (negativa = va ganando el Dire); solo en partidas analizadas
+    goldAdvantage: Array.isArray(m.radiant_gold_adv) ? m.radiant_gold_adv : null,
+    players: (m.players || []).map(p => ({
+      accountId: p.account_id ? String(p.account_id) : null,
+      name: p.personaname || null,
+      radiant: p.isRadiant ?? p.player_slot < 128,
+      heroId: p.hero_id,
+      level: p.level,
+      kills: p.kills, deaths: p.deaths, assists: p.assists,
+      lastHits: p.last_hits, denies: p.denies,
+      goldPerMin: p.gold_per_min, xpPerMin: p.xp_per_min,
+      netWorth: p.net_worth ?? p.total_gold ?? null,
+      heroDamage: p.hero_damage ?? 0, towerDamage: p.tower_damage ?? 0, heroHealing: p.hero_healing ?? 0,
+      items: ITEM_SLOTS.map(k => p[k] || 0),
+      backpack: BACKPACK.map(k => p[k] || 0),
+      neutral: p.item_neutral || 0,
+      rankTier: p.rank_tier ?? null,
+    })),
+  };
+}
+
+router.get("/match/:id", handle(async (req, res) => {
+  const id = String(req.params.id || "");
+  if (!/^\d{1,20}$/.test(id)) throw new HttpError(400, "ID de partida no válido", { code: "INVALID_MATCH_ID" });
+  const match = await upstream.get(`/matches/${id}`, { ttl: 60 * MIN, notFound: { message: "Partida no encontrada", code: "MATCH_NOT_FOUND" } });
+  if (!match?.players) throw new HttpError(404, "Partida no encontrada", { code: "MATCH_NOT_FOUND" });
+  res.json(reduceMatch(match));
+}));
+
+module.exports = { router, upstream, accountIdOf, reduceMatch };

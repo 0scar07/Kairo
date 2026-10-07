@@ -19,7 +19,9 @@ test("soloEntry se queda con Solo/Dúo y con lo que usa la app", () => {
     { queueType: "RANKED_FLEX_SR", tier: "GOLD" },
     { queueType: "RANKED_SOLO_5x5", tier: "DIAMOND", rank: "II", leaguePoints: 45, wins: 10, losses: 5, hotStreak: true, leagueId: "x" },
   ];
-  assert.deepStrictEqual(soloEntry(entries), { tier: "DIAMOND", rank: "II", leaguePoints: 45, wins: 10, losses: 5 });
+  assert.deepStrictEqual(soloEntry(entries), {
+    tier: "DIAMOND", rank: "II", leaguePoints: 45, wins: 10, losses: 5, hotStreak: true, veteran: false, freshBlood: false,
+  });
   assert.strictEqual(soloEntry([]), null);
   assert.strictEqual(soloEntry(undefined), null);
 });

@@ -8,6 +8,9 @@ const storeRef = require("../lib/storeRef");
 const rank = require("../lib/rank");
 const { isRegion, accountHost } = require("../lib/regions");
 const leaderboard = require("../lib/leaderboard");
+const { masterySummary } = require("../lib/insights");
+const { reduceTimeline } = require("../lib/timeline");
+const { routingHost, regionFromMatchId } = require("../lib/regions");
 
 // League of Legends: summoner-v4, league-v4, match-v5 + maestría, rotación, estado del servidor y partida en vivo
 const router = createGameRouter("lol", PATHS.lol);
@@ -81,19 +84,54 @@ router.get("/live/:puuid", handle(async (req, res) => {
   res.json(normalizeLive(game, ranks));
 }));
 
-// Clasificación Challenger de una región (la usa la web): los N mejores por LP con su Riot ID.
-// La liga se guarda 10 min y cada cuenta 24 h, así que una región cuesta 1 + N consultas a Riot como mucho cada 10 min.
-// Si una cuenta falla, ese jugador sale sin nombre en vez de romper la lista.
+// Clasificación de una región (la usa la web): Challenger, Gran Maestro o Maestro, por LP y con su Riot ID.
+// ?tier=challenger|grandmaster|master &queue=RANKED_SOLO_5x5|RANKED_FLEX_SR &start=0 &limit=10 (paginación)
+// La liga se guarda 10 min y cada cuenta 24 h, así que una página cuesta 1 + N consultas a Riot como mucho cada 10 min.
+// Si una cuenta falla, ese jugador sale sin nombre en vez de romper la lista. X-Total-Count = jugadores de la liga.
 router.get("/leaderboard", handle(async (req, res) => {
   const region = regionOf(req);
-  const queue = leaderboard.queueOf(req.query.queue);
   const limit = leaderboard.limitOf(req.query.limit);
-  const league = await riotGet(`${platformHost(region)}/lol/league/v4/challengerleagues/by-queue/${queue}`, { ttl: 10 * MIN });
-  const top = leaderboard.topEntries(league.entries, limit);
+  const start = leaderboard.startOf(req.query.start);
+  const league = await riotGet(`${platformHost(region)}${leaderboard.leaguePath(req.query.tier, req.query.queue)}`, { ttl: 10 * MIN });
+  const top = leaderboard.topEntries(league.entries, limit, start);
   const accounts = await Promise.allSettled(
     top.map(e => riotGet(`${accountHost(region)}/riot/account/v1/accounts/by-puuid/${e.puuid}`, { ttl: 24 * 60 * MIN }))
   );
+  res.set("X-Total-Count", String((league.entries || []).length));
+  res.set("Access-Control-Expose-Headers", "X-Total-Count");
   res.json(leaderboard.withRiotIds(top, accounts.map(r => (r.status === "fulfilled" ? r.value : null))));
+}));
+
+// Etiquetas de la partida en vivo (las arma la web): la maestría completa de cada jugador resumida respecto al campeón
+// que está jugando. Es 1 consulta por jugador (10 en total), guardada 10 min; si alguna falla, ese jugador va sin datos.
+// Responde { inGame, gameId, players: { [puuid]: { champion, position, top, totalPoints, championsPlayed } | null } }.
+router.get("/live/:puuid/insights", handle(async (req, res) => {
+  const puuid = puuidOf(req);
+  const host = platformHost(regionOf(req));
+  let game;
+  try {
+    game = await riotGet(`${host}/lol/spectator/v5/active-games/by-summoner/${puuid}`, { ttl: 15_000, notFound: { message: "No está en partida", code: "NOT_IN_GAME" } });
+  } catch (e) {
+    if (e instanceof HttpError && e.status === 404) return res.json({ inGame: false, players: {} });
+    throw e;
+  }
+  const players = (game.participants || []).filter(p => p.puuid);
+  const results = await Promise.allSettled(
+    players.map(p => riotGet(`${host}/lol/champion-mastery/v4/champion-masteries/by-puuid/${p.puuid}`, { ttl: 10 * MIN }))
+  );
+  const out = {};
+  players.forEach((p, i) => { out[p.puuid] = results[i].status === "fulfilled" ? masterySummary(results[i].value, p.championId) : null; });
+  res.json({ inGame: true, gameId: game.gameId, players: out });
+}));
+
+// Línea de tiempo de una partida terminada: oro, experiencia y farmeo por minuto y objetivos (ver lib/timeline.js)
+const MATCH_ID_RE = /^[A-Za-z0-9]+_\d+$/;
+router.get("/match/:matchId/timeline", handle(async (req, res) => {
+  const { matchId } = req.params;
+  if (!MATCH_ID_RE.test(matchId)) throw new HttpError(400, "ID de partida no válido", { code: "INVALID_MATCH_ID" });
+  const region = regionFromMatchId(matchId) || regionOf(req);
+  const raw = await riotGet(`${routingHost(region)}/lol/match/v5/matches/${matchId}/timeline`, { ttl: 60 * MIN, notFound: { message: "Partida no encontrada", code: "MATCH_NOT_FOUND" } });
+  res.json(reduceTimeline(raw));
 }));
 
 // Historial de rango: fotos diarias de Solo/Dúo y Flex. Pedirlo también le dice al servidor que siga guardando a ese

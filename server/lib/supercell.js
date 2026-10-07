@@ -18,6 +18,8 @@ const GAMES = {
     base: "https://bsproxy.royaleapi.dev/v1",
     battlelog: true,
     top: "/rankings/global/players",
+    club: "/clubs",          // los clubes de Brawl Stars
+    war: null,
   },
   clashroyale: {
     name: "Clash Royale",
@@ -26,6 +28,8 @@ const GAMES = {
     base: "https://proxy.royaleapi.dev/v1",
     battlelog: true,
     top: "/locations/global/pathoflegend/players",
+    club: "/clans",
+    war: "/currentriverrace",   // guerra de clanes (río)
   },
   clashofclans: {
     name: "Clash of Clans",
@@ -34,11 +38,13 @@ const GAMES = {
     base: "https://cocproxy.royaleapi.dev/v1",
     battlelog: false,
     top: "/locations/global/rankings/players",
+    club: "/clans",
+    war: "/currentwar",         // la guerra no se ve si el clan tiene el registro privado
   },
 };
 
 // TTL (ms) por tipo de dato
-const TTL = { player: 60_000, battles: 30_000, top: 10 * 60_000 };
+const TTL = { player: 60_000, battles: 30_000, top: 10 * 60_000, club: 2 * 60_000, brawlers: 24 * 60 * 60_000 };
 
 const cache = new TtlCache({ max: 300 });
 
@@ -55,15 +61,15 @@ function normalizeTag(raw) {
 const configured = id => Boolean(process.env[GAMES[id].keyEnv]);
 const baseOf = id => (process.env[GAMES[id].baseEnv] || GAMES[id].base).replace(/\/+$/, "");
 
-// Traduce los errores de Supercell / de red a HttpError
-function toHttpError(id, e) {
+// Traduce los errores de Supercell / de red a HttpError (notFound: mensaje para 404, por defecto el de jugador)
+function toHttpError(id, e, notFound) {
   if (e instanceof HttpError) return e;
   const { name } = GAMES[id];
   const provider = name;
   const status = e.response?.status;
   const reason = e.response?.data?.reason;
 
-  if (status === 404) return new HttpError(404, "Jugador no encontrado: revisa el tag", { code: "TAG_NOT_FOUND" });
+  if (status === 404) return new HttpError(404, notFound || "Jugador no encontrado: revisa el tag", { code: "TAG_NOT_FOUND" });
   if (status === 400) return new HttpError(400, "Tag no válido", { code: "INVALID_TAG" });
   if (status === 401 || status === 403) {
     // 403 "accessDenied.invalidIp": la key no permite la IP desde la que sale la petición
@@ -78,7 +84,7 @@ function toHttpError(id, e) {
 }
 
 /** GET a una ruta de la API del juego con caché y errores normalizados. */
-async function apiGet(id, path, ttl) {
+async function apiGet(id, path, ttl, notFound) {
   if (!configured(id)) {
     throw new HttpError(503, `${GAMES[id].name} no está configurado en el servidor`, { code: "NOT_CONFIGURED", provider: GAMES[id].name });
   }
@@ -87,11 +93,20 @@ async function apiGet(id, path, ttl) {
     return await cache.wrap(url, ttl, () =>
       axios.get(url, { timeout: 8000, headers: { Authorization: `Bearer ${process.env[GAMES[id].keyEnv]}` } }).then(r => r.data));
   } catch (e) {
-    throw toHttpError(id, e);
+    throw toHttpError(id, e, notFound);
   }
 }
+
+/** País de un ranking: "global" o el código de 2 letras ("co", "MX"); null si no es válido */
+function countryOf(raw) {
+  const value = String(raw || "global").trim().toLowerCase();
+  return value === "global" || /^[a-z]{2}$/.test(value) ? value : null;
+}
+
+/** ID de brawler (16000000 en adelante) o null */
+const brawlerIdOf = raw => (/^160\d{5}$/.test(String(raw || "")) ? String(raw) : null);
 
 /** `/players/%23TAG[/suffix]` */
 const playerGet = (id, tag, suffix, ttl) => apiGet(id, `/players/%23${tag}${suffix}`, ttl);
 
-module.exports = { GAMES, TTL, TAG_RE, normalizeTag, configured, apiGet, playerGet, toHttpError, cache };
+module.exports = { GAMES, TTL, TAG_RE, normalizeTag, countryOf, brawlerIdOf, configured, apiGet, playerGet, toHttpError, cache };

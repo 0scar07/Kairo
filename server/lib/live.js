@@ -3,11 +3,18 @@
 
 const SOLO_QUEUE = "RANKED_SOLO_5x5";
 
-/** De la lista de entradas de league-v4 se queda con Solo/Dúo, sin campos que la app no usa. */
+/**
+ * De la lista de entradas de league-v4 se queda con Solo/Dúo, sin campos que la app no usa.
+ * hotStreak (3+ victorias seguidas), veteran (100+ partidas en esa división) y freshBlood (recién llegado a la liga)
+ * son marcas de Riot que la web usa para las etiquetas de la partida en vivo.
+ */
 function soloEntry(entries) {
   const e = (entries || []).find(x => x.queueType === SOLO_QUEUE);
   return e
-    ? { tier: e.tier, rank: e.rank, leaguePoints: e.leaguePoints, wins: e.wins, losses: e.losses }
+    ? {
+      tier: e.tier, rank: e.rank, leaguePoints: e.leaguePoints, wins: e.wins, losses: e.losses,
+      hotStreak: Boolean(e.hotStreak), veteran: Boolean(e.veteran), freshBlood: Boolean(e.freshBlood),
+    }
     : null;
 }
 

@@ -32,3 +32,18 @@ test("queueOf y limitOf validan lo que llega por la URL", () => {
   assert.strictEqual(limitOf("0"), 10);   // 0 no es válido: valor por defecto
   assert.strictEqual(limitOf("abc"), 10);
 });
+
+test("tierOf, startOf y leaguePath eligen la liga y la página", () => {
+  const { tierOf, startOf, leaguePath } = require("../lib/leaderboard");
+  assert.strictEqual(tierOf("GrandMaster"), "grandmaster");
+  assert.strictEqual(tierOf("diamond"), "challenger");   // las ligas por división no tienen "los mejores"
+  assert.strictEqual(startOf("20"), 20);
+  assert.strictEqual(startOf("-5"), 0);
+  assert.strictEqual(leaguePath("master", "RANKED_FLEX_SR"), "/lol/league/v4/masterleagues/by-queue/RANKED_FLEX_SR");
+  assert.strictEqual(leaguePath(undefined, undefined), "/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5");
+});
+
+test("topEntries pagina desde `start`", () => {
+  const list = [entry("a", 900), entry("b", 800), entry("c", 700), entry("d", 600)];
+  assert.deepStrictEqual(topEntries(list, 2, 2).map(e => e.puuid), ["c", "d"]);
+});
