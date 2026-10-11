@@ -73,6 +73,7 @@ export default {
   // --- Profile
   "profile.loadError": "Couldn't load the profile",
   "profile.refreshError": "Couldn't refresh: {error}",
+  "profile.updated": "Updated {time}",
   "profile.favoriteError": "Couldn't update favorites: {error}",
   "ranked.solo": "Solo / Duo",
   "ranked.flex": "Flex 5v5",

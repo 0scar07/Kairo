@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { ScrollView, StyleSheet, RefreshControl } from "react-native";
+import { ScrollView, StyleSheet, RefreshControl, Text } from "react-native";
 import Reveal from "./Reveal";
 import { ErrorBanner, Notice, ProfileHeader } from "./ui";
 import { activeLanguage } from "../i18n";
@@ -16,7 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { PressableScale, showHud } from "./ui";
 import { useNotifications } from "../notifications/NotificationsProvider";
 import { success, tap, warning } from "../utils/haptics";
-import { colors, sizes, spacing, useAccent } from "../theme";
+import { colors, sizes, spacing, type, useAccent } from "../theme";
 
 /**
  * Perfil genérico: cabecera, favorito, refresco y errores. El contenido propio de cada juego
@@ -36,6 +36,9 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
   const [isFav, setIsFav] = useState(false);
   const [offline, setOffline] = useState(offlineAt || null);   // fecha de la copia local que se está mostrando sin conexión
   const [alerts, setAlerts] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState(() => (offlineAt ? new Date(offlineAt).getTime() : Date.now()));
+  const [, setTick] = useState(0);   // vuelve a pintar "hace X min" cada 30 s
+  useEffect(() => { const id = setInterval(() => setTick(n => n + 1), 30000); return () => clearInterval(id); }, []);
   const { supported, toggleAlerts, favoritesVersion } = useNotifications();
 
   const { account, region } = data;
@@ -81,6 +84,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
     try {
       setData(await game.api.search(account.lookup ?? account.gameName, account.tagLine, region));
       setOffline(null);
+      setUpdatedAt(Date.now());
       success();
     } catch (e) {
       warning();
@@ -142,6 +146,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
             </>
           )}
         />
+        <Text style={styles.updated} accessibilityLiveRegion="polite">{t("profile.updated", { time: relativeTime(updatedAt) })}</Text>
       </Reveal>
 
       <game.ProfileBody data={data} setData={setData} setError={setError} mine={mine} />
@@ -149,7 +154,26 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
   );
 }
 
+// "ahora", "hace 3 minutos", "hace 2 horas"… en el idioma de la app
+// Hermes (Android) puede no traer Intl.RelativeTimeFormat: entonces se usa un formato compacto ("3 min").
+function relativeTime(ts) {
+  const secs = Math.round((ts - Date.now()) / 1000);
+  if (typeof Intl === "undefined" || typeof Intl.RelativeTimeFormat !== "function") {
+    const s = -secs;
+    if (s < 60) return "< 1 min";
+    if (s < 3600) return `${Math.round(s / 60)} min`;
+    if (s < 86400) return `${Math.round(s / 3600)} h`;
+    return `${Math.round(s / 86400)} d`;
+  }
+  const rtf = new Intl.RelativeTimeFormat(activeLanguage(), { numeric: "auto" });
+  if (secs > -45) return rtf.format(0, "second");
+  if (secs > -3600) return rtf.format(Math.round(secs / 60), "minute");
+  if (secs > -86400) return rtf.format(Math.round(secs / 3600), "hour");
+  return rtf.format(Math.round(secs / 86400), "day");
+}
+
 const styles = StyleSheet.create({
+  updated:   { ...type.caption, color: colors.textMuted, textAlign: "center", marginTop: -spacing.sm, marginBottom: spacing.md },
   iconButton: { padding: spacing.xs + spacing.xxs },
   container: { flex: 1, backgroundColor: colors.bg },
   content:   { padding: spacing.lg },

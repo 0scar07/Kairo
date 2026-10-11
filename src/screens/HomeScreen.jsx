@@ -16,7 +16,7 @@ import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequence, withSpring } from "react-native-reanimated";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import GameLogo from "../components/GameLogo";
@@ -281,7 +281,7 @@ export default function HomeScreen({ navigation }) {
                   accessibilityState={{ selected: active }}
                   style={[styles.gameBtn, active && { backgroundColor: withAlpha(g.accent, 0.14), borderColor: g.accent }]}
                 >
-                  <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={active ? g.accent : colors.textMuted} muted={!active} />
+                  <GamePop active={active}><GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={active ? g.accent : colors.textMuted} muted={!active} /></GamePop>
                   <Text style={[styles.gameShort, active && { color: g.accent }]}>{g.short}</Text>
                 </PressableScale>
               );
@@ -380,6 +380,16 @@ export default function HomeScreen({ navigation }) {
       <CompactTitleBar y={y} title={t("home.title")} />
     </View>
   );
+}
+
+// El logo del juego recién elegido da un pequeño salto
+function GamePop({ active, children }) {
+  const s = useSharedValue(1);
+  useEffect(() => {
+    if (active) s.value = withSequence(withSpring(1.2, { damping: 9, stiffness: 380 }), withSpring(1, { damping: 12, stiffness: 240 }));
+  }, [active]);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  return <Animated.View style={style}>{children}</Animated.View>;
 }
 
 const styles = StyleSheet.create({

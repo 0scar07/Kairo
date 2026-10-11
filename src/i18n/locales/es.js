@@ -74,6 +74,7 @@ export default {
   // --- Perfil
   "profile.loadError": "No se pudo cargar el perfil",
   "profile.refreshError": "No se pudo actualizar: {error}",
+  "profile.updated": "Actualizado {time}",
   "profile.favoriteError": "No se pudo actualizar favoritos: {error}",
   "ranked.solo": "Solo / Dúo",
   "ranked.flex": "Flex 5v5",
