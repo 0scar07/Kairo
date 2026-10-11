@@ -29,8 +29,8 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
   const t = useT();
   const accent = useAccent(GAME);
   const tabs = [
-    { key: "partidas",  label: t("lol.tabMatches").toUpperCase(), icon: "gamepad" },
-    { key: "campeones", label: t("lol.tabChampions").toUpperCase(), icon: "trophy" },
+    { key: "partidas",  label: t("lol.tabMatches"), icon: "gamepad" },
+    { key: "campeones", label: t("lol.tabChampions"), icon: "trophy" },
   ];
   const resultFilters = [
     { key: "all",  label: t("filters.allMatches") },

@@ -1,22 +1,35 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Alert, RefreshControl } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import FavoriteCard from "../components/FavoriteCard";
 import Reveal from "../components/Reveal";
+import Animated from "react-native-reanimated";
+import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import GameLogo from "../components/GameLogo";
-import { Chip, EmptyState, ErrorBanner } from "../components/ui";
+import { Chip, EmptyState, ErrorBanner, showHud } from "../components/ui";
 import { GAMES } from "../games";
 import { errorMessage } from "../utils/format";
 import { canAlert, loadFavorites, removeFavorite } from "../utils/favorites";
 import { useNotifications } from "../notifications/NotificationsProvider";
 import { profileTarget } from "../utils/target";
 import { useBootData } from "../boot/BootContext";
+import { tap, success } from "../utils/haptics";
 import { colors, spacing, sizes, fontSizes, type, tracking } from "../theme";
 
 // Todos los favoritos, con filtro por juego
 export default function FavoritesScreen({ navigation }) {
   const t = useT();
+  const { y, onScroll } = useLargeTitle();
+  const [refreshing, setRefreshing] = useState(false);
+  // Tirar hacia abajo recarga la lista guardada
+  async function onRefresh() {
+    tap();
+    setRefreshing(true);
+    try { setFavorites(await loadFavorites()); setError(null); success(); }
+    catch (e) { setError(t("favorites.readError", { error: errorMessage(e) })); }
+    setRefreshing(false);
+  }
   const { favorites: bootFavorites, gameEnabled } = useBootData();
   const availableGames = GAMES.filter(g => gameEnabled(g.id));
   const [favorites, setFavorites] = useState(bootFavorites);
@@ -44,6 +57,7 @@ export default function FavoritesScreen({ navigation }) {
     setFavorites(prev => prev.filter(f => !(f.gameId === fav.gameId && f.puuid === fav.puuid)));
     try {
       await removeFavorite(fav);
+      showHud(t("hud.removed"));
     } catch (e) {
       Alert.alert(t("common.error"), t("favorites.saveError", { error: errorMessage(e) }));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
@@ -51,9 +65,13 @@ export default function FavoritesScreen({ navigation }) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <View style={styles.container}>
+    <Animated.ScrollView
+      style={styles.container} contentContainerStyle={styles.content} onScroll={onScroll} scrollEventThrottle={16}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.textSecondary} progressBackgroundColor={colors.surface} />}
+    >
       <Reveal order={0}>
-        <Text style={styles.title}>{t("favorites.title").toUpperCase()}</Text>
+        <LargeTitle y={y}>{t("favorites.title")}</LargeTitle>
         <Text style={styles.subtitle}>{t("favorites.saved", { count: known.length })}</Text>
       </Reveal>
 
@@ -91,14 +109,15 @@ export default function FavoritesScreen({ navigation }) {
           ))}
         </View>
       )}
-    </ScrollView>
+    </Animated.ScrollView>
+    <CompactTitleBar y={y} title={t("favorites.title")} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content:   { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
-  title:     { ...type.brand, fontSize: fontSizes.xxl, letterSpacing: tracking.widest, color: colors.text },
   subtitle:  { ...type.small, color: colors.textMuted, marginTop: spacing.xs, marginBottom: spacing.xl },
   filters:   { flexDirection: "row", flexWrap: "wrap", marginBottom: spacing.lg, rowGap: spacing.sm },
   grid:      { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },

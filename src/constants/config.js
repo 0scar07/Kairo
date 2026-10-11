@@ -14,6 +14,7 @@ export const ACTIVE_GAME_KEY = "kairo_active_game";
 export const REGION_KEY = "kairo_region";
 export const RECENTS_KEY = "kairo_recents";
 export const HAPTICS_KEY = "kairo_haptics";
+export const LAST_SEEN_VERSION_KEY = "kairo_last_seen_version";   // para mostrar "Novedades" una vez por versión
 export const LANGUAGE_KEY = "kairo_language";
 export const PLATFORMS_KEY = "kairo_platforms";
 export const NOTIF_PREFS_KEY = "kairo_notifications";

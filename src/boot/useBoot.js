@@ -3,7 +3,7 @@ import { Easing, useSharedValue, withTiming } from "react-native-reanimated";
 import { BOOT_TASKS, TASK_TIMEOUT_MS } from "./tasks";
 
 const TICK_MS = 60;
-const SETTLE_MS = 450;   // pausa en 100 % antes de retirar la pantalla de carga
+const SETTLE_MS = 150;   // pausa en 100 % antes de retirar la pantalla de carga
 
 function withTimeout(promise, ms) {
   return new Promise((resolve, reject) => {
@@ -19,7 +19,7 @@ function withTimeout(promise, ms) {
  *  - result: datos que dejaron las tareas (favoritos, juego guardado, estado del servidor)
  *  - finished: la barra llegó a 100 % y se puede retirar la pantalla de carga
  */
-export function useBoot({ minDuration = 1800 } = {}) {
+export function useBoot({ minDuration = 700 } = {}) {
   const progress = useSharedValue(0);
   const [fontsReady, setFontsReady] = useState(false);
   const [result, setResult] = useState(null);
@@ -53,7 +53,7 @@ export function useBoot({ minDuration = 1800 } = {}) {
       if (target >= 1) {
         clearInterval(tick);
         setResult({ ...values });
-        settle = setTimeout(() => setFinished(true), 300 + SETTLE_MS);
+        settle = setTimeout(() => setFinished(true), SETTLE_MS);
       }
     }, TICK_MS);
 

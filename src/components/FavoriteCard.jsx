@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, Image, StyleSheet } from "react-native";
-import { PressableScale } from "./ui";
+import { View, Text, Image, StyleSheet, Platform } from "react-native";
+import { PressableScale, Sheet, SheetAction } from "./ui";
+import { tap } from "../utils/haptics";
 import { getGame } from "../games";
 import { profileIconUrl } from "../api/ddragon";
 import RankEmblem from "./RankEmblem";
@@ -19,10 +20,14 @@ function favoriteStat(fav, t) {
   return fav.label || null;
 }
 
+// En la web un botón no puede contener otros botones (la ✕ y la campanita): ahí la tarjeta es un grupo
+const CARD_ROLE = Platform.OS === "web" ? "group" : "button";
+
 // Tarjeta de favorito: ícono, nombre, región y rango con el color del tier
 // onToggleAlerts: si se pasa (solo LoL en Android) aparece la campanita de alertas de partida en vivo
 export default function FavoriteCard({ fav, onPress, onRemove, onToggleAlerts, style }) {
   const t = useT();
+  const [menu, setMenu] = useState(false);
   const game = getGame(fav.gameId);
   const tierColor = colors.tier[fav.tier];
   // "#TAG · LAN" (Riot), "#TAG" (Supercell) o "PC" (juegos por nombre con plataforma)
@@ -33,9 +38,16 @@ export default function FavoriteCard({ fav, onPress, onRemove, onToggleAlerts, s
   const iconUri = fav.iconUrl || (fav.iconId != null ? profileIconUrl(fav.iconId) : null);
 
   return (
+    <>
     <PressableScale
       haptic
       onPress={onPress}
+      onLongPress={() => { tap(); setMenu(true); }}
+      delayLongPress={350}
+      accessibilityLabel={`${fav.gameName}, ${subline}`}
+      accessibilityActions={[{ name: "longpress", label: t("favorites.open") }]}
+      onAccessibilityAction={() => setMenu(true)}
+      accessibilityRole={CARD_ROLE}
       style={[styles.card, { borderColor: withAlpha(tint, 0.4), backgroundColor: withAlpha(tint, 0.05) }, style]}
     >
       <View style={styles.top}>
@@ -50,7 +62,7 @@ export default function FavoriteCard({ fav, onPress, onRemove, onToggleAlerts, s
           {onToggleAlerts && <BellButton active={fav.alerts === true} accent={game?.accent || colors.textMuted} onPress={onToggleAlerts} />}
           {onRemove && (
             <PressableScale onPress={onRemove} scaleTo={0.8} hitSlop={spacing.md} style={styles.remove} accessibilityLabel={t("favorites.remove")}>
-              <Icon name="close" size={fontSizes.base} color={colors.textFaint} />
+              <Icon name="close" size={fontSizes.base} color={colors.textMuted} />
             </PressableScale>
           )}
         </View>
@@ -66,6 +78,29 @@ export default function FavoriteCard({ fav, onPress, onRemove, onToggleAlerts, s
         </Text>
       </View>
     </PressableScale>
+    <Sheet visible={menu} onClose={() => setMenu(false)} title={fav.gameName}>
+      <SheetAction
+        label={t("favorites.open")}
+        icon={<Icon name="search" size={fontSizes.lg} color={colors.text} />}
+        onPress={() => { setMenu(false); onPress?.(); }}
+      />
+      {onToggleAlerts ? (
+        <SheetAction
+          label={fav.alerts === true ? t("notif.alertsOn") : t("notif.alertsOff")}
+          icon={<Icon name={fav.alerts === true ? "bell" : "bellOff"} size={fontSizes.lg} color={colors.text} />}
+          onPress={() => { setMenu(false); onToggleAlerts(); }}
+        />
+      ) : null}
+      {onRemove ? (
+        <SheetAction
+          destructive
+          label={t("favorites.remove")}
+          icon={<Icon name="close" size={fontSizes.lg} color={colors.loss} />}
+          onPress={() => { setMenu(false); onRemove(); }}
+        />
+      ) : null}
+    </Sheet>
+    </>
   );
 }
 

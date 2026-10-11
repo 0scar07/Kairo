@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   teamStat:     { alignItems: "center" },
   teamStatVal:  { ...type.statLarge },
   teamStatLabel:{ ...type.micro, color: colors.textMuted },
-  vs:           { ...type.label, color: colors.textFaint, fontSize: fontSizes.sm },
+  vs:           { ...type.label, color: colors.textMuted, fontSize: fontSizes.sm },
   teamBlock:    { padding: spacing.md },
   teamBorder:   { borderBottomWidth: sizes.hairline, borderBottomColor: colors.border },
   teamLabel:    { ...type.label, fontSize: fontSizes.xs, letterSpacing: tracking.wide, marginBottom: spacing.sm },

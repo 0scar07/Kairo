@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, TextInput, ScrollView, Image, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, ScrollView, Image, StyleSheet } from "react-native";
+import Icon from "../../components/Icon";
+import { warning } from "../../utils/haptics";
 import { Card, Chip, ErrorState, PressableScale, SectionLabel, Skeleton } from "../../components/ui";
 import { RegionButton } from "../../components/RegionPicker";
 import RankEmblem from "../../components/RankEmblem";
@@ -92,6 +94,7 @@ export default function CompareScreen({ route }) {
   const [B, setB] = useState(null);                       // null = aún sin elegir
   const [favorites, setFavorites] = useState([]);
   const [input, setInput] = useState("");
+  const [inputError, setInputError] = useState(null);   // formato incorrecto: bajo el campo, sin alertas
   const [regionB, setRegionB] = useState(targetA.region || defaultRegion);
   const [attempt, setAttempt] = useState(0);
 
@@ -122,7 +125,8 @@ export default function CompareScreen({ route }) {
     const cut = text.lastIndexOf("#");
     const name = (cut < 0 ? text : text.slice(0, cut)).trim();
     const tag = cut < 0 ? "" : text.slice(cut + 1).trim();
-    if (!name || !tag) { Alert.alert(t("home.badFormat"), t("home.badRiotId")); return; }
+    if (!name || !tag) { warning(); setInputError(t("home.badRiotId")); return; }
+    setInputError(null);
     choose(name, tag, regionB);
   }
 
@@ -198,9 +202,10 @@ export default function CompareScreen({ route }) {
               <TextInput
                 style={styles.input}
                 value={input}
-                onChangeText={setInput}
+                onChangeText={v => { setInput(v); if (inputError) setInputError(null); }}
+                accessibilityLabel={t("compare.search")}
                 placeholder={t("home.placeholderRiotId")}
-                placeholderTextColor={colors.textFaint}
+                placeholderTextColor={colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
                 onSubmitEditing={submit}
@@ -210,6 +215,12 @@ export default function CompareScreen({ route }) {
                 <Text style={styles.goText}>{t("compare.go")}</Text>
               </PressableScale>
             </View>
+            {inputError ? (
+              <View style={styles.errorRow} accessibilityLiveRegion="polite">
+                <Icon name="alert" size={fontSizes.md} color={colors.loss} />
+                <Text style={styles.errorText}>{inputError}</Text>
+              </View>
+            ) : null}
           </Card>
         </Reveal>
       ) : null}
@@ -218,12 +229,14 @@ export default function CompareScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
+  errorRow:   { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, marginTop: spacing.md },
+  errorText:  { ...type.small, color: colors.text, flex: 1 },
   container:  { flex: 1, backgroundColor: colors.bg },
   content:    { padding: spacing.lg, paddingBottom: spacing.xxxl, gap: spacing.lg },
   center:     { flex: 1, backgroundColor: colors.bg, justifyContent: "center" },
   heads:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   head:       { flex: 1, alignItems: "center", gap: spacing.xs },
-  vs:         { ...type.heading, color: colors.textFaint, paddingHorizontal: spacing.sm },
+  vs:         { ...type.heading, color: colors.textMuted, paddingHorizontal: spacing.sm },
   avatar:     { borderRadius: radii.pill, borderWidth: 2, padding: 2, marginBottom: spacing.xs },
   avatarEmpty:{ width: sizes.avatarXl, height: sizes.avatarXl, alignItems: "center", justifyContent: "center", backgroundColor: colors.surfaceHigh, borderColor: colors.border },
   question:   { ...type.statLarge, color: colors.textMuted },
@@ -242,7 +255,7 @@ const styles = StyleSheet.create({
   favs:       { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.sm, marginBottom: spacing.md },
   hint:       { ...type.small, color: colors.textMuted, marginBottom: spacing.md },
   searchRow:  { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  input:      { flex: 1, height: sizes.button - spacing.sm, borderRadius: radii.md, borderWidth: sizes.hairline, borderColor: colors.border, backgroundColor: colors.bg, color: colors.text, paddingHorizontal: spacing.md, fontFamily: "Inter_500Medium" },
+  input:      { flex: 1, minWidth: 0, height: sizes.button - spacing.sm, borderRadius: radii.md, borderWidth: sizes.hairline, borderColor: colors.border, backgroundColor: colors.bg, color: colors.text, paddingHorizontal: spacing.md, fontFamily: "Inter_500Medium" },
   go:         { height: sizes.button - spacing.sm, paddingHorizontal: spacing.lg, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
   goText:     { ...type.bodyStrong, color: colors.onAccent },
 });

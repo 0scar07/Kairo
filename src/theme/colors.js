@@ -9,10 +9,11 @@ export const colors = {
   border:        "#1C2733",
   borderStrong:  "#2B3A4B",
 
-  text:          "#E6EDF6",
-  textSecondary: "#9AAABD",
-  textMuted:     "#66778B",
-  textFaint:     "#3E4C5E",
+  // Contraste sobre bg / surface / surfaceRaised (WCAG AA pide 4.5:1 para texto pequeño)
+  text:          "#E6EDF6",   // 16.7 / 15.8 / 14.6
+  textSecondary: "#9AAABD",   //  8.3 /  7.8 /  7.3
+  textMuted:     "#8193A8",   //  6.2 /  5.9 /  5.5
+  textFaint:     "#3E4C5E",   //  2.3 — solo iconos apagados, separadores y elementos deshabilitados, nunca texto
 
   // Resultado de la partida
   win:           "#4FC97A",

@@ -36,7 +36,7 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
             value={name}
             onChangeText={setName}
             placeholder={t("myProfile.namePlaceholder")}
-            placeholderTextColor={colors.textFaint}
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}
@@ -45,7 +45,7 @@ function SetupModal({ visible, game, initialRegion, onSave, onCancel }) {
             value={tag}
             onChangeText={setTag}
             placeholder={byName ? t(game.searchResults ? "myProfile.idPlaceholder" : "myProfile.nameOnlyPlaceholder") : tagOnly ? t("myProfile.tagOnlyPlaceholder") : t("myProfile.tagPlaceholder")}
-            placeholderTextColor={colors.textFaint}
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             autoCapitalize="none"
             autoCorrect={false}

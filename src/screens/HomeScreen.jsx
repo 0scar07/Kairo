@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity, Platform, RefreshControl } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { GAMES, UPCOMING_GAMES, getGame } from "../games";
-import { APP_NAME } from "../constants/config";
 import { regionName } from "../constants/regions";
 import { errorMessage } from "../utils/format";
 import { GLOBAL_REGION, tagOf } from "../utils/supercell";
@@ -11,16 +10,19 @@ import { profileTarget } from "../utils/target";
 import { loadPlatforms, savePlatform } from "../utils/prefs";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
 import { loadRecents, clearRecents } from "../utils/recents";
-import { select } from "../utils/haptics";
-import { Card, SectionLabel, PressableScale, EmptyState } from "../components/ui";
+import { select, warning, tap, success } from "../utils/haptics";
+import { Card, SectionLabel, PressableScale, EmptyState, showHud } from "../components/ui";
 import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
+import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import GameLogo from "../components/GameLogo";
 import { useBootData } from "../boot/BootContext";
 import {
-  colors, radii, sizes, spacing, fontSizes, type, tracking, glow, textGlow, withAlpha, useActiveGame,
+  colors, radii, sizes, spacing, fontSizes, lineHeights, type, withAlpha, useActiveGame,
 } from "../theme";
 
 // Espera a que la pantalla de carga se desvanezca antes de empezar la aparición escalonada
@@ -37,13 +39,32 @@ export default function HomeScreen({ navigation }) {
   const [favorites, setFavorites] = useState(bootFavorites);
   const [recents,   setRecents]   = useState(bootRecents);
   const [platforms, setPlatforms] = useState({});   // plataforma elegida por juego (Fortnite, Apex, PUBG…)
+  const [error,     setError]     = useState(null); // formato incorrecto: se muestra bajo el buscador, sin alertas
+  const { y, onScroll } = useLargeTitle();
+  const [focused, setFocused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [extrasKey, setExtrasKey] = useState(0);   // al refrescar se vuelven a pedir los extras del juego (estado, rotación)
+
+  // Tirar hacia abajo: vuelve a comprobar el servidor y recarga favoritos, recientes y extras
+  async function onRefresh() {
+    tap();
+    setRefreshing(true);
+    await Promise.all([
+      retryServer(),
+      loadFavorites().then(setFavorites).catch(e => console.warn("No se pudieron leer los favoritos:", e.message)),
+      loadRecents().then(setRecents).catch(e => console.warn("No se pudieron leer las búsquedas recientes:", e.message)),
+    ]);
+    setExtrasKey(k => k + 1);
+    setRefreshing(false);
+    success();
+  }
 
   const game = getGame(gameId) || GAMES[0];
   const Extras = game.HomeExtras;
   const platform = game.platforms ? (platforms[game.id] || game.platforms[0].id) : null;
 
   useEffect(() => { loadPlatforms().then(setPlatforms); }, []);
-  useEffect(() => { setInput(""); }, [game.id]);   // lo escrito para un juego no vale para otro
+  useEffect(() => { setInput(""); setError(null); }, [game.id]);   // lo escrito para un juego no vale para otro
 
   function changePlatform(id) {
     setPlatforms(prev => ({ ...prev, [game.id]: id }));
@@ -67,14 +88,20 @@ export default function HomeScreen({ navigation }) {
     navigation.navigate("Profile", target);
   }
 
+  function invalid(message) {
+    warning();
+    setError(message);
+  }
+
   function handleSearch() {
     const text = input.trim();
+    setError(null);
 
     // Juegos de Supercell: se busca solo por el tag (#2PP0) y no hay regiones
     if (game.tagSearch) {
       const tag = tagOf(text);
       if (tag.length < 3) {
-        Alert.alert(t("home.badFormat"), t("home.badTag"));
+        invalid(t("home.badTag"));
         return;
       }
       openProfile({ gameId: game.id, gameName: "", tagLine: tag, region: GLOBAL_REGION });
@@ -84,7 +111,7 @@ export default function HomeScreen({ navigation }) {
     // Juegos que se buscan por nombre (Dota 2, Fortnite, Apex, PUBG): una plataforma opcional y, en Dota 2, una lista de resultados
     if (game.search === "name") {
       if (text.length < 2) {
-        Alert.alert(t("home.badFormat"), t("home.badName"));
+        invalid(t("home.badName"));
         return;
       }
       const target = { gameId: game.id, gameName: text, tagLine: "", region: platform || GLOBAL_REGION };
@@ -98,7 +125,7 @@ export default function HomeScreen({ navigation }) {
     const tag  = cut < 0 ? "" : text.slice(cut + 1).trim();
 
     if (!name || !tag) {
-      Alert.alert(t("home.badFormat"), t("home.badRiotId"));
+      invalid(t("home.badRiotId"));
       return;
     }
     openProfile({ gameId: game.id, gameName: name, tagLine: tag, region });
@@ -108,6 +135,7 @@ export default function HomeScreen({ navigation }) {
     setFavorites(prev => prev.filter(f => !(f.gameId === fav.gameId && f.puuid === fav.puuid)));
     try {
       await removeFavorite(fav);
+      showHud(t("hud.removed"));
     } catch (e) {
       Alert.alert(t("common.error"), t("favorites.saveError", { error: errorMessage(e) }));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
@@ -128,11 +156,26 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
+      <Animated.ScrollView
+        contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} progressBackgroundColor={colors.surface} />}
+      >
+        {/* Brillo ambiental del juego activo: cambia con un fundido al elegir otro juego */}
+        <Animated.View key={game.id} entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)} pointerEvents="none" style={styles.ambient}>
+          <Svg width="100%" height="100%">
+            <Defs>
+              <RadialGradient id={`amb-${game.id}`} cx="30%" cy="0%" r="75%">
+                <Stop offset="0" stopColor={accent} stopOpacity="0.22" />
+                <Stop offset="1" stopColor={accent} stopOpacity="0" />
+              </RadialGradient>
+            </Defs>
+            <Rect x="0" y="0" width="100%" height="100%" fill={`url(#amb-${game.id})`} />
+          </Svg>
+        </Animated.View>
 
         {!serverOnline && (
           <Reveal order={0} baseDelay={HANDOFF_MS}>
-            <TouchableOpacity style={styles.offline} onPress={retryServer} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.offline} onPress={retryServer} activeOpacity={0.8} accessibilityRole="button">
               <View style={styles.offlineDot} />
               <Text style={styles.offlineText}>{t("home.offline")}</Text>
             </TouchableOpacity>
@@ -141,13 +184,13 @@ export default function HomeScreen({ navigation }) {
 
         {/* Encabezado */}
         <Reveal order={0} baseDelay={HANDOFF_MS} style={styles.header}>
-          <Text style={[styles.logoText, { color: accent }, textGlow(accent, spacing.lg)]}>{APP_NAME.toUpperCase()}</Text>
-          <Text style={styles.logoSub}>{t("app.tagline").toUpperCase()}</Text>
+          <LargeTitle y={y}>{t("home.title")}</LargeTitle>
+          <Text style={styles.subtitle}>{t("app.tagline")}</Text>
         </Reveal>
 
         {/* Buscador destacado */}
         <Reveal order={1} baseDelay={HANDOFF_MS}>
-          <Card style={[styles.searchCard, { borderColor: withAlpha(accent, 0.45) }, glow(accent, spacing.xl, 0.18)]}>
+          <Card style={[styles.searchCard, { borderColor: withAlpha(accent, error ? 0 : 0.35) }, error && styles.searchCardError]}>
             <SectionLabel>{t("home.searchIn", { game: game.name })}</SectionLabel>
             <View style={styles.searchRow}>
               {game.hasRegion === false
@@ -158,39 +201,61 @@ export default function HomeScreen({ navigation }) {
                   />
                 ) : null)
                 : <RegionButton value={region} onChange={setRegion} />}
+              <View style={[styles.field, focused && { borderColor: withAlpha(accent, 0.7) }]}>
+              <Icon name="search" size={fontSizes.lg} color={colors.textMuted} />
               <TextInput
                 value={input}
-                onChangeText={setInput}
+                onChangeText={v => { setInput(v); if (error) setError(null); }}
                 onSubmitEditing={handleSearch}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                accessibilityLabel={t("home.searchIn", { game: game.name })}
+                accessibilityHint={error || undefined}
                 placeholder={game.tagSearch ? t("home.placeholderTag") : game.search === "name" ? t(game.searchResults ? "home.placeholderNameOrId" : "home.placeholderName") : t("home.placeholderRiotId")}
-                placeholderTextColor={colors.textFaint}
+                placeholderTextColor={colors.textMuted}
                 style={styles.input}
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="search"
               />
+              {input ? (
+                <PressableScale
+                  onPress={() => { setInput(""); setError(null); }}
+                  scaleTo={0.85} hitSlop={spacing.sm} style={styles.clear}
+                  accessibilityLabel={t("home.clearInput")}
+                >
+                  <Icon name="close" size={fontSizes.sm} color={colors.bg} strokeWidth={3} />
+                </PressableScale>
+              ) : null}
+              </View>
               <PressableScale
                 haptic
                 onPress={handleSearch}
                 scaleTo={0.92}
-                style={[styles.go, { backgroundColor: accent }, glow(accent, spacing.md, 0.45)]}
+                style={[styles.go, { backgroundColor: accent }]}
                 accessibilityLabel={t("home.searchIn", { game: game.hasRegion === false ? game.name : regionName(region) })}
               >
                 <Icon name="search" size={sizes.item} color={colors.onAccent} />
               </PressableScale>
             </View>
+            {error ? (
+              <View style={styles.errorRow} accessibilityLiveRegion="polite">
+                <Icon name="alert" size={fontSizes.md} color={colors.loss} />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : null}
           </Card>
         </Reveal>
 
         {/* Selector de juego */}
         <Reveal order={2} baseDelay={HANDOFF_MS}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.gameScroll} contentContainerStyle={styles.gameSelector}>
-            {GAMES.map(g => {
+            {[...GAMES].sort((a, b) => gameEnabled(b.id) - gameEnabled(a.id)).map(g => {
               const active = g.id === game.id;
               // Un juego que la key del servidor no puede consultar aparece como "PRONTO"
               if (!gameEnabled(g.id)) {
                 return (
-                  <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
+                  <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]} accessible accessibilityLabel={`${g.name}, ${t("home.soon")}`}>
                     <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} muted />
                     <Text style={styles.gameShort}>{g.short}</Text>
                     <Text style={styles.soon}>{t("home.soon")}</Text>
@@ -202,6 +267,8 @@ export default function HomeScreen({ navigation }) {
                   key={g.id}
                   scaleTo={0.95}
                   onPress={() => { if (!active) { select(); setGameId(g.id); } }}
+                  accessibilityLabel={g.name}
+                  accessibilityState={{ selected: active }}
                   style={[styles.gameBtn, active && { backgroundColor: withAlpha(g.accent, 0.14), borderColor: g.accent }]}
                 >
                   <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={active ? g.accent : colors.textMuted} muted={!active} />
@@ -210,7 +277,7 @@ export default function HomeScreen({ navigation }) {
               );
             })}
             {UPCOMING_GAMES.map(g => (
-              <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]}>
+              <View key={g.id} style={[styles.gameBtn, styles.gameBtnSoon]} accessible accessibilityLabel={`${g.name}, ${t("home.soon")}`}>
                 <GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={colors.textFaint} muted />
                 <Text style={styles.gameShort}>{g.short}</Text>
                 <Text style={styles.soon}>{t("home.soon")}</Text>
@@ -222,7 +289,7 @@ export default function HomeScreen({ navigation }) {
         {/* Extras propios del juego (LoL: estado del servidor y rotación gratuita) */}
         {Extras && (
           <Reveal order={3} baseDelay={HANDOFF_MS}>
-            <Extras region={region} />
+            <Extras key={extrasKey} region={region} />
           </Reveal>
         )}
 
@@ -231,7 +298,7 @@ export default function HomeScreen({ navigation }) {
           <Reveal order={4} baseDelay={HANDOFF_MS}>
             <View style={styles.sectionHeader}>
               <SectionLabel style={styles.sectionLabel}>{t("home.recents")}</SectionLabel>
-              <TouchableOpacity onPress={onClearRecents} hitSlop={spacing.md}>
+              <TouchableOpacity onPress={onClearRecents} hitSlop={spacing.md} accessibilityRole="button">
                 <Text style={styles.link}>{t("home.clear")}</Text>
               </TouchableOpacity>
             </View>
@@ -257,7 +324,7 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.sectionHeader}>
             <SectionLabel style={styles.sectionLabel} icon="star" iconColor={colors.gold}>{t("home.favoritesOf", { game: game.short })}</SectionLabel>
             {gameFavs.length > 0 && (
-              <TouchableOpacity onPress={() => navigation.navigate("Favoritos")} hitSlop={spacing.md}>
+              <TouchableOpacity onPress={() => navigation.navigate("Favoritos")} hitSlop={spacing.md} accessibilityRole="button">
                 <Text style={styles.link}>{t("home.seeAll")}</Text>
               </TouchableOpacity>
             )}
@@ -284,13 +351,15 @@ export default function HomeScreen({ navigation }) {
           )}
         </Reveal>
 
-      </ScrollView>
+      </Animated.ScrollView>
+      <CompactTitleBar y={y} title={t("home.title")} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: colors.bg },
+  ambient:       { position: "absolute", top: 0, left: 0, right: 0, height: sizes.iconHero * 4 },
   inner:         { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
   offline:       {
     flexDirection: "row", alignItems: "center", alignSelf: "center", gap: spacing.sm,
@@ -301,13 +370,22 @@ const styles = StyleSheet.create({
   offlineDot:    { width: sizes.dot, height: sizes.dot, borderRadius: sizes.dot / 2, backgroundColor: colors.loss },
   offlineText:   { ...type.caption, color: colors.textSecondary },
   header:        { marginBottom: spacing.xl },
-  logoText:      { ...type.brand, fontSize: fontSizes.hero, letterSpacing: tracking.brand },
-  logoSub:       { ...type.label, color: colors.textMuted, letterSpacing: tracking.widest, marginTop: spacing.sm },
+  subtitle:      { ...type.body, color: colors.textSecondary, marginTop: spacing.xs },
   searchCard:    { padding: spacing.lg },
+  searchCardError: { borderColor: withAlpha(colors.loss, 0.6) },
+  errorRow:      { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, marginTop: spacing.md },
+  errorText:     { ...type.small, color: colors.text, flex: 1, lineHeight: lineHeights.small + 2 },
   searchRow:     { flexDirection: "row", gap: spacing.sm, alignItems: "stretch" },
-  input:         {
-    ...type.body, flex: 1, backgroundColor: colors.bg, borderWidth: sizes.hairline, borderColor: colors.border,
-    borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.md, color: colors.text, minWidth: 0,
+  field:         {
+    flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: spacing.sm,
+    backgroundColor: colors.bg, borderWidth: sizes.hairline, borderColor: colors.border,
+    borderRadius: radii.md, paddingHorizontal: spacing.md,
+  },
+  // En la web el foco lo marca el borde del campo (el contorno del navegador queda fuera de lugar)
+  input:         { ...type.body, flex: 1, minWidth: 0, paddingVertical: spacing.md, color: colors.text, ...(Platform.OS === "web" ? { outlineStyle: "none" } : null) },
+  clear:         {
+    width: sizes.avatarXs, height: sizes.avatarXs, borderRadius: radii.pill,
+    backgroundColor: colors.textMuted, alignItems: "center", justifyContent: "center",
   },
   go:            { width: sizes.button, flexShrink: 0, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
   gameScroll:    { marginBottom: spacing.xl, marginHorizontal: -spacing.xl },
@@ -319,7 +397,7 @@ const styles = StyleSheet.create({
   },
   gameBtnSoon:   { opacity: 0.45 },
   gameIcon:      { marginBottom: spacing.xs },
-  gameShort:     { ...type.label, color: colors.textMuted, fontSize: fontSizes.xs },
+  gameShort:     { ...type.label, color: colors.textMuted },
   soon:          { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.sm },
   sectionLabel:  { marginBottom: 0 },

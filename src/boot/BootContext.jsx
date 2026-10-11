@@ -32,6 +32,9 @@ export function BootProvider({ boot, children }) {
     }
   }, []);
 
+  // Estado del servidor en segundo plano: la app ya es usable mientras responde
+  useEffect(() => { if (!boot.server) retryServer(); }, []);
+
   const setRegion = useCallback(id => {
     setRegionState(id);
     saveRegion(id).catch(e => console.warn("No se pudo guardar la región:", e.message));

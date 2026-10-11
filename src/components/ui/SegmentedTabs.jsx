@@ -4,7 +4,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import PressableScale from "./PressableScale";
 import Icon from "../Icon";
 import { select } from "../../utils/haptics";
-import { colors, radii, sizes, spacing, fontSizes, type, tracking, useAccent, withAlpha } from "../../theme";
+import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../../theme";
 
 const SPRING = { damping: 18, stiffness: 220, mass: 0.7 };
 
@@ -23,7 +23,7 @@ export default function SegmentedTabs({ tabs, value, onChange, game }) {
   }, [index, tabWidth]);
 
   return (
-    <View style={styles.wrap} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+    <View style={styles.wrap} accessibilityRole="tablist" onLayout={e => setWidth(e.nativeEvent.layout.width)}>
       {tabWidth > 0 && (
         <Animated.View style={[
           styles.indicator,
@@ -38,10 +38,12 @@ export default function SegmentedTabs({ tabs, value, onChange, game }) {
             key={t.key}
             scaleTo={0.96}
             style={styles.tab}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
             onPress={() => { if (!active) { select(); onChange(t.key); } }}
           >
             {t.icon ? <Icon name={t.icon} size={fontSizes.base} color={active ? accent : colors.textMuted} /> : null}
-            <Text style={[styles.text, active && { color: accent }]}>{t.label}</Text>
+            <Text style={[styles.text, active && { color: accent }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{t.label}</Text>
           </PressableScale>
         );
       })}
@@ -58,6 +60,6 @@ const styles = StyleSheet.create({
     position: "absolute", top: spacing.xs, bottom: spacing.xs, left: spacing.xs,
     borderRadius: radii.sm, borderWidth: sizes.hairline,
   },
-  tab:       { flex: 1, flexDirection: "row", gap: spacing.sm, paddingVertical: spacing.sm, alignItems: "center", justifyContent: "center", borderRadius: radii.sm },
-  text:      { ...type.label, fontSize: fontSizes.sm, color: colors.textMuted, letterSpacing: tracking.wide },
+  tab:       { flex: 1, flexDirection: "row", gap: spacing.sm, minHeight: sizes.placement - spacing.sm, paddingVertical: spacing.sm, alignItems: "center", justifyContent: "center", borderRadius: radii.sm },
+  text:      { ...type.label, fontSize: fontSizes.sm, color: colors.textMuted },
 });

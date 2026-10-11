@@ -1,12 +1,15 @@
 import React from "react";
-import { View, Text, ScrollView, Switch, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, Switch, StyleSheet, Alert, Image } from "react-native";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 import { Card, SectionLabel, SettingRow, Chip } from "../components/ui";
 import NotificationsSection from "../notifications/NotificationsSection";
 import { RegionChips } from "../components/RegionPicker";
 import Reveal from "../components/Reveal";
+import Animated from "react-native-reanimated";
+import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import Icon from "../components/Icon";
+import { openWhatsNew } from "../components/WhatsNew";
 import { getGame } from "../games";
 import { APP_NAME } from "../constants/config";
 import { LANGUAGES, AUTO } from "../i18n";
@@ -15,11 +18,12 @@ import { errorMessage } from "../utils/format";
 import { clearRecents } from "../utils/recents";
 import { select } from "../utils/haptics";
 import { useBootData } from "../boot/BootContext";
-import { colors, sizes, spacing, fontSizes, lineHeights, type, useActiveGame, withAlpha } from "../theme";
+import { colors, radii, sizes, spacing, fontSizes, lineHeights, type, useActiveGame, withAlpha } from "../theme";
 
 // Ajustes: mi perfil, región por defecto, vibración, búsquedas recientes y acerca de
 export default function SettingsScreen({ navigation }) {
   const { t, preference, setPreference } = useI18n();
+  const { y, onScroll } = useLargeTitle();
   const { gameId, accent } = useActiveGame();
   const game = getGame(gameId);
   const { region, setRegion, haptics, setHaptics } = useBootData();
@@ -36,9 +40,10 @@ export default function SettingsScreen({ navigation }) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <View style={styles.container}>
+    <Animated.ScrollView style={styles.container} contentContainerStyle={styles.content} onScroll={onScroll} scrollEventThrottle={16}>
       <Reveal order={0}>
-        <Text style={styles.title}>{t("settings.title").toUpperCase()}</Text>
+        <LargeTitle y={y} style={styles.title}>{t("settings.title")}</LargeTitle>
       </Reveal>
 
       <Reveal order={1}>
@@ -102,27 +107,40 @@ export default function SettingsScreen({ navigation }) {
       <Reveal order={6}>
         <SectionLabel>{t("settings.about")}</SectionLabel>
         <Card>
-          <Text style={styles.about}>{t("settings.version", { app: APP_NAME, version })}</Text>
-          <Text style={styles.rowHint}>{t("app.tagline")}</Text>
+          <View style={styles.appRow}>
+            <Image source={require("../../assets/icon.png")} style={styles.appIcon} accessibilityIgnoresInvertColors />
+            <View style={styles.appCopy}>
+              <Text style={styles.about}>{t("settings.version", { app: APP_NAME, version })}</Text>
+              <Text style={styles.rowHint}>{t("app.tagline")}</Text>
+            </View>
+          </View>
+          <View style={styles.divider} />
+          <SettingRow label={t("settings.whatsNew")} onPress={openWhatsNew} />
+          <View style={styles.divider} />
           {Updates.updateId ? <Text style={styles.rowHint}>{t("settings.update", { id: Updates.updateId.slice(0, 8) })}</Text> : null}
           <Text style={styles.legal}>{t("legal.riot", { app: APP_NAME })}</Text>
           <Text style={styles.legal}>{t("legal.supercell")}</Text>
           <Text style={styles.legal}>{t("legal.games")}</Text>
         </Card>
       </Reveal>
-    </ScrollView>
+    </Animated.ScrollView>
+    <CompactTitleBar y={y} title={t("settings.title")} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  appRow:    { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.md },
+  appIcon:   { width: sizes.avatarXl - spacing.sm, height: sizes.avatarXl - spacing.sm, borderRadius: radii.lg },
+  appCopy:   { flex: 1 },
   languages: { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.sm, marginTop: spacing.md },
   container:  { flex: 1, backgroundColor: colors.bg },
   content:    { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
-  title:      { ...type.brand, fontSize: fontSizes.xxl, color: colors.text, marginBottom: spacing.xl },
+  title:      { marginBottom: spacing.xl },
   rowLabel:   { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   rowHint:    { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
   regionHint: { marginBottom: spacing.md },
   divider:    { height: sizes.hairline, backgroundColor: colors.border, marginHorizontal: spacing.lg },
   about:      { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
-  legal:      { ...type.micro, color: colors.textFaint, marginTop: spacing.md, lineHeight: lineHeights.small },
+  legal:      { ...type.micro, color: colors.textMuted, marginTop: spacing.md, lineHeight: lineHeights.small },
 });

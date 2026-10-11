@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from "react-native-reanimated";
 import { useT } from "../i18n/I18nProvider";
 import { View, Text, StyleSheet } from "react-native";
-import { Card, ProgressBar, SectionLabel } from "./ui";
+import { Card, CountUp, ProgressBar, SectionLabel } from "./ui";
 import RankEmblem from "./RankEmblem";
 import Icon from "./Icon";
 import { winrate, tierLabel } from "../utils/format";
@@ -32,24 +33,36 @@ export default function RankedCard({ entry, label, game = "lol" }) {
     <Card style={[styles.card, { borderColor: withAlpha(color, 0.4), backgroundColor: withAlpha(color, 0.06) }]}>
       <SectionLabel>{label}</SectionLabel>
       <View style={styles.top}>
-        <RankEmblem tier={tier} size={sizes.avatarXl - spacing.lg} />
-        <Text style={styles.lp} numberOfLines={1}>{leaguePoints}<Text style={styles.lpUnit}> LP</Text></Text>
+        <EmblemPop><RankEmblem tier={tier} size={sizes.avatarXl - spacing.lg} /></EmblemPop>
+        <View style={styles.lpBox}>
+          <CountUp value={leaguePoints} style={styles.lp} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} />
+          <Text style={styles.lpUnit}>LP</Text>
+        </View>
       </View>
       <Text style={[styles.tierText, { color }]} numberOfLines={1} adjustsFontSizeToFit>{tierLabel(tier, rank)}</Text>
       <View style={styles.recordRow}>
         <Text style={styles.record}>{wins}V · {losses}D</Text>
-        <Text style={[styles.wr, { color: wrColor }]}>{wr}%</Text>
+        <CountUp value={wr} format={v => `${v}%`} style={[styles.wr, { color: wrColor }]} />
       </View>
       <ProgressBar value={wr} color={wrColor} glowing style={styles.bar} />
     </Card>
   );
 }
 
+// El emblema entra con un pequeño salto la primera vez que aparece la tarjeta
+function EmblemPop({ children }) {
+  const p = useSharedValue(0);
+  useEffect(() => { p.value = withDelay(120, withSpring(1, { damping: 10, stiffness: 170 })); }, []);
+  const style = useAnimatedStyle(() => ({ opacity: Math.min(p.value * 1.4, 1), transform: [{ scale: 0.6 + p.value * 0.4 }] }));
+  return <Animated.View style={style}>{children}</Animated.View>;
+}
+
 const styles = StyleSheet.create({
   card:         { flex: 1, marginBottom: 0 },
   top:          { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm },
   tierText:     { ...type.heading, fontSize: fontSizes.base, letterSpacing: tracking.tight, marginTop: spacing.xs, marginBottom: spacing.md },
-  lp:           { ...type.statLarge, fontSize: fontSizes.xl, color: colors.text, flexShrink: 1 },
+  lpBox:        { alignItems: "flex-end", flexShrink: 1 },
+  lp:           { ...type.statLarge, fontSize: fontSizes.xl, color: colors.text },
   lpUnit:       { ...type.captionStrong, color: colors.textMuted },
   recordRow:    { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
   record:       { ...type.caption, color: colors.textSecondary },

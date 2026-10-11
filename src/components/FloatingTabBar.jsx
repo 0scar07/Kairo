@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "./Icon";
+import { Glass } from "./ui";
 import { select } from "../utils/haptics";
 import { useT } from "../i18n/I18nProvider";
 import { colors, radii, sizes, spacing, fontSizes, type, glow, useAccent, withAlpha } from "../theme";
@@ -25,7 +26,8 @@ export default function FloatingTabBar({ state, navigation }) {
 
   return (
     <View pointerEvents="box-none" style={[styles.host, { bottom: Math.max(insets.bottom, spacing.md) }]}>
-      <View style={styles.pill} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+      <View style={styles.pill} accessibilityRole="tablist" onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+        <Glass style={[StyleSheet.absoluteFill, styles.glass]} intensity={70} />
         {itemWidth > 0 && (
           <Animated.View style={[
             styles.indicator,
@@ -40,7 +42,7 @@ export default function FloatingTabBar({ state, navigation }) {
             <Pressable
               key={route.key}
               style={styles.item}
-              accessibilityRole="button"
+              accessibilityRole="tab"
               accessibilityLabel={t(LABELS[route.name])}
               accessibilityState={{ selected: focused }}
               onPress={() => {
@@ -48,8 +50,8 @@ export default function FloatingTabBar({ state, navigation }) {
                 if (!focused && !event.defaultPrevented) { select(); navigation.navigate(route.name); }
               }}
             >
-              <Icon name={ICONS[route.name]} size={sizes.item - spacing.xs} color={color} />
-              <Text style={[styles.label, { color }]}>{t(LABELS[route.name])}</Text>
+              <TabIcon name={ICONS[route.name]} focused={focused} color={color} />
+              <Text style={[styles.label, { color }]} maxFontSizeMultiplier={1.3} numberOfLines={1}>{t(LABELS[route.name])}</Text>
             </Pressable>
           );
         })}
@@ -58,18 +60,33 @@ export default function FloatingTabBar({ state, navigation }) {
   );
 }
 
+// El ícono da un pequeño rebote cuando su pestaña pasa a estar activa
+function TabIcon({ name, focused, color }) {
+  const s = useSharedValue(1);
+  useEffect(() => {
+    if (focused) s.value = withSequence(withSpring(1.18, { damping: 10, stiffness: 400 }), withSpring(1, SPRING));
+  }, [focused]);
+  const animated = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  return (
+    <Animated.View style={animated}>
+      <Icon name={name} size={sizes.item - spacing.xs} color={color} />
+    </Animated.View>
+  );
+}
+
 const styles = StyleSheet.create({
   host:      { position: "absolute", left: 0, right: 0, alignItems: "center" },
   pill:      {
     flexDirection: "row", padding: spacing.sm, minWidth: "72%",
-    backgroundColor: withAlpha(colors.surfaceRaised, 0.96), borderRadius: radii.pill,
+    borderRadius: radii.pill,
     borderWidth: sizes.hairline, borderColor: colors.borderStrong,
     ...glow(colors.bg, spacing.lg, 0.9),
   },
+  glass:     { borderRadius: radii.pill },
   indicator: {
     position: "absolute", top: spacing.sm, bottom: spacing.sm, left: spacing.sm,
     borderRadius: radii.pill, borderWidth: sizes.hairline,
   },
-  item:      { flex: 1, alignItems: "center", paddingVertical: spacing.sm, gap: spacing.xxs },
-  label:     { ...type.label, fontSize: fontSizes.xxs },
+  item:      { flex: 1, minHeight: sizes.placement, alignItems: "center", justifyContent: "center", paddingVertical: spacing.xs, gap: spacing.xxs },
+  label:     { ...type.label },
 });

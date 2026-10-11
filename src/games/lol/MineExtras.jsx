@@ -98,7 +98,7 @@ export default function MineExtras({ data }) {
             {statBoxes.map(s => (
               <View key={s.label} style={styles.statBox}>
                 <Text style={[styles.statNum, { color: s.color }]}>{s.value}</Text>
-                <Text style={styles.statLabel}>{s.label.toUpperCase()}</Text>
+                <Text style={styles.statLabel}>{s.label}</Text>
               </View>
             ))}
           </View>

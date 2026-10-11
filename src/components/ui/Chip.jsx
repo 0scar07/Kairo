@@ -11,11 +11,12 @@ export default function Chip({ label, active, onPress, image, icon, game }) {
     <PressableScale
       style={[styles.chip, active && { borderColor: accent, backgroundColor: withAlpha(accent, 0.12) }]}
       scaleTo={0.94}
+      accessibilityState={{ selected: !!active }}
       onPress={() => { select(); onPress(); }}
     >
       {icon}
       {image ? <Image source={{ uri: image }} style={styles.img} /> : null}
-      <Text style={[styles.text, active && { color: accent }]}>{label}</Text>
+      <Text style={[styles.text, active && { color: accent }]} maxFontSizeMultiplier={1.4}>{label}</Text>
     </PressableScale>
   );
 }
@@ -23,7 +24,7 @@ export default function Chip({ label, active, onPress, image, icon, game }) {
 const styles = StyleSheet.create({
   chip: {
     flexDirection: "row", alignItems: "center", gap: spacing.sm,
-    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    minHeight: sizes.placement - spacing.xs, paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     borderRadius: radii.pill, backgroundColor: colors.surface,
     borderWidth: sizes.hairline, borderColor: colors.border, marginRight: spacing.sm,
   },
