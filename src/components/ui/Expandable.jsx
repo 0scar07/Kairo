@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 /**
  * Expansión animada (altura + opacidad). El contenido se monta la primera vez que se abre
@@ -17,7 +17,8 @@ export default function Expandable({ open, children, duration = 260 }) {
   useEffect(() => {
     const easing = Easing.out(Easing.cubic);
     if (open && measured > 0) {
-      height.value = withTiming(measured, { duration, easing });
+      // Abre con un muelle suave (leve rebote, como en iOS); cierra sin rebote
+      height.value = withSpring(measured, { damping: 18, stiffness: 190, mass: 0.8, overshootClamping: false });
       opacity.value = withTiming(1, { duration, easing });
     } else if (!open) {
       height.value = withTiming(0, { duration: duration - 60, easing });

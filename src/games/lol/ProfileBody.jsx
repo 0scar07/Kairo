@@ -203,13 +203,14 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
                 />
               )}
 
-              {filteredMatches.map(m => {
+              {filteredMatches.map((m, i) => {
                 const open = activeMatch === m.metadata.matchId;
                 return (
-                  <View key={m.metadata.matchId}>
+                  // Cada fila entra en cascada (también las que llegan con "Cargar más")
+                  <Reveal key={m.metadata.matchId} order={Math.min(i % 10, 8)} step={45} distance={12}>
                     <MatchRow match={m} myPuuid={account.puuid} expanded={open} onPress={() => setActiveMatch(open ? null : m.metadata.matchId)} />
                     <Expandable open={open}><MatchDetail match={m} myPuuid={account.puuid} /></Expandable>
-                  </View>
+                  </Reveal>
                 );
               })}
 
