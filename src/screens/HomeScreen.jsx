@@ -16,7 +16,8 @@ import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import GameLogo from "../components/GameLogo";
 import { useBootData } from "../boot/BootContext";
@@ -140,6 +141,18 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Animated.ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
+        {/* Brillo ambiental del juego activo: cambia con un fundido al elegir otro juego */}
+        <Animated.View key={game.id} entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)} pointerEvents="none" style={styles.ambient}>
+          <Svg width="100%" height="100%">
+            <Defs>
+              <RadialGradient id={`amb-${game.id}`} cx="30%" cy="0%" r="75%">
+                <Stop offset="0" stopColor={accent} stopOpacity="0.22" />
+                <Stop offset="1" stopColor={accent} stopOpacity="0" />
+              </RadialGradient>
+            </Defs>
+            <Rect x="0" y="0" width="100%" height="100%" fill={`url(#amb-${game.id})`} />
+          </Svg>
+        </Animated.View>
 
         {!serverOnline && (
           <Reveal order={0} baseDelay={HANDOFF_MS}>
@@ -327,6 +340,7 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: colors.bg },
+  ambient:       { position: "absolute", top: 0, left: 0, right: 0, height: sizes.iconHero * 4 },
   inner:         { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
   offline:       {
     flexDirection: "row", alignItems: "center", alignSelf: "center", gap: spacing.sm,

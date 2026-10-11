@@ -25,6 +25,7 @@ import { NotificationsProvider } from "./src/notifications/NotificationsProvider
 import PermissionSheet from "./src/notifications/PermissionSheet";
 import BannerHost from "./src/notifications/BannerHost";
 import { HudHost } from "./src/components/ui";
+import WhatsNew from "./src/components/WhatsNew";
 import { navigationRef, flushNavigationQueue } from "./src/navigation/ref";
 import { colors, fonts, tracking, GameProvider, useAccent } from "./src/theme";
 
@@ -109,6 +110,7 @@ export default function App() {
                 <PermissionSheet />
                 <BannerHost />
                 <HudHost />
+                <WhatsNew />
               </NotificationsProvider>
             </GameProvider>
           </BootProvider>
