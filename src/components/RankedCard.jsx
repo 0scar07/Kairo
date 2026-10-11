@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring } from "react-native-reanimated";
 import { useT } from "../i18n/I18nProvider";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, CountUp, ProgressBar, SectionLabel } from "./ui";
@@ -32,7 +33,7 @@ export default function RankedCard({ entry, label, game = "lol" }) {
     <Card style={[styles.card, { borderColor: withAlpha(color, 0.4), backgroundColor: withAlpha(color, 0.06) }]}>
       <SectionLabel>{label}</SectionLabel>
       <View style={styles.top}>
-        <RankEmblem tier={tier} size={sizes.avatarXl - spacing.lg} />
+        <EmblemPop><RankEmblem tier={tier} size={sizes.avatarXl - spacing.lg} /></EmblemPop>
         <View style={styles.lpBox}>
           <CountUp value={leaguePoints} style={styles.lp} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} />
           <Text style={styles.lpUnit}>LP</Text>
@@ -46,6 +47,14 @@ export default function RankedCard({ entry, label, game = "lol" }) {
       <ProgressBar value={wr} color={wrColor} glowing style={styles.bar} />
     </Card>
   );
+}
+
+// El emblema entra con un pequeño salto la primera vez que aparece la tarjeta
+function EmblemPop({ children }) {
+  const p = useSharedValue(0);
+  useEffect(() => { p.value = withDelay(120, withSpring(1, { damping: 10, stiffness: 170 })); }, []);
+  const style = useAnimatedStyle(() => ({ opacity: Math.min(p.value * 1.4, 1), transform: [{ scale: 0.6 + p.value * 0.4 }] }));
+  return <Animated.View style={style}>{children}</Animated.View>;
 }
 
 const styles = StyleSheet.create({

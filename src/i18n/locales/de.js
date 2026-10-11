@@ -42,7 +42,6 @@ export default {
   "home.title": "Suchen",
   "home.placeholderRiotId": "Name#TAG",
   "home.placeholderTag": "#TAG des Spielers",
-  "home.badFormat": "Falsches Format",
   "home.badTag": "Gib den Tag des Spielers ein, zum Beispiel #2PP0. Du findest ihn in seinem Profil im Spiel.",
   "home.badRiotId": "Gib die vollständige Riot ID ein: Name#TAG\nBeispiel: Hide on bush#KR1",
   "home.offline": "Keine Verbindung zum Server · tippen zum Wiederholen",
