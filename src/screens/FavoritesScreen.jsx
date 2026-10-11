@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Alert, RefreshControl } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import FavoriteCard from "../components/FavoriteCard";
 import Reveal from "../components/Reveal";
@@ -14,12 +14,22 @@ import { canAlert, loadFavorites, removeFavorite } from "../utils/favorites";
 import { useNotifications } from "../notifications/NotificationsProvider";
 import { profileTarget } from "../utils/target";
 import { useBootData } from "../boot/BootContext";
+import { tap, success } from "../utils/haptics";
 import { colors, spacing, sizes, fontSizes, type, tracking } from "../theme";
 
 // Todos los favoritos, con filtro por juego
 export default function FavoritesScreen({ navigation }) {
   const t = useT();
   const { y, onScroll } = useLargeTitle();
+  const [refreshing, setRefreshing] = useState(false);
+  // Tirar hacia abajo recarga la lista guardada
+  async function onRefresh() {
+    tap();
+    setRefreshing(true);
+    try { setFavorites(await loadFavorites()); setError(null); success(); }
+    catch (e) { setError(t("favorites.readError", { error: errorMessage(e) })); }
+    setRefreshing(false);
+  }
   const { favorites: bootFavorites, gameEnabled } = useBootData();
   const availableGames = GAMES.filter(g => gameEnabled(g.id));
   const [favorites, setFavorites] = useState(bootFavorites);
@@ -56,7 +66,10 @@ export default function FavoritesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-    <Animated.ScrollView style={styles.container} contentContainerStyle={styles.content} onScroll={onScroll} scrollEventThrottle={16}>
+    <Animated.ScrollView
+      style={styles.container} contentContainerStyle={styles.content} onScroll={onScroll} scrollEventThrottle={16}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.textSecondary} progressBackgroundColor={colors.surface} />}
+    >
       <Reveal order={0}>
         <LargeTitle y={y}>{t("favorites.title")}</LargeTitle>
         <Text style={styles.subtitle}>{t("favorites.saved", { count: known.length })}</Text>

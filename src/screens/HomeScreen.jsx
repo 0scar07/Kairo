@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity, Platform } from "react-native";
+import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity, Platform, RefreshControl } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { GAMES, UPCOMING_GAMES, getGame } from "../games";
 import { regionName } from "../constants/regions";
@@ -10,7 +10,7 @@ import { profileTarget } from "../utils/target";
 import { loadPlatforms, savePlatform } from "../utils/prefs";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
 import { loadRecents, clearRecents } from "../utils/recents";
-import { select, warning } from "../utils/haptics";
+import { select, warning, tap, success } from "../utils/haptics";
 import { Card, SectionLabel, PressableScale, EmptyState, showHud } from "../components/ui";
 import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
@@ -42,6 +42,22 @@ export default function HomeScreen({ navigation }) {
   const [error,     setError]     = useState(null); // formato incorrecto: se muestra bajo el buscador, sin alertas
   const { y, onScroll } = useLargeTitle();
   const [focused, setFocused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [extrasKey, setExtrasKey] = useState(0);   // al refrescar se vuelven a pedir los extras del juego (estado, rotación)
+
+  // Tirar hacia abajo: vuelve a comprobar el servidor y recarga favoritos, recientes y extras
+  async function onRefresh() {
+    tap();
+    setRefreshing(true);
+    await Promise.all([
+      retryServer(),
+      loadFavorites().then(setFavorites).catch(e => console.warn("No se pudieron leer los favoritos:", e.message)),
+      loadRecents().then(setRecents).catch(e => console.warn("No se pudieron leer las búsquedas recientes:", e.message)),
+    ]);
+    setExtrasKey(k => k + 1);
+    setRefreshing(false);
+    success();
+  }
 
   const game = getGame(gameId) || GAMES[0];
   const Extras = game.HomeExtras;
@@ -140,7 +156,10 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Animated.ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
+      <Animated.ScrollView
+        contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} progressBackgroundColor={colors.surface} />}
+      >
         {/* Brillo ambiental del juego activo: cambia con un fundido al elegir otro juego */}
         <Animated.View key={game.id} entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)} pointerEvents="none" style={styles.ambient}>
           <Svg width="100%" height="100%">
@@ -270,7 +289,7 @@ export default function HomeScreen({ navigation }) {
         {/* Extras propios del juego (LoL: estado del servidor y rotación gratuita) */}
         {Extras && (
           <Reveal order={3} baseDelay={HANDOFF_MS}>
-            <Extras region={region} />
+            <Extras key={extrasKey} region={region} />
           </Reveal>
         )}
 
