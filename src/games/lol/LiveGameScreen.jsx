@@ -3,6 +3,7 @@ import { useT } from "../../i18n/I18nProvider";
 import { View, Text, ScrollView, RefreshControl, StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Card, SectionLabel, EmptyState, ErrorState, LiveDot, PressableScale, Skeleton } from "../../components/ui";
+import Reveal from "../../components/Reveal";
 import RankEmblem from "../../components/RankEmblem";
 import Icon from "../../components/Icon";
 import Mini from "./components/Mini";
@@ -11,7 +12,7 @@ import { ensureLolAssets, spellIcon, perkIcon } from "./assets";
 import { queueLabel } from "./utils";
 import { championByKey, championIcon, championLabel, championSplash } from "../../api/ddragon";
 import { errorMessage, formatDuration, tierLabel, winrate } from "../../utils/format";
-import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../../theme";
+import { colors, radii, sizes, spacing, fontSizes, tracking, type, useAccent, withAlpha } from "../../theme";
 
 const GAME = "lol";
 const REFRESH_MS = 30_000;
@@ -177,6 +178,7 @@ export default function LiveGameScreen({ route }) {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
+      <Reveal order={0}>
       <View style={[styles.hero, { borderColor: withAlpha(colors.loss, 0.5) }]}>
         {splash ? <Image source={{ uri: splash }} style={StyleSheet.absoluteFill} blurRadius={4} resizeMode="cover" /> : null}
         <View style={[StyleSheet.absoluteFill, { backgroundColor: withAlpha(colors.bg, splash ? 0.66 : 0.9) }]} />
@@ -186,14 +188,16 @@ export default function LiveGameScreen({ route }) {
         </View>
         {meName ? <Text style={styles.heroName} numberOfLines={1}>{meName}{meChamp ? ` · ${championLabel(meChamp.name)}` : ""}</Text> : null}
         <Text style={styles.mode}>{queueLabel(live.queueId)}</Text>
-        <Text style={styles.timer}>{elapsed == null ? t("live.loading") : formatDuration(elapsed)}</Text>
+        <Text style={styles.timer} accessibilityRole="timer">{elapsed == null ? t("live.loading") : formatDuration(elapsed)}</Text>
       </View>
+      </Reveal>
 
-      {TEAMS.map(team => {
+      {TEAMS.map((team, ti) => {
         const players = live.participants.filter(p => p.teamId === team.id);
         const bans = live.bans.filter(b => b.teamId === team.id);
         return (
-          <Card key={team.id} accent={team.color}>
+          <Reveal key={team.id} order={ti + 1}>
+          <Card accent={team.color}>
             <View style={styles.teamHeader}>
               <SectionLabel style={styles.teamLabel}>{t(team.label)}</SectionLabel>
               <BanRow bans={bans} color={team.color} />
@@ -202,6 +206,7 @@ export default function LiveGameScreen({ route }) {
               <PlayerRow key={p.puuid || `bot-${team.id}-${i}`} p={p} isMe={p.puuid === puuid} region={region} accent={accent} />
             ))}
           </Card>
+          </Reveal>
         );
       })}
     </ScrollView>
@@ -218,7 +223,8 @@ const styles = StyleSheet.create({
   liveBadge:  { flexDirection: "row", alignItems: "center", gap: spacing.xs },
   liveText:   { ...type.label, color: colors.loss },
   mode:       { ...type.heading, color: colors.text },
-  timer:      { ...type.statLarge, color: colors.text },
+  // Cronómetro grande con cifras tabulares: los segundos avanzan sin que el texto "baile"
+  timer:      { ...type.statLarge, fontSize: fontSizes.hero, letterSpacing: tracking.tight, color: colors.text, fontVariant: ["tabular-nums"] },
   teamHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.md },
   teamLabel:  { marginBottom: 0 },
   bans:       { flexDirection: "row", gap: spacing.xs },
