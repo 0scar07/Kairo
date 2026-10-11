@@ -51,6 +51,7 @@ export default function SettingsScreen({ navigation }) {
         <Card padded={false}>
           <SettingRow
             label={t("settings.myProfile", { game: game.short })}
+            icon="edit" iconColor="#0A84FF"
             hint={game.tagSearch ? t("settings.myProfileHintTag") : t("settings.myProfileHintRiot")}
             onPress={() => navigation.navigate("MyProfile")}
             right={<Icon name="chevron" size={sizes.item - spacing.xs} color={colors.textMuted} />}
@@ -89,6 +90,7 @@ export default function SettingsScreen({ navigation }) {
         <Card padded={false}>
           <SettingRow
             label={t("settings.haptics")}
+            icon="zap" iconColor="#FF9F0A"
             hint={t("settings.hapticsHint")}
             right={
               <Switch
@@ -100,7 +102,7 @@ export default function SettingsScreen({ navigation }) {
             }
           />
           <View style={styles.divider} />
-          <SettingRow label={t("settings.clearRecents")} danger onPress={confirmClearRecents} />
+          <SettingRow label={t("settings.clearRecents")} danger icon="close" iconColor="#FF453A" onPress={confirmClearRecents} />
         </Card>
       </Reveal>
 
@@ -115,7 +117,7 @@ export default function SettingsScreen({ navigation }) {
             </View>
           </View>
           <View style={styles.divider} />
-          <SettingRow label={t("settings.whatsNew")} onPress={openWhatsNew} />
+          <SettingRow label={t("settings.whatsNew")} icon="star" iconColor={accent} onPress={openWhatsNew} right={<Icon name="chevron" size={sizes.item - spacing.xs} color={colors.textMuted} />} />
           <View style={styles.divider} />
           {Updates.updateId ? <Text style={styles.rowHint}>{t("settings.update", { id: Updates.updateId.slice(0, 8) })}</Text> : null}
           <Text style={styles.legal}>{t("legal.riot", { app: APP_NAME })}</Text>

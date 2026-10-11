@@ -56,17 +56,17 @@ export default function NotificationsSection() {
     <>
       <SectionLabel>{t("notif.section")}</SectionLabel>
       <Card padded={false}>
-        <SettingRow label={t("notif.enable")} hint={t("notif.enableHint")} right={toggle(prefs.enabled, v => setPref({ enabled: v }))} />
+        <SettingRow icon="bell" iconColor="#FF453A" label={t("notif.enable")} hint={t("notif.enableHint")} right={toggle(prefs.enabled, v => setPref({ enabled: v }))} />
         <View style={styles.divider} />
-        <SettingRow label={t("notif.start")} disabled={off} right={toggle(prefs.notifyStart, v => setPref({ notifyStart: v }))} />
+        <SettingRow icon="eye" iconColor="#30D158" label={t("notif.start")} disabled={off} right={toggle(prefs.notifyStart, v => setPref({ notifyStart: v }))} />
         <View style={styles.divider} />
-        <SettingRow label={t("notif.end")} disabled={off} right={toggle(prefs.notifyEnd, v => setPref({ notifyEnd: v }))} />
+        <SettingRow icon="check" iconColor="#64D2FF" label={t("notif.end")} disabled={off} right={toggle(prefs.notifyEnd, v => setPref({ notifyEnd: v }))} />
         <View style={styles.divider} />
-        <SettingRow label={t("notif.weekly")} hint={t("notif.weeklyHint")} disabled={off} right={toggle(prefs.weekly, v => setPref({ weekly: v }))} />
+        <SettingRow icon="clock" iconColor="#BF5AF2" label={t("notif.weekly")} hint={t("notif.weeklyHint")} disabled={off} right={toggle(prefs.weekly, v => setPref({ weekly: v }))} />
         <View style={styles.divider} />
-        <SettingRow label={t("notif.rankAlerts")} hint={t("notif.rankAlertsHint")} disabled={off} right={toggle(prefs.rankAlerts, v => setPref({ rankAlerts: v }))} />
+        <SettingRow icon="trending" iconColor="#FFD60A" label={t("notif.rankAlerts")} hint={t("notif.rankAlertsHint")} disabled={off} right={toggle(prefs.rankAlerts, v => setPref({ rankAlerts: v }))} />
         <View style={styles.divider} />
-        <SettingRow label={t("notif.trophyAlerts")} hint={t("notif.trophyAlertsHint")} disabled={off} right={toggle(prefs.trophyAlerts, v => setPref({ trophyAlerts: v }))} />
+        <SettingRow icon="trophy" iconColor="#FF9F0A" label={t("notif.trophyAlerts")} hint={t("notif.trophyAlertsHint")} disabled={off} right={toggle(prefs.trophyAlerts, v => setPref({ trophyAlerts: v }))} />
         <View style={styles.divider} />
         <SettingRow
           label={t("notif.quiet")}

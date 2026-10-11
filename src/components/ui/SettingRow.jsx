@@ -1,12 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import PressableScale from "./PressableScale";
-import { colors, spacing, fontSizes, type } from "../../theme";
+import Icon from "../Icon";
+import { colors, radii, sizes, spacing, fontSizes, type } from "../../theme";
 
-// Fila de ajustes: título, pista opcional y un control a la derecha (interruptor, flecha…)
-export default function SettingRow({ label, hint, right, onPress, danger, disabled }) {
+// Fila de ajustes: ícono opcional (blanco sobre un cuadrado de color, como en Ajustes de iOS), título,
+// pista opcional y un control a la derecha (interruptor, flecha…)
+export default function SettingRow({ label, hint, right, onPress, danger, disabled, icon, iconColor = colors.textMuted }) {
   const body = (
     <View style={[styles.row, disabled && styles.disabled]}>
+      {icon ? (
+        <View style={[styles.icon, { backgroundColor: iconColor }]}>
+          <Icon name={icon} size={fontSizes.lg} color="#FFFFFF" strokeWidth={2.2} filled={icon === "star"} />
+        </View>
+      ) : null}
       <View style={styles.text}>
         <Text style={[styles.label, danger && { color: colors.loss }]}>{label}</Text>
         {hint ? <Text style={styles.hint}>{hint}</Text> : null}
@@ -20,6 +27,7 @@ export default function SettingRow({ label, hint, right, onPress, danger, disabl
 const styles = StyleSheet.create({
   row:      { flexDirection: "row", alignItems: "center", gap: spacing.md, padding: spacing.lg },
   disabled: { opacity: 0.45 },
+  icon:     { width: sizes.avatarSm - spacing.xxs, height: sizes.avatarSm - spacing.xxs, borderRadius: radii.sm + 1, alignItems: "center", justifyContent: "center" },
   text:     { flex: 1 },
   label:    { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   hint:     { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
