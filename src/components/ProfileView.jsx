@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
 import { ScrollView, StyleSheet, RefreshControl } from "react-native";
 import Reveal from "./Reveal";
@@ -14,7 +14,7 @@ import ShareButton from "../share/ShareButton";
 import { useNavigation } from "@react-navigation/native";
 import { PressableScale } from "./ui";
 import { useNotifications } from "../notifications/NotificationsProvider";
-import { success } from "../utils/haptics";
+import { success, tap, warning } from "../utils/haptics";
 import { colors, sizes, spacing, useAccent } from "../theme";
 
 /**
@@ -73,15 +73,27 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
   }
 
   async function onRefresh() {
+    tap();
     setRefreshing(true);
     setError(null);
     try {
       setData(await game.api.search(account.lookup ?? account.gameName, account.tagLine, region));
       setOffline(null);
+      success();
     } catch (e) {
+      warning();
       setError(t("profile.refreshError", { error: errorMessage(e) }));
     }
     setRefreshing(false);
+  }
+
+  // Al pasar la cabecera, el nombre del jugador sube a la barra de navegación (como en iOS)
+  const nameInBar = useRef(false);
+  function onScroll(e) {
+    const show = e.nativeEvent.contentOffset.y > 110;
+    if (show === nameInBar.current) return;
+    nameInBar.current = show;
+    navigation.setOptions({ headerTitle: show ? profile.name : undefined });
   }
 
   const ranked = profile.ranked;
@@ -91,6 +103,8 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
     <ScrollView
       style={styles.container}
       contentContainerStyle={[styles.content, { paddingBottom: bottomSpace }]}
+      onScroll={onScroll}
+      scrollEventThrottle={32}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} />}
     >
       <ErrorBanner message={error} onDismiss={() => setError(null)} />

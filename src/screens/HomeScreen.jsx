@@ -16,6 +16,8 @@ import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
+import Animated from "react-native-reanimated";
+import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import GameLogo from "../components/GameLogo";
 import { useBootData } from "../boot/BootContext";
 import {
@@ -37,6 +39,7 @@ export default function HomeScreen({ navigation }) {
   const [recents,   setRecents]   = useState(bootRecents);
   const [platforms, setPlatforms] = useState({});   // plataforma elegida por juego (Fortnite, Apex, PUBG…)
   const [error,     setError]     = useState(null); // formato incorrecto: se muestra bajo el buscador, sin alertas
+  const { y, onScroll } = useLargeTitle();
 
   const game = getGame(gameId) || GAMES[0];
   const Extras = game.HomeExtras;
@@ -134,7 +137,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled">
+      <Animated.ScrollView contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
 
         {!serverOnline && (
           <Reveal order={0} baseDelay={HANDOFF_MS}>
@@ -147,7 +150,7 @@ export default function HomeScreen({ navigation }) {
 
         {/* Encabezado */}
         <Reveal order={0} baseDelay={HANDOFF_MS} style={styles.header}>
-          <Text style={styles.title} accessibilityRole="header">{t("home.title")}</Text>
+          <LargeTitle y={y}>{t("home.title")}</LargeTitle>
           <Text style={styles.subtitle}>{t("app.tagline")}</Text>
         </Reveal>
 
@@ -300,7 +303,8 @@ export default function HomeScreen({ navigation }) {
           )}
         </Reveal>
 
-      </ScrollView>
+      </Animated.ScrollView>
+      <CompactTitleBar y={y} title={t("home.title")} />
     </View>
   );
 }
@@ -317,7 +321,6 @@ const styles = StyleSheet.create({
   offlineDot:    { width: sizes.dot, height: sizes.dot, borderRadius: sizes.dot / 2, backgroundColor: colors.loss },
   offlineText:   { ...type.caption, color: colors.textSecondary },
   header:        { marginBottom: spacing.xl },
-  title:         { ...type.largeTitle, color: colors.text },
   subtitle:      { ...type.body, color: colors.textSecondary, marginTop: spacing.xs },
   searchCard:    { padding: spacing.lg },
   searchCardError: { borderColor: withAlpha(colors.loss, 0.6) },

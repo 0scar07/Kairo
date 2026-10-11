@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "./Icon";
 import { select } from "../utils/haptics";
@@ -48,13 +48,27 @@ export default function FloatingTabBar({ state, navigation }) {
                 if (!focused && !event.defaultPrevented) { select(); navigation.navigate(route.name); }
               }}
             >
-              <Icon name={ICONS[route.name]} size={sizes.item - spacing.xs} color={color} />
+              <TabIcon name={ICONS[route.name]} focused={focused} color={color} />
               <Text style={[styles.label, { color }]} maxFontSizeMultiplier={1.3} numberOfLines={1}>{t(LABELS[route.name])}</Text>
             </Pressable>
           );
         })}
       </View>
     </View>
+  );
+}
+
+// El ícono da un pequeño rebote cuando su pestaña pasa a estar activa
+function TabIcon({ name, focused, color }) {
+  const s = useSharedValue(1);
+  useEffect(() => {
+    if (focused) s.value = withSequence(withSpring(1.18, { damping: 10, stiffness: 400 }), withSpring(1, SPRING));
+  }, [focused]);
+  const animated = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
+  return (
+    <Animated.View style={animated}>
+      <Icon name={name} size={sizes.item - spacing.xs} color={color} />
+    </Animated.View>
   );
 }
 

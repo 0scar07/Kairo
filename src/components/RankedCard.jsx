@@ -1,7 +1,7 @@
 import React from "react";
 import { useT } from "../i18n/I18nProvider";
 import { View, Text, StyleSheet } from "react-native";
-import { Card, ProgressBar, SectionLabel } from "./ui";
+import { Card, CountUp, ProgressBar, SectionLabel } from "./ui";
 import RankEmblem from "./RankEmblem";
 import Icon from "./Icon";
 import { winrate, tierLabel } from "../utils/format";
@@ -34,14 +34,14 @@ export default function RankedCard({ entry, label, game = "lol" }) {
       <View style={styles.top}>
         <RankEmblem tier={tier} size={sizes.avatarXl - spacing.lg} />
         <View style={styles.lpBox}>
-          <Text style={styles.lp} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{leaguePoints}</Text>
+          <CountUp value={leaguePoints} style={styles.lp} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} />
           <Text style={styles.lpUnit}>LP</Text>
         </View>
       </View>
       <Text style={[styles.tierText, { color }]} numberOfLines={1} adjustsFontSizeToFit>{tierLabel(tier, rank)}</Text>
       <View style={styles.recordRow}>
         <Text style={styles.record}>{wins}V · {losses}D</Text>
-        <Text style={[styles.wr, { color: wrColor }]}>{wr}%</Text>
+        <CountUp value={wr} format={v => `${v}%`} style={[styles.wr, { color: wrColor }]} />
       </View>
       <ProgressBar value={wr} color={wrColor} glowing style={styles.bar} />
     </Card>

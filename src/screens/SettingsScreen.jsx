@@ -6,6 +6,8 @@ import { Card, SectionLabel, SettingRow, Chip } from "../components/ui";
 import NotificationsSection from "../notifications/NotificationsSection";
 import { RegionChips } from "../components/RegionPicker";
 import Reveal from "../components/Reveal";
+import Animated from "react-native-reanimated";
+import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import Icon from "../components/Icon";
 import { getGame } from "../games";
 import { APP_NAME } from "../constants/config";
@@ -20,6 +22,7 @@ import { colors, sizes, spacing, fontSizes, lineHeights, type, useActiveGame, wi
 // Ajustes: mi perfil, región por defecto, vibración, búsquedas recientes y acerca de
 export default function SettingsScreen({ navigation }) {
   const { t, preference, setPreference } = useI18n();
+  const { y, onScroll } = useLargeTitle();
   const { gameId, accent } = useActiveGame();
   const game = getGame(gameId);
   const { region, setRegion, haptics, setHaptics } = useBootData();
@@ -36,9 +39,10 @@ export default function SettingsScreen({ navigation }) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <View style={styles.container}>
+    <Animated.ScrollView style={styles.container} contentContainerStyle={styles.content} onScroll={onScroll} scrollEventThrottle={16}>
       <Reveal order={0}>
-        <Text style={styles.title}>{t("settings.title")}</Text>
+        <LargeTitle y={y} style={styles.title}>{t("settings.title")}</LargeTitle>
       </Reveal>
 
       <Reveal order={1}>
@@ -110,7 +114,9 @@ export default function SettingsScreen({ navigation }) {
           <Text style={styles.legal}>{t("legal.games")}</Text>
         </Card>
       </Reveal>
-    </ScrollView>
+    </Animated.ScrollView>
+    <CompactTitleBar y={y} title={t("settings.title")} />
+    </View>
   );
 }
 
@@ -118,7 +124,7 @@ const styles = StyleSheet.create({
   languages: { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.sm, marginTop: spacing.md },
   container:  { flex: 1, backgroundColor: colors.bg },
   content:    { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
-  title:      { ...type.largeTitle, color: colors.text, marginBottom: spacing.xl },
+  title:      { marginBottom: spacing.xl },
   rowLabel:   { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   rowHint:    { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
   regionHint: { marginBottom: spacing.md },
