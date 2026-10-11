@@ -33,10 +33,10 @@
   <!-- Fuentes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Sora:wght@800&display=swap" />
 
   <link rel="preload" as="image" href="landing/img/profile-lol.webp" fetchpriority="high" />
-  <link rel="stylesheet" href="landing/styles.css?v=20260929" />
+  <link rel="stylesheet" href="landing/styles.css?v=20261011d" />
 
   <script>document.documentElement.classList.add("js");</script>
 
@@ -57,10 +57,10 @@
   }
   </script>
 
-  <script defer src="landing/lib/gsap.min.js?v=20260929"></script>
-  <script defer src="landing/lib/ScrollTrigger.min.js?v=20260929"></script>
-  <script defer src="landing/lib/manifest.js?v=20260929"></script>
-  <script defer src="landing/main.js?v=20260929"></script>
+  <script defer src="landing/lib/gsap.min.js?v=20261011d"></script>
+  <script defer src="landing/lib/ScrollTrigger.min.js?v=20261011d"></script>
+  <script defer src="landing/lib/manifest.js?v=20261011d"></script>
+  <script defer src="landing/main.js?v=20261011d"></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -110,16 +110,6 @@
   </defs>
   </svg>
 
-  <!-- Pantalla de carga (igual que la de la app) -->
-  <div class="splash" data-splash aria-hidden="true">
-    <div class="splash-inner">
-      <svg class="splash-mark"><use href="#i-k" /></svg>
-      <span class="splash-word">KAIRO</span>
-      <span class="splash-tag">CADA PARTIDA CUENTA.</span>
-      <span class="splash-bar"><i></i></span>
-    </div>
-  </div>
-
   <!-- Navegación -->
   <header class="nav" data-nav>
     <div class="nav-inner container">
@@ -129,6 +119,7 @@
       </a>
       <nav class="nav-links" id="menu" aria-label="Principal">
         <a href="#juegos">Juegos</a>
+        <a href="#probar">Pruébalo</a>
         <a href="#funciones">Funciones</a>
         <a href="#en-vivo">En vivo</a>
         <a href="#capturas">Capturas</a>
@@ -151,17 +142,20 @@
     <!-- ============ HERO ============ -->
     <section class="hero" id="inicio" data-hero>
       <div class="hero-gradient" aria-hidden="true"></div>
-      <div class="hero-grid" aria-hidden="true"></div>
 
       <div class="container hero-layout">
         <div class="hero-copy">
+          <a class="release-pill hero-in" style="--d:0" href="https://github.com/0scar07/Kairo/releases/latest" data-release hidden>
+            <span class="release-tag" data-release-tag>Nuevo</span>
+            <span data-release-text>Última versión</span>
+            <svg class="ic" aria-hidden="true"><use href="#i-chev-r" /></svg>
+          </a>
           <p class="eyebrow hero-in" style="--d:0">
-            <span class="dot-live" aria-hidden="true"></span>
             Estadísticas de 9 juegos · Android y iPhone
           </p>
           <h1 class="hero-title hero-in" style="--d:1">
             <span class="hero-brand">KAIRO</span>
-            Cada partida <span class="grad-text">cuenta.</span>
+            Cada partida <span class="accent-text">cuenta.</span>
           </h1>
           <p class="hero-lead hero-in" style="--d:2">
             Tu rango, tu historial y la partida que se está jugando ahora mismo.
@@ -190,6 +184,7 @@
           </dl>
         </div>
 
+        <div class="hero-visual">
         <div class="hero-stage" data-stage aria-label="Vista previa de la app">
           <div class="stage-glow" aria-hidden="true"></div>
 
@@ -202,16 +197,13 @@
           <div class="phone phone-main" data-depth="0.8">
             <div class="phone-screen">
               <img src="landing/img/profile-lol.webp" alt="Perfil de League of Legends en Kairo: rango Challenger con 2178 LP, maestría de campeones y racha de 3 victorias" width="600" height="1298" fetchpriority="high" />
-              <!-- Banner líquido de notificación -->
-              <div class="liquid" aria-hidden="true">
-                <div class="liquid-goo">
-                  <span class="liquid-drop"></span>
-                  <span class="liquid-pill"></span>
-                </div>
-                <div class="liquid-text">
-                  <span class="dot-live"></span>
-                  <span><b>Perico Bandit</b> entró en partida · Flex</span>
-                </div>
+              <!-- La Dynamic Island se estira y se convierte en el aviso -->
+              <div class="island" aria-hidden="true">
+                <span class="island-content">
+                  <img class="island-avatar" src="landing/img/icon-192.webp" alt="" width="20" height="20" />
+                  <span class="island-text"><b>Perico Bandit</b> entró en partida</span>
+                  <span class="island-live"><span class="dot-live"></span>Flex</span>
+                </span>
               </div>
             </div>
           </div>
@@ -232,17 +224,45 @@
             <span class="fc-rank-name">PLATINUM I</span>
           </div>
         </div>
+        </div>
       </div>
+    </section>
 
-      <a class="scroll-cue" href="#juegos" aria-label="Bajar a los juegos">
-        <span></span>
-      </a>
+    <!-- ============ VUELO (scroll en 3D por las capturas) ============ -->
+    <section class="world" id="mundo" aria-labelledby="world-title" data-world>
+      <div class="world-sticky">
+        <div class="world-tint" aria-hidden="true"></div>
+        <header class="world-intro" data-world-intro>
+          <p class="kicker">Un vistazo por dentro</p>
+          <h2 id="world-title">Vuela por tus partidas.</h2>
+          <p class="world-hint">Sigue bajando.</p>
+        </header>
+        <div class="world-scene" aria-hidden="true">
+          <div class="world-cam" data-world-cam>
+          <figure class="world-card" style="--x:-24;--y:-8"><div class="phone"><div class="phone-screen"><img src="landing/img/profile-lol.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          <figure class="world-card" style="--x:23;--y:5"><div class="phone"><div class="phone-screen"><img src="landing/img/matches-lol.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          <figure class="world-card" style="--x:-26;--y:6"><div class="phone"><div class="phone-screen"><img src="landing/img/match-detail-lol.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          <figure class="world-card" style="--x:24;--y:-6"><div class="phone"><div class="phone-screen"><img src="landing/img/live-blue-lol.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          <figure class="world-card" style="--x:-23;--y:-3"><div class="phone"><div class="phone-screen"><img src="landing/img/clashroyale-profile.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          <figure class="world-card" style="--x:26;--y:6"><div class="phone"><div class="phone-screen"><img src="landing/img/brawlstars-profile.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          <figure class="world-card" style="--x:-25;--y:4"><div class="phone"><div class="phone-screen"><img src="landing/img/dota2-profile.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          <figure class="world-card" style="--x:0;--y:0"><div class="phone"><div class="phone-screen"><img src="landing/img/favorites.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div></figure>
+          </div>
+        </div>
+        <ol class="world-captions">
+          <li data-at="1" style="--tint:#C89B3C"><b>Cada victoria y cada derrota,</b> en orden y con su KDA.</li>
+          <li data-at="3" style="--tint:#E05555"><b>La partida en vivo,</b> jugador por jugador.</li>
+          <li data-at="5" style="--tint:#FFCE1F"><b>Brawl Stars, Clash Royale, Dota 2</b> y seis juegos más.</li>
+          <li data-at="7" style="--tint:#35E0A1"><b>Tus jugadores, siempre a un toque.</b> <a href="#descargar">Descargar Kairo</a></li>
+        </ol>
+        <span class="world-progress" aria-hidden="true"><i data-world-bar></i></span>
+      </div>
     </section>
 
     <!-- ============ JUEGOS ============ -->
     <section class="games" id="juegos" aria-labelledby="games-title">
       <div class="container">
-        <h2 class="games-title" id="games-title" data-reveal>
+        <h2 class="games-title" id="games-title" data-reveal data-lines>
           <span>Nueve juegos.</span> Un solo lugar para seguirlos.
         </h2>
       </div>
@@ -259,6 +279,70 @@
           <li class="game" style="--gc:#F5A623"><span class="game-glyph">PUBG</span><span class="game-name">PUBG<small>FPP y TPP</small></span></li>
         </ul>
       </div>
+
+      <div class="container">
+        <div class="picker" data-picker style="--pc:#C89B3C">
+          <div class="picker-copy">
+            <h3 class="picker-title">Cada juego, a su manera.</h3>
+            <div class="picker-tabs" role="tablist" aria-label="Elige un juego">
+              <button class="picker-tab" type="button" role="tab" id="pt-lol" aria-controls="pp-lol" aria-selected="true" data-key="lol" style="--gc:#C89B3C">League of Legends</button>
+              <button class="picker-tab" type="button" role="tab" id="pt-bs" aria-controls="pp-bs" aria-selected="false" tabindex="-1" data-key="bs" style="--gc:#FFCE1F">Brawl Stars</button>
+              <button class="picker-tab" type="button" role="tab" id="pt-cr" aria-controls="pp-cr" aria-selected="false" tabindex="-1" data-key="cr" style="--gc:#3F8CFF">Clash Royale</button>
+              <button class="picker-tab" type="button" role="tab" id="pt-d2" aria-controls="pp-d2" aria-selected="false" tabindex="-1" data-key="d2" style="--gc:#E4572E">Dota 2</button>
+            </div>
+            <div class="picker-panels">
+              <p class="picker-panel" role="tabpanel" id="pp-lol" aria-labelledby="pt-lol">Rango y LP de Solo/Dúo y Flex, maestría de campeones, historial y la partida que se está jugando ahora mismo.</p>
+              <p class="picker-panel" role="tabpanel" id="pp-bs" aria-labelledby="pt-bs" hidden>Trofeos, récord personal, victorias por modo y los brawlers con más trofeos.</p>
+              <p class="picker-panel" role="tabpanel" id="pp-cr" aria-labelledby="pt-cr" hidden>Trofeos, récord, mazo actual y estadísticas de batalla.</p>
+              <p class="picker-panel" role="tabpanel" id="pp-d2" aria-labelledby="pt-d2" hidden>Medalla oficial, winrate y los héroes que más juegas.</p>
+            </div>
+          </div>
+          <div class="picker-media">
+            <div class="phone">
+              <div class="phone-screen">
+                <img class="picker-shot is-on" data-key="lol" src="landing/img/profile-lol.webp" alt="Perfil de League of Legends en Kairo" width="600" height="1298" loading="lazy" decoding="async" />
+                <img class="picker-shot" data-key="bs" src="landing/img/brawlstars-profile.webp" alt="Perfil de Brawl Stars en Kairo" width="600" height="1298" loading="lazy" decoding="async" />
+                <img class="picker-shot" data-key="cr" src="landing/img/clashroyale-profile.webp" alt="Perfil de Clash Royale en Kairo" width="600" height="1298" loading="lazy" decoding="async" />
+                <img class="picker-shot" data-key="d2" src="landing/img/dota2-profile.webp" alt="Perfil de Dota 2 en Kairo" width="600" height="1298" loading="lazy" decoding="async" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRUÉBALO (búsqueda real contra la API de Kairo) ============ -->
+    <section class="section section-alt try" id="probar" aria-labelledby="try-title">
+      <div class="container">
+        <header class="section-head section-head-center" data-reveal>
+          <p class="kicker">Pruébalo ahora</p>
+          <h2 id="try-title" data-lines>Búscate. Aquí mismo.</h2>
+          <p class="section-lead">Escribe tu Riot ID y mira tu rango de League of Legends sin instalar nada.</p>
+        </header>
+
+        <form class="try-form" data-try novalidate>
+          <label class="sr-only" for="try-id">Riot ID</label>
+          <input class="try-input" id="try-id" name="riotId" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Nombre#TAG" required />
+          <label class="sr-only" for="try-region">Región</label>
+          <select class="try-select" id="try-region" name="region">
+            <option value="la1" selected>LAN</option>
+            <option value="la2">LAS</option>
+            <option value="na1">NA</option>
+            <option value="br1">BR</option>
+            <option value="euw1">EUW</option>
+            <option value="eun1">EUNE</option>
+            <option value="tr1">TR</option>
+            <option value="ru">RU</option>
+            <option value="kr">KR</option>
+            <option value="jp1">JP</option>
+            <option value="oc1">OCE</option>
+          </select>
+          <button class="btn btn-primary try-btn" type="submit">Buscar</button>
+        </form>
+        <p class="try-example">¿Sin Riot ID a mano? <button type="button" class="try-sample" data-try-sample>Prueba con Hide on bush#KR1</button></p>
+
+        <div class="try-result" data-try-result aria-live="polite"></div>
+      </div>
     </section>
 
     <!-- ============ FUNCIONES (BENTO) ============ -->
@@ -266,7 +350,7 @@
       <div class="container">
         <header class="section-head" data-reveal>
           <p class="kicker">Funciones</p>
-          <h2 id="features-title">Todo lo que pasa en tus partidas, sin abrir diez pestañas.</h2>
+          <h2 id="features-title" data-lines>Todo lo que pasa en tus partidas, sin abrir diez pestañas.</h2>
           <p class="section-lead">Kairo no solo muestra un número. Guarda tu evolución, te avisa cuando algo cambia y te deja ponerte cara a cara con quien quieras.</p>
         </header>
 
@@ -278,6 +362,19 @@
               <h3>Historial de rango</h3>
             </div>
             <p>Una foto diaria de tu rango, convertida en la curva de LP de Solo/Dúo y Flex. Mira de un vistazo cuánto subiste esta semana y este mes.</p>
+            <div class="rankup" data-rankup role="img" aria-label="Ejemplo: ascenso de Platinum I a Emerald IV">
+              <span class="rankup-emblem" aria-hidden="true">
+                <img class="re-from" src="landing/img/ranks/platinum.webp" alt="" width="200" height="171" loading="lazy" decoding="async" />
+                <img class="re-to" src="landing/img/ranks/emerald.webp" alt="" width="200" height="148" loading="lazy" decoding="async" />
+                <i class="rankup-flash"></i>
+              </span>
+              <span class="rankup-info" aria-hidden="true">
+                <b class="rankup-tier" data-rankup-tier>PLATINUM I</b>
+                <span class="rankup-lp"><span data-rankup-lp>62</span> LP</span>
+                <span class="rankup-bar"><i data-rankup-bar></i></span>
+              </span>
+              <span class="rankup-badge" aria-hidden="true">Ascenso</span>
+            </div>
             <div class="lp-chart" role="img" aria-label="Gráfico de ejemplo: los LP suben de Platinum I a Emerald III en 30 días, con más 86 LP en 7 días y más 214 LP en 30 días">
               <div class="lp-deltas" aria-hidden="true">
                 <span class="delta up"><svg class="ic"><use href="#i-trend-up" /></svg>+86 LP <small>7 días</small></span>
@@ -395,7 +492,7 @@
         <!-- Filas alternas con capturas -->
         <div class="rows">
           <div class="row" data-reveal>
-            <div class="row-media">
+            <div class="row-media" style="--k:#C89B3C">
               <div class="phone phone-tilt" data-tilt>
                 <div class="phone-screen">
                   <img src="landing/img/match-detail-lol.webp" alt="Detalle de una partida de LoL: marcador 30 contra 31 y los diez jugadores con objetos, hechizos, runas, daño y oro" width="600" height="1298" loading="lazy" decoding="async" />
@@ -404,7 +501,7 @@
             </div>
             <div class="row-copy">
               <p class="kicker" style="--k:#C89B3C">Detalle de partidas</p>
-              <h3 class="row-title">Los diez jugadores, objeto por objeto.</h3>
+              <h3 class="row-title" data-lines>Los diez jugadores, objeto por objeto.</h3>
               <p>Abre cualquier partida y mira qué construyó cada uno: objetos, hechizos de invocador, runas, daño, oro y CS. En TFT, los ocho jugadores con sus rasgos y unidades con estrellas.</p>
               <ul class="ticks">
                 <li><svg class="ic" aria-hidden="true"><use href="#i-check" /></svg>Marcador de kills por equipo</li>
@@ -424,7 +521,7 @@
             </div>
             <div class="row-copy">
               <p class="kicker">Historial</p>
-              <h3 class="row-title">Victorias en verde. Derrotas en rojo. Sin letra chica.</h3>
+              <h3 class="row-title" data-lines>Victorias en verde. Derrotas en rojo. Sin letra chica.</h3>
               <p>Resultado, campeón, cola, KDA, CS y daño de cada partida. Filtra por resultado o por campeón y carga más cuando quieras mirar atrás.</p>
               <ul class="ticks">
                 <li><svg class="ic" aria-hidden="true"><use href="#i-check" /></svg>Resumen de las últimas 10 partidas</li>
@@ -454,7 +551,7 @@
             </div>
             <div class="row-copy">
               <p class="kicker">Multijuego</p>
-              <h3 class="row-title">Cada juego con su color, sus datos y su forma de buscar.</h3>
+              <h3 class="row-title" data-lines>Cada juego con su color, sus datos y su forma de buscar.</h3>
               <p>Trofeos y brawlers en Brawl Stars, mazo y batallas en Clash Royale, medalla oficial y héroes en Dota 2. Riot ID con región, #TAG de Supercell o nombre y plataforma: Kairo recuerda cómo buscaste la última vez.</p>
               <div class="swatches" aria-label="Colores de acento por juego">
                 <span style="--gc:#C89B3C" title="League of Legends"></span>
@@ -474,12 +571,12 @@
     </section>
 
     <!-- ============ PARTIDA EN VIVO ============ -->
-    <section class="section live" id="en-vivo" aria-labelledby="live-title" data-live>
+    <section class="section section-alt live" id="en-vivo" aria-labelledby="live-title" data-live>
       <div class="live-halo" aria-hidden="true"></div>
       <div class="container">
         <header class="section-head section-head-center" data-reveal>
           <p class="kicker kicker-live"><span class="dot-live" aria-hidden="true"></span>La función estrella</p>
-          <h2 id="live-title">Partida en vivo.</h2>
+          <h2 id="live-title" data-lines>Partida en vivo.</h2>
           <p class="section-lead">Si alguien que buscas está jugando League of Legends ahora mismo, Kairo lo sabe. Abre la sala completa mientras la partida sigue en juego.</p>
         </header>
 
@@ -544,7 +641,7 @@
       <div class="container gallery-head">
         <header class="section-head" data-reveal>
           <p class="kicker">Capturas</p>
-          <h2 id="gallery-title">Así se ve en tu mano.</h2>
+          <h2 id="gallery-title" data-lines>Así se ve en tu mano.</h2>
         </header>
         <div class="gallery-nav" data-reveal>
           <button class="round-btn" type="button" data-gallery-prev aria-label="Capturas anteriores">
@@ -595,12 +692,58 @@
       </div>
     </section>
 
+    <!-- ============ ANTES / AHORA ============ -->
+    <section class="section compare" aria-labelledby="compare-title">
+      <div class="container">
+        <header class="section-head section-head-center" data-reveal>
+          <p class="kicker">Antes y ahora</p>
+          <h2 id="compare-title" data-lines>Diez pestañas. O una app.</h2>
+          <p class="section-lead">Arrastra para ver la diferencia.</p>
+        </header>
+
+        <div class="cmp" data-cmp style="--pos:50%">
+          <div class="cmp-layer cmp-after" aria-hidden="true">
+            <div class="cmp-after-inner">
+              <div class="phone cmp-phone"><div class="phone-screen"><img src="landing/img/profile-lol.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></div></div>
+              <p class="cmp-copy"><b>Con Kairo</b>Rango, historial y partida en vivo en una sola pantalla.</p>
+            </div>
+          </div>
+          <div class="cmp-layer cmp-before" aria-hidden="true">
+            <div class="browser">
+              <div class="browser-tabs">
+                <span>Estadísticas LoL</span><span>Buscar invocador</span><span>Brawl tracker</span><span>Mazos CR</span><span>Dota stats</span><span>Fortnite stats</span><span>Apex rango</span><span>PUBG</span><span>Partida en vivo</span><span class="is-active">Guerra de clanes</span>
+              </div>
+              <div class="browser-bar"><i></i><span>buscando-mi-rango.example/perfil?id=</span></div>
+              <div class="browser-body">
+                <div class="b-ad">Anuncio</div>
+                <div class="b-lines"><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="b-modal"><b>Crea una cuenta para continuar</b><span>Registrarse</span></div>
+                <div class="b-cookie">Usamos cookies para mejorar tu experiencia <span>Aceptar</span></div>
+                <div class="b-spinner"></div>
+              </div>
+            </div>
+            <p class="cmp-copy cmp-copy-before"><b>Sin Kairo</b>Una web por juego, anuncios y registros.</p>
+          </div>
+          <span class="cmp-handle" aria-hidden="true"><svg class="ic"><use href="#i-chev-l" /></svg><svg class="ic"><use href="#i-chev-r" /></svg></span>
+          <label class="sr-only" for="cmp-range">Comparar: sin Kairo a la izquierda, con Kairo a la derecha</label>
+          <input class="cmp-range" id="cmp-range" type="range" min="0" max="100" value="50" data-cmp-range />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DECLARACIÓN (las palabras se encienden con el scroll) ============ -->
+    <section class="statement" aria-label="Por qué Kairo">
+      <div class="container">
+        <p class="statement-text" data-statement>Sin cuentas. Sin anuncios. Sin diez pestañas abiertas. Solo tu rango, tus partidas y la que se está jugando ahora mismo. <span class="statement-accent">Gratis, en tu bolsillo.</span></p>
+      </div>
+    </section>
+
     <!-- ============ DESCARGAR ============ -->
-    <section class="section download" id="descargar" aria-labelledby="download-title">
+    <section class="section section-alt download" id="descargar" aria-labelledby="download-title">
       <div class="container">
         <header class="section-head section-head-center" data-reveal>
           <p class="kicker">Cómo descargar</p>
-          <h2 id="download-title">Instálala en un minuto.</h2>
+          <h2 id="download-title" data-lines>Instálala en un minuto.</h2>
           <p class="section-lead">Sin tienda, sin cuenta y sin registro. Elige el camino que va con tu celular.</p>
         </header>
 
@@ -609,7 +752,7 @@
             <span class="dl-os"><svg class="ic" aria-hidden="true"><use href="#i-android" /></svg>Android</span>
             <h3>APK directo</h3>
             <p>Descarga <code>Kairo.apk</code> de la última versión y ábrelo. Android te pedirá permitir instalar apps desde esa fuente.</p>
-            <a class="btn btn-primary" href="https://github.com/0scar07/Kairo/releases/latest/download/Kairo.apk">
+            <a class="btn btn-ghost" href="https://github.com/0scar07/Kairo/releases/latest/download/Kairo.apk">
               <svg class="ic" aria-hidden="true"><use href="#i-download" /></svg>Descargar APK
             </a>
           </article>
@@ -637,6 +780,14 @@
             </a>
           </article>
         </div>
+
+        <div class="dl-qr" data-reveal>
+          <div class="qr-tile"><svg class="qr-code" viewBox="0 0 29 29" role="img" aria-label="Código QR que abre esta página en tu celular" shape-rendering="crispEdges"><path fill="#05080A" d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM9 0h1v1h-1zM10 0h1v1h-1zM13 0h1v1h-1zM14 0h1v1h-1zM18 0h1v1h-1zM20 0h1v1h-1zM22 0h1v1h-1zM23 0h1v1h-1zM24 0h1v1h-1zM25 0h1v1h-1zM26 0h1v1h-1zM27 0h1v1h-1zM28 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM10 1h1v1h-1zM11 1h1v1h-1zM12 1h1v1h-1zM13 1h1v1h-1zM16 1h1v1h-1zM17 1h1v1h-1zM22 1h1v1h-1zM28 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM9 2h1v1h-1zM11 2h1v1h-1zM12 2h1v1h-1zM14 2h1v1h-1zM18 2h1v1h-1zM19 2h1v1h-1zM22 2h1v1h-1zM24 2h1v1h-1zM25 2h1v1h-1zM26 2h1v1h-1zM28 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM9 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM13 3h1v1h-1zM17 3h1v1h-1zM20 3h1v1h-1zM22 3h1v1h-1zM24 3h1v1h-1zM25 3h1v1h-1zM26 3h1v1h-1zM28 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM9 4h1v1h-1zM12 4h1v1h-1zM16 4h1v1h-1zM17 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM24 4h1v1h-1zM25 4h1v1h-1zM26 4h1v1h-1zM28 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM16 5h1v1h-1zM18 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM28 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM25 6h1v1h-1zM26 6h1v1h-1zM27 6h1v1h-1zM28 6h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM11 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM20 7h1v1h-1zM0 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM9 8h1v1h-1zM11 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM17 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM22 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM27 8h1v1h-1zM4 9h1v1h-1zM5 9h1v1h-1zM7 9h1v1h-1zM9 9h1v1h-1zM10 9h1v1h-1zM11 9h1v1h-1zM12 9h1v1h-1zM15 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM21 9h1v1h-1zM23 9h1v1h-1zM24 9h1v1h-1zM26 9h1v1h-1zM27 9h1v1h-1zM0 10h1v1h-1zM2 10h1v1h-1zM3 10h1v1h-1zM4 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM15 10h1v1h-1zM17 10h1v1h-1zM21 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM7 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM16 11h1v1h-1zM22 11h1v1h-1zM24 11h1v1h-1zM25 11h1v1h-1zM1 12h1v1h-1zM2 12h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM18 12h1v1h-1zM20 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM28 12h1v1h-1zM0 13h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM8 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM15 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM24 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM1 14h1v1h-1zM5 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM21 14h1v1h-1zM23 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM0 15h1v1h-1zM3 15h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM22 15h1v1h-1zM24 15h1v1h-1zM26 15h1v1h-1zM28 15h1v1h-1zM1 16h1v1h-1zM2 16h1v1h-1zM3 16h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM10 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM25 16h1v1h-1zM26 16h1v1h-1zM0 17h1v1h-1zM1 17h1v1h-1zM8 17h1v1h-1zM10 17h1v1h-1zM12 17h1v1h-1zM15 17h1v1h-1zM17 17h1v1h-1zM18 17h1v1h-1zM19 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM0 18h1v1h-1zM1 18h1v1h-1zM2 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM15 18h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM28 18h1v1h-1zM0 19h1v1h-1zM2 19h1v1h-1zM3 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM10 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM21 19h1v1h-1zM22 19h1v1h-1zM24 19h1v1h-1zM0 20h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM17 20h1v1h-1zM19 20h1v1h-1zM20 20h1v1h-1zM21 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM26 20h1v1h-1zM27 20h1v1h-1zM28 20h1v1h-1zM8 21h1v1h-1zM10 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM0 22h1v1h-1zM1 22h1v1h-1zM2 22h1v1h-1zM3 22h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM11 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM0 23h1v1h-1zM6 23h1v1h-1zM10 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM19 23h1v1h-1zM20 23h1v1h-1zM24 23h1v1h-1zM28 23h1v1h-1zM0 24h1v1h-1zM2 24h1v1h-1zM3 24h1v1h-1zM4 24h1v1h-1zM6 24h1v1h-1zM9 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM12 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM16 24h1v1h-1zM19 24h1v1h-1zM20 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM27 24h1v1h-1zM0 25h1v1h-1zM2 25h1v1h-1zM3 25h1v1h-1zM4 25h1v1h-1zM6 25h1v1h-1zM10 25h1v1h-1zM11 25h1v1h-1zM12 25h1v1h-1zM15 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM18 25h1v1h-1zM19 25h1v1h-1zM20 25h1v1h-1zM23 25h1v1h-1zM25 25h1v1h-1zM26 25h1v1h-1zM28 25h1v1h-1zM0 26h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM6 26h1v1h-1zM10 26h1v1h-1zM11 26h1v1h-1zM14 26h1v1h-1zM15 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM25 26h1v1h-1zM26 26h1v1h-1zM27 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM11 27h1v1h-1zM12 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM21 27h1v1h-1zM24 27h1v1h-1zM26 27h1v1h-1zM28 27h1v1h-1zM0 28h1v1h-1zM1 28h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM5 28h1v1h-1zM6 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM11 28h1v1h-1zM12 28h1v1h-1zM15 28h1v1h-1zM16 28h1v1h-1zM17 28h1v1h-1zM19 28h1v1h-1zM21 28h1v1h-1zM22 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1z"/></svg></div>
+          <div class="dl-qr-copy">
+            <h3>¿Lo estás viendo en el computador?</h3>
+            <p>Apunta la cámara de tu celular al código y descarga Kairo directamente ahí.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -645,7 +796,7 @@
       <div class="container faq-layout">
         <header class="section-head" data-reveal>
           <p class="kicker">Preguntas</p>
-          <h2 id="faq-title">Lo que todos preguntan primero.</h2>
+          <h2 id="faq-title" data-lines>Lo que todos preguntan primero.</h2>
           <p class="section-lead">¿Algo más? Abre un issue en <a href="https://github.com/0scar07/Kairo/issues">GitHub</a>.</p>
         </header>
         <div class="faq-list" data-reveal>
@@ -678,7 +829,7 @@
       <div class="final-glow" aria-hidden="true"></div>
       <div class="container final-inner" data-reveal>
         <svg class="final-mark" aria-hidden="true"><use href="#i-k" /></svg>
-        <h2 id="final-title">La próxima partida ya cuenta.</h2>
+        <h2 id="final-title" data-lines>La próxima partida ya cuenta.</h2>
         <p>Instala Kairo y búscate. Tarda menos que una cola de ARAM.</p>
         <div class="hero-ctas">
           <a class="btn btn-primary btn-lg" href="https://github.com/0scar07/Kairo/releases/latest/download/Kairo.apk">
@@ -704,7 +855,7 @@
           <p>Cada partida cuenta.</p>
         </div>
         <nav class="footer-links" aria-label="Enlaces del pie">
-          <a href="https://github.com/0scar07/Kairo"><svg class="ic" aria-hidden="true"><use href="#i-github" /></svg>GitHub</a>
+          <a class="star-link" href="https://github.com/0scar07/Kairo" data-stars><svg class="ic" aria-hidden="true"><use href="#i-github" /></svg>Danos una estrella en GitHub<span class="star-count" data-stars-count hidden></span></a>
           <a href="privacy.html"><svg class="ic" aria-hidden="true"><use href="#i-shield" /></svg>Política de privacidad</a>
           <a href="https://github.com/0scar07/Kairo/blob/main/LICENSE"><svg class="ic" aria-hidden="true"><use href="#i-scale" /></svg>Licencia MIT</a>
           <a href="https://0scar07.github.io/Kairo/app/"><svg class="ic" aria-hidden="true"><use href="#i-globe" /></svg>Versión web</a>
@@ -714,5 +865,30 @@
       <p class="copy">© <span data-year>2026</span> Kairo · Código abierto bajo licencia MIT.</p>
     </div>
   </footer>
+  <!-- Visor de capturas -->
+  <dialog class="lightbox" data-lightbox aria-label="Captura ampliada">
+    <div class="lb-stage" data-lb-stage>
+      <figure class="lb-figure">
+        <div class="phone lb-phone" data-lb-phone><div class="phone-screen"><img data-lb-img src="landing/img/profile-lol.webp" alt="" width="600" height="1298" /></div></div>
+        <figcaption class="lb-caption" data-lb-caption></figcaption>
+      </figure>
+      <button class="round-btn lb-prev" type="button" data-lb-prev aria-label="Captura anterior"><svg class="ic" aria-hidden="true"><use href="#i-chev-l" /></svg></button>
+      <button class="round-btn lb-next" type="button" data-lb-next aria-label="Captura siguiente"><svg class="ic" aria-hidden="true"><use href="#i-chev-r" /></svg></button>
+      <button class="round-btn lb-close" type="button" data-lb-close aria-label="Cerrar"><svg class="ic" aria-hidden="true"><use href="#i-plus" /></svg></button>
+      <p class="lb-count" data-lb-count></p>
+    </div>
+  </dialog>
+
+  <!-- Barra de descarga flotante (solo móvil, aparece tras el hero) -->
+  <div class="dock" data-dock role="region" aria-label="Descarga rápida" inert>
+    <img src="landing/img/icon-192.webp" alt="" width="36" height="36" loading="lazy" />
+    <span class="dock-copy"><b>Kairo</b><small>Gratis · sin cuentas</small></span>
+    <a class="btn btn-primary btn-sm" href="https://github.com/0scar07/Kairo/releases/latest/download/Kairo.apk">
+      <svg class="ic" aria-hidden="true"><use href="#i-android" /></svg>APK
+    </a>
+    <a class="btn btn-ghost btn-sm" href="https://0scar07.github.io/Kairo/app/" aria-label="Usar en iPhone">
+      <svg class="ic" aria-hidden="true"><use href="#i-apple" /></svg>iPhone
+    </a>
+  </div>
 </body>
 </html>
