@@ -7,7 +7,7 @@ import Reveal from "../components/Reveal";
 import Animated from "react-native-reanimated";
 import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
 import GameLogo from "../components/GameLogo";
-import { Chip, EmptyState, ErrorBanner } from "../components/ui";
+import { Chip, EmptyState, ErrorBanner, showHud } from "../components/ui";
 import { GAMES } from "../games";
 import { errorMessage } from "../utils/format";
 import { canAlert, loadFavorites, removeFavorite } from "../utils/favorites";
@@ -47,6 +47,7 @@ export default function FavoritesScreen({ navigation }) {
     setFavorites(prev => prev.filter(f => !(f.gameId === fav.gameId && f.puuid === fav.puuid)));
     try {
       await removeFavorite(fav);
+      showHud(t("hud.removed"));
     } catch (e) {
       Alert.alert(t("common.error"), t("favorites.saveError", { error: errorMessage(e) }));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));

@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "./Icon";
+import { Glass } from "./ui";
 import { select } from "../utils/haptics";
 import { useT } from "../i18n/I18nProvider";
 import { colors, radii, sizes, spacing, fontSizes, type, glow, useAccent, withAlpha } from "../theme";
@@ -26,6 +27,7 @@ export default function FloatingTabBar({ state, navigation }) {
   return (
     <View pointerEvents="box-none" style={[styles.host, { bottom: Math.max(insets.bottom, spacing.md) }]}>
       <View style={styles.pill} accessibilityRole="tablist" onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+        <Glass style={[StyleSheet.absoluteFill, styles.glass]} intensity={70} />
         {itemWidth > 0 && (
           <Animated.View style={[
             styles.indicator,
@@ -76,10 +78,11 @@ const styles = StyleSheet.create({
   host:      { position: "absolute", left: 0, right: 0, alignItems: "center" },
   pill:      {
     flexDirection: "row", padding: spacing.sm, minWidth: "72%",
-    backgroundColor: withAlpha(colors.surfaceRaised, 0.96), borderRadius: radii.pill,
+    borderRadius: radii.pill,
     borderWidth: sizes.hairline, borderColor: colors.borderStrong,
     ...glow(colors.bg, spacing.lg, 0.9),
   },
+  glass:     { borderRadius: radii.pill },
   indicator: {
     position: "absolute", top: spacing.sm, bottom: spacing.sm, left: spacing.sm,
     borderRadius: radii.pill, borderWidth: sizes.hairline,

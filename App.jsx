@@ -24,6 +24,7 @@ import { I18nProvider, useT } from "./src/i18n/I18nProvider";
 import { NotificationsProvider } from "./src/notifications/NotificationsProvider";
 import PermissionSheet from "./src/notifications/PermissionSheet";
 import BannerHost from "./src/notifications/BannerHost";
+import { HudHost } from "./src/components/ui";
 import { navigationRef, flushNavigationQueue } from "./src/navigation/ref";
 import { colors, fonts, tracking, GameProvider, useAccent } from "./src/theme";
 
@@ -65,8 +66,13 @@ function RootStack() {
     <Stack.Navigator screenOptions={{
       headerStyle:      { backgroundColor: colors.surface },
       headerTintColor:  accent,
-      headerTitleStyle: { fontFamily: fonts.display, letterSpacing: tracking.wide },
+      headerTitleStyle: { fontFamily: fonts.display, letterSpacing: tracking.tight },
+      headerShadowVisible: false,
+      headerBackButtonDisplayMode: "minimal",
       contentStyle:     { backgroundColor: colors.bg },
+      // Volver deslizando desde cualquier punto (iOS) y la misma transición lateral en Android
+      fullScreenGestureEnabled: true,
+      animation: Platform.OS === "android" ? "slide_from_right" : "default",
     }}>
       <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
       <Stack.Screen
@@ -102,6 +108,7 @@ export default function App() {
                 </NavigationContainer>
                 <PermissionSheet />
                 <BannerHost />
+                <HudHost />
               </NotificationsProvider>
             </GameProvider>
           </BootProvider>

@@ -8,11 +8,12 @@ import { getGame } from "../games";
 import RankEmblem from "./RankEmblem";
 import { errorMessage, tierLabel } from "../utils/format";
 import Icon from "./Icon";
+import FavoriteStar from "./FavoriteStar";
 import { canAlert, hasAlerts, isFavoriteIn, loadFavorites, refreshFavorite, sameFavorite, toggleFavorite } from "../utils/favorites";
 import BellButton from "../notifications/BellButton";
 import ShareButton from "../share/ShareButton";
 import { useNavigation } from "@react-navigation/native";
-import { PressableScale } from "./ui";
+import { PressableScale, showHud } from "./ui";
 import { useNotifications } from "../notifications/NotificationsProvider";
 import { success, tap, warning } from "../utils/haptics";
 import { colors, sizes, spacing, useAccent } from "../theme";
@@ -67,6 +68,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
       const { isFav: marked } = await toggleFavorite({ ...game.toFavorite(data), gameId, region });
       setIsFav(marked);
       if (marked) success();
+      showHud(t(marked ? "hud.added" : "hud.removed"), marked ? "star" : "check");
     } catch (e) {
       setError(t("profile.favoriteError", { error: errorMessage(e) }));
     }
@@ -121,7 +123,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
           badgeIcon={ranked ? <RankEmblem tier={ranked.tier} size={sizes.item} /> : profile.badgeIcon || null}
           glowColor={colors.tier[ranked?.tier]}
           action={headerAction ? headerAction.icon : (
-            <Icon name="star" size={sizes.avatarSm} color={isFav ? colors.gold : colors.textMuted} filled={isFav} />
+            <FavoriteStar active={isFav} size={sizes.avatarSm} />
           )}
           onAction={headerAction ? headerAction.onPress : onToggleFavorite}
           extraAction={(

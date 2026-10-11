@@ -4,7 +4,8 @@ import Animated, {
   Extrapolation, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, sizes, spacing, type, withAlpha } from "../theme";
+import Glass from "./ui/Glass";
+import { colors, sizes, spacing, type } from "../theme";
 
 const BAR_HEIGHT = 48;
 
@@ -48,6 +49,7 @@ export function CompactTitleBar({ y, title, threshold = 56 }) {
       importantForAccessibility="no-hide-descendants"
       style={[styles.bar, { paddingTop: insets.top, height: insets.top + BAR_HEIGHT }, bar]}
     >
+      <Glass style={StyleSheet.absoluteFill} intensity={70} />
       <Animated.Text style={[styles.compact, text]} numberOfLines={1}>{title}</Animated.Text>
     </Animated.View>
   );
@@ -58,7 +60,6 @@ const styles = StyleSheet.create({
   bar:     {
     position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
     alignItems: "center", justifyContent: "center",
-    backgroundColor: withAlpha(colors.bg, 0.94),
     borderBottomWidth: sizes.hairline, borderBottomColor: colors.border,
   },
   compact: { ...type.heading, color: colors.text, paddingHorizontal: spacing.xxxl },

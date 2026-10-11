@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, Modal, Pressable, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import { Chip } from "./ui";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { Chip, Sheet, SheetAction } from "./ui";
+import Icon from "./Icon";
+import { select } from "../utils/haptics";
 import { REGIONS, regionName } from "../constants/regions";
 import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../theme";
 
@@ -25,28 +27,23 @@ export function RegionButton({ value, onChange, disabled, options = REGIONS, nam
         <Text style={styles.caret}>▾</Text>
       </TouchableOpacity>
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
-        <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
-          <Pressable style={styles.sheet}>
-            <Text style={styles.title} accessibilityRole="header">{title || t("region.title")}</Text>
-            {options.map(r => {
-              const active = r.id === value;
-              return (
-                <TouchableOpacity
-                  key={r.id}
-                  style={[styles.option, active && { backgroundColor: withAlpha(accent, 0.12) }]}
-                  onPress={() => { onChange(r.id); setOpen(false); }}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}
-                >
-                  <Text style={[styles.optionLabel, active && { color: accent }]}>{r.label}</Text>
-                  {nameOf ? <Text style={styles.optionName}>{nameOf(r.id)}</Text> : null}
-                </TouchableOpacity>
-              );
-            })}
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <Sheet visible={open} onClose={() => setOpen(false)} title={title || t("region.title")}>
+        <ScrollView bounces={false}>
+          {options.map(r => {
+            const active = r.id === value;
+            return (
+              <SheetAction
+                key={r.id}
+                selected={active}
+                onPress={() => { if (!active) select(); onChange(r.id); setOpen(false); }}
+                icon={<Text style={[styles.optionLabel, active && { color: accent }]}>{r.label}</Text>}
+                label={nameOf ? nameOf(r.id) : ""}
+                detail={active ? <Icon name="check" size={fontSizes.lg} color={accent} /> : null}
+              />
+            );
+          })}
+        </ScrollView>
+      </Sheet>
     </>
   );
 }

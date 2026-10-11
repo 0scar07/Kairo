@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity, Platform } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { GAMES, UPCOMING_GAMES, getGame } from "../games";
 import { regionName } from "../constants/regions";
@@ -11,7 +11,7 @@ import { loadPlatforms, savePlatform } from "../utils/prefs";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
 import { loadRecents, clearRecents } from "../utils/recents";
 import { select, warning } from "../utils/haptics";
-import { Card, SectionLabel, PressableScale, EmptyState } from "../components/ui";
+import { Card, SectionLabel, PressableScale, EmptyState, showHud } from "../components/ui";
 import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
@@ -40,6 +40,7 @@ export default function HomeScreen({ navigation }) {
   const [platforms, setPlatforms] = useState({});   // plataforma elegida por juego (Fortnite, Apex, PUBG…)
   const [error,     setError]     = useState(null); // formato incorrecto: se muestra bajo el buscador, sin alertas
   const { y, onScroll } = useLargeTitle();
+  const [focused, setFocused] = useState(false);
 
   const game = getGame(gameId) || GAMES[0];
   const Extras = game.HomeExtras;
@@ -117,6 +118,7 @@ export default function HomeScreen({ navigation }) {
     setFavorites(prev => prev.filter(f => !(f.gameId === fav.gameId && f.puuid === fav.puuid)));
     try {
       await removeFavorite(fav);
+      showHud(t("hud.removed"));
     } catch (e) {
       Alert.alert(t("common.error"), t("favorites.saveError", { error: errorMessage(e) }));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
@@ -167,10 +169,14 @@ export default function HomeScreen({ navigation }) {
                   />
                 ) : null)
                 : <RegionButton value={region} onChange={setRegion} />}
+              <View style={[styles.field, focused && { borderColor: withAlpha(accent, 0.7) }]}>
+              <Icon name="search" size={fontSizes.lg} color={colors.textMuted} />
               <TextInput
                 value={input}
                 onChangeText={v => { setInput(v); if (error) setError(null); }}
                 onSubmitEditing={handleSearch}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
                 accessibilityLabel={t("home.searchIn", { game: game.name })}
                 accessibilityHint={error || undefined}
                 placeholder={game.tagSearch ? t("home.placeholderTag") : game.search === "name" ? t(game.searchResults ? "home.placeholderNameOrId" : "home.placeholderName") : t("home.placeholderRiotId")}
@@ -180,6 +186,16 @@ export default function HomeScreen({ navigation }) {
                 autoCorrect={false}
                 returnKeyType="search"
               />
+              {input ? (
+                <PressableScale
+                  onPress={() => { setInput(""); setError(null); }}
+                  scaleTo={0.85} hitSlop={spacing.sm} style={styles.clear}
+                  accessibilityLabel={t("home.clearInput")}
+                >
+                  <Icon name="close" size={fontSizes.sm} color={colors.bg} strokeWidth={3} />
+                </PressableScale>
+              ) : null}
+              </View>
               <PressableScale
                 haptic
                 onPress={handleSearch}
@@ -327,9 +343,16 @@ const styles = StyleSheet.create({
   errorRow:      { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, marginTop: spacing.md },
   errorText:     { ...type.small, color: colors.text, flex: 1, lineHeight: lineHeights.small + 2 },
   searchRow:     { flexDirection: "row", gap: spacing.sm, alignItems: "stretch" },
-  input:         {
-    ...type.body, flex: 1, backgroundColor: colors.bg, borderWidth: sizes.hairline, borderColor: colors.border,
-    borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.md, color: colors.text, minWidth: 0,
+  field:         {
+    flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: spacing.sm,
+    backgroundColor: colors.bg, borderWidth: sizes.hairline, borderColor: colors.border,
+    borderRadius: radii.md, paddingHorizontal: spacing.md,
+  },
+  // En la web el foco lo marca el borde del campo (el contorno del navegador queda fuera de lugar)
+  input:         { ...type.body, flex: 1, minWidth: 0, paddingVertical: spacing.md, color: colors.text, ...(Platform.OS === "web" ? { outlineStyle: "none" } : null) },
+  clear:         {
+    width: sizes.avatarXs, height: sizes.avatarXs, borderRadius: radii.pill,
+    backgroundColor: colors.textMuted, alignItems: "center", justifyContent: "center",
   },
   go:            { width: sizes.button, flexShrink: 0, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
   gameScroll:    { marginBottom: spacing.xl, marginHorizontal: -spacing.xl },
