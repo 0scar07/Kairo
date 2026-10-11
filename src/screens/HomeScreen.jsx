@@ -9,9 +9,9 @@ import { GLOBAL_REGION, tagOf } from "../utils/supercell";
 import { profileTarget } from "../utils/target";
 import { loadPlatforms, savePlatform } from "../utils/prefs";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
-import { loadRecents, clearRecents } from "../utils/recents";
+import { loadRecents, clearRecents, removeRecent } from "../utils/recents";
 import { select, warning, tap, success } from "../utils/haptics";
-import { Card, SectionLabel, PressableScale, EmptyState, showHud } from "../components/ui";
+import { Card, SectionLabel, PressableScale, EmptyState, showHud, Sheet, SheetAction } from "../components/ui";
 import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
@@ -43,6 +43,7 @@ export default function HomeScreen({ navigation }) {
   const { y, onScroll } = useLargeTitle();
   const [focused, setFocused] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [recentMenu, setRecentMenu] = useState(null);   // búsqueda reciente con el menú contextual abierto
   const [extrasKey, setExtrasKey] = useState(0);   // al refrescar se vuelven a pedir los extras del juego (estado, rotación)
 
   // Tirar hacia abajo: vuelve a comprobar el servidor y recarga favoritos, recientes y extras
@@ -139,6 +140,15 @@ export default function HomeScreen({ navigation }) {
     } catch (e) {
       Alert.alert(t("common.error"), t("favorites.saveError", { error: errorMessage(e) }));
       loadFavorites().then(setFavorites).catch(err => console.warn("No se pudieron recargar los favoritos:", err.message));
+    }
+  }
+
+  async function onRemoveRecent(r) {
+    setRecents(prev => prev.filter(x => x !== r));
+    try {
+      await removeRecent(r);
+    } catch (e) {
+      loadRecents().then(setRecents).catch(err => console.warn("No se pudieron recargar las búsquedas recientes:", err.message));
     }
   }
 
@@ -309,6 +319,8 @@ export default function HomeScreen({ navigation }) {
                   scaleTo={0.94}
                   haptic
                   onPress={() => openProfile(profileTarget(r))}
+                  onLongPress={() => { tap(); setRecentMenu(r); }}
+                  delayLongPress={350}
                   style={styles.recent}
                 >
                   <GameLogo game={r.gameId} size={sizes.avatarXs} color={getGame(r.gameId).accent} />
@@ -352,6 +364,19 @@ export default function HomeScreen({ navigation }) {
         </Reveal>
 
       </Animated.ScrollView>
+      <Sheet visible={!!recentMenu} onClose={() => setRecentMenu(null)} title={recentMenu ? `${recentMenu.gameName}${recentMenu.tagLine ? ` #${recentMenu.tagLine}` : ""}` : ""}>
+        <SheetAction
+          label={t("favorites.open")}
+          icon={<Icon name="search" size={fontSizes.lg} color={colors.text} />}
+          onPress={() => { const r = recentMenu; setRecentMenu(null); openProfile(profileTarget(r)); }}
+        />
+        <SheetAction
+          destructive
+          label={t("home.removeRecent")}
+          icon={<Icon name="close" size={fontSizes.lg} color={colors.loss} />}
+          onPress={() => { const r = recentMenu; setRecentMenu(null); onRemoveRecent(r); }}
+        />
+      </Sheet>
       <CompactTitleBar y={y} title={t("home.title")} />
     </View>
   );

@@ -45,6 +45,7 @@ export default {
   "home.offline": "No connection to the server · tap to retry",
   "home.soon": "Soon",
   "home.recents": "Recent",
+  "home.removeRecent": "Remove from recents",
   "home.clear": "Clear",
   "home.clearError": "Couldn't clear the searches: {error}",
   "home.favoritesOf": "Favorites — {game}",

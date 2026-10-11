@@ -46,6 +46,7 @@ export default {
   "home.offline": "Sin conexión con el servidor · toca para reintentar",
   "home.soon": "Pronto",
   "home.recents": "Recientes",
+  "home.removeRecent": "Quitar de recientes",
   "home.clear": "Borrar",
   "home.clearError": "No se pudieron borrar las búsquedas: {error}",
   "home.favoritesOf": "Favoritos — {game}",
