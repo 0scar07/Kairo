@@ -8,7 +8,7 @@
 
 Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale**, **Clash of Clans**, **Dota 2**, **Fortnite**, **Apex Legends** y **PUBG** en una app móvil premium, hecha con React Native y Expo.
 
-[![Versión](https://img.shields.io/github/package-json/v/0scar07/Kairo?label=versi%C3%B3n&color=35E0A1)](https://github.com/0scar07/Kairo/releases)
+[![Versión](https://img.shields.io/github/v/release/0scar07/Kairo?label=versi%C3%B3n&color=35E0A1&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases/latest)
 [![CI](https://github.com/0scar07/Kairo/actions/workflows/ci.yml/badge.svg)](https://github.com/0scar07/Kairo/actions/workflows/ci.yml)
 ![Android](https://img.shields.io/badge/Android-APK-3DDC84?logo=android&logoColor=white)
 ![Juegos](https://img.shields.io/badge/juegos-9-C89B3C)
