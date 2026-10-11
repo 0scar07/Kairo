@@ -200,7 +200,7 @@ export default function CompareScreen({ route }) {
                 value={input}
                 onChangeText={setInput}
                 placeholder={t("home.placeholderRiotId")}
-                placeholderTextColor={colors.textFaint}
+                placeholderTextColor={colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
                 onSubmitEditing={submit}
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   center:     { flex: 1, backgroundColor: colors.bg, justifyContent: "center" },
   heads:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   head:       { flex: 1, alignItems: "center", gap: spacing.xs },
-  vs:         { ...type.heading, color: colors.textFaint, paddingHorizontal: spacing.sm },
+  vs:         { ...type.heading, color: colors.textMuted, paddingHorizontal: spacing.sm },
   avatar:     { borderRadius: radii.pill, borderWidth: 2, padding: 2, marginBottom: spacing.xs },
   avatarEmpty:{ width: sizes.avatarXl, height: sizes.avatarXl, alignItems: "center", justifyContent: "center", backgroundColor: colors.surfaceHigh, borderColor: colors.border },
   question:   { ...type.statLarge, color: colors.textMuted },

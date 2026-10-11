@@ -11,3 +11,4 @@ const run = fn => { if (enabled) fn().catch(() => { /* sin soporte: se ignora a 
 export const tap     = () => run(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
 export const select  = () => run(() => Haptics.selectionAsync());
 export const success = () => run(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success));
+export const warning = () => run(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning));

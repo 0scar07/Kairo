@@ -39,13 +39,14 @@ export default {
 
   // --- Start
   "home.searchIn": "Suchen in {game}",
+  "home.title": "Suchen",
   "home.placeholderRiotId": "Name#TAG",
   "home.placeholderTag": "#TAG des Spielers",
   "home.badFormat": "Falsches Format",
   "home.badTag": "Gib den Tag des Spielers ein, zum Beispiel #2PP0. Du findest ihn in seinem Profil im Spiel.",
   "home.badRiotId": "Gib die vollständige Riot ID ein: Name#TAG\nBeispiel: Hide on bush#KR1",
   "home.offline": "Keine Verbindung zum Server · tippen zum Wiederholen",
-  "home.soon": "BALD",
+  "home.soon": "Bald",
   "home.recents": "Zuletzt",
   "home.clear": "Löschen",
   "home.clearError": "Die Suchen konnten nicht gelöscht werden: {error}",

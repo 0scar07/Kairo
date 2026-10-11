@@ -82,5 +82,5 @@ const styles = StyleSheet.create({
   stat:      { alignItems: "center", gap: 2 },
   statValue: { fontFamily: fonts.displayHeavy, fontSize: 22, color: colors.text },
   statLabel: { fontFamily: fonts.bodyMedium, fontSize: 10, letterSpacing: tracking.wide, color: colors.textMuted, textTransform: "uppercase" },
-  footer:    { fontFamily: fonts.bodyMedium, fontSize: 11, letterSpacing: tracking.wide, color: colors.textFaint, marginTop: spacing.md },
+  footer:    { fontFamily: fonts.bodyMedium, fontSize: 11, letterSpacing: tracking.wide, color: colors.textMuted, marginTop: spacing.md },
 });

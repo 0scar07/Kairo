@@ -37,13 +37,14 @@ export default {
 
   // --- Home
   "home.searchIn": "Search in {game}",
+  "home.title": "Search",
   "home.placeholderRiotId": "Name#TAG",
   "home.placeholderTag": "Player #TAG",
   "home.badFormat": "Wrong format",
   "home.badTag": "Enter the player's tag, for example #2PP0. You can find it on their profile inside the game.",
   "home.badRiotId": "Enter the full Riot ID: Name#TAG\nExample: Hide on bush#KR1",
   "home.offline": "No connection to the server · tap to retry",
-  "home.soon": "SOON",
+  "home.soon": "Soon",
   "home.recents": "Recent",
   "home.clear": "Clear",
   "home.clearError": "Couldn't clear the searches: {error}",

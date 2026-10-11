@@ -25,7 +25,7 @@ export default function FloatingTabBar({ state, navigation }) {
 
   return (
     <View pointerEvents="box-none" style={[styles.host, { bottom: Math.max(insets.bottom, spacing.md) }]}>
-      <View style={styles.pill} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+      <View style={styles.pill} accessibilityRole="tablist" onLayout={e => setWidth(e.nativeEvent.layout.width)}>
         {itemWidth > 0 && (
           <Animated.View style={[
             styles.indicator,
@@ -40,7 +40,7 @@ export default function FloatingTabBar({ state, navigation }) {
             <Pressable
               key={route.key}
               style={styles.item}
-              accessibilityRole="button"
+              accessibilityRole="tab"
               accessibilityLabel={t(LABELS[route.name])}
               accessibilityState={{ selected: focused }}
               onPress={() => {
@@ -49,7 +49,7 @@ export default function FloatingTabBar({ state, navigation }) {
               }}
             >
               <Icon name={ICONS[route.name]} size={sizes.item - spacing.xs} color={color} />
-              <Text style={[styles.label, { color }]}>{t(LABELS[route.name])}</Text>
+              <Text style={[styles.label, { color }]} maxFontSizeMultiplier={1.3} numberOfLines={1}>{t(LABELS[route.name])}</Text>
             </Pressable>
           );
         })}
@@ -70,6 +70,6 @@ const styles = StyleSheet.create({
     position: "absolute", top: spacing.sm, bottom: spacing.sm, left: spacing.sm,
     borderRadius: radii.pill, borderWidth: sizes.hairline,
   },
-  item:      { flex: 1, alignItems: "center", paddingVertical: spacing.sm, gap: spacing.xxs },
-  label:     { ...type.label, fontSize: fontSizes.xxs },
+  item:      { flex: 1, minHeight: sizes.placement, alignItems: "center", justifyContent: "center", paddingVertical: spacing.xs, gap: spacing.xxs },
+  label:     { ...type.label },
 });

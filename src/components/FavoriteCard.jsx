@@ -50,7 +50,7 @@ export default function FavoriteCard({ fav, onPress, onRemove, onToggleAlerts, s
           {onToggleAlerts && <BellButton active={fav.alerts === true} accent={game?.accent || colors.textMuted} onPress={onToggleAlerts} />}
           {onRemove && (
             <PressableScale onPress={onRemove} scaleTo={0.8} hitSlop={spacing.md} style={styles.remove} accessibilityLabel={t("favorites.remove")}>
-              <Icon name="close" size={fontSizes.base} color={colors.textFaint} />
+              <Icon name="close" size={fontSizes.base} color={colors.textMuted} />
             </PressableScale>
           )}
         </View>

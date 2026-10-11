@@ -1,6 +1,5 @@
 import * as Font from "expo-font";
 import { initDataDragon } from "../api/ddragon";
-import { pingServer } from "../api/client";
 import { migrateLegacyStorage } from "../utils/storage";
 import { loadFavorites } from "../utils/favorites";
 import { loadActiveGame, loadRegion, loadHaptics } from "../utils/prefs";
@@ -45,12 +44,8 @@ export const BOOT_TASKS = [
     run: loadRecents,
     fallback: [],
   },
-  {
-    key: "server",
-    // Que el backend no responda no es un error de arranque: se avisa en Home
-    run: () => pingServer().then(health => ({ ok: true, games: health.games || {} }), () => ({ ok: false, games: {} })),
-    fallback: { ok: false, games: {} },
-  },
 ];
 
-export const TASK_TIMEOUT_MS = 6000;
+// El servidor ya no se espera al arrancar: el servidor gratuito puede tardar casi un minuto en despertar.
+// BootProvider lo consulta en segundo plano y Home avisa si no responde.
+export const TASK_TIMEOUT_MS = 4000;

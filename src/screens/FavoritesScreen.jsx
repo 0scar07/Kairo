@@ -53,7 +53,7 @@ export default function FavoritesScreen({ navigation }) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Reveal order={0}>
-        <Text style={styles.title}>{t("favorites.title").toUpperCase()}</Text>
+        <Text style={styles.title}>{t("favorites.title")}</Text>
         <Text style={styles.subtitle}>{t("favorites.saved", { count: known.length })}</Text>
       </Reveal>
 
@@ -98,7 +98,7 @@ export default function FavoritesScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content:   { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
-  title:     { ...type.brand, fontSize: fontSizes.xxl, letterSpacing: tracking.widest, color: colors.text },
+  title:     { ...type.largeTitle, color: colors.text },
   subtitle:  { ...type.small, color: colors.textMuted, marginTop: spacing.xs, marginBottom: spacing.xl },
   filters:   { flexDirection: "row", flexWrap: "wrap", marginBottom: spacing.lg, rowGap: spacing.sm },
   grid:      { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },

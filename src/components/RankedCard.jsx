@@ -33,7 +33,10 @@ export default function RankedCard({ entry, label, game = "lol" }) {
       <SectionLabel>{label}</SectionLabel>
       <View style={styles.top}>
         <RankEmblem tier={tier} size={sizes.avatarXl - spacing.lg} />
-        <Text style={styles.lp} numberOfLines={1}>{leaguePoints}<Text style={styles.lpUnit}> LP</Text></Text>
+        <View style={styles.lpBox}>
+          <Text style={styles.lp} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{leaguePoints}</Text>
+          <Text style={styles.lpUnit}>LP</Text>
+        </View>
       </View>
       <Text style={[styles.tierText, { color }]} numberOfLines={1} adjustsFontSizeToFit>{tierLabel(tier, rank)}</Text>
       <View style={styles.recordRow}>
@@ -49,7 +52,8 @@ const styles = StyleSheet.create({
   card:         { flex: 1, marginBottom: 0 },
   top:          { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.sm },
   tierText:     { ...type.heading, fontSize: fontSizes.base, letterSpacing: tracking.tight, marginTop: spacing.xs, marginBottom: spacing.md },
-  lp:           { ...type.statLarge, fontSize: fontSizes.xl, color: colors.text, flexShrink: 1 },
+  lpBox:        { alignItems: "flex-end", flexShrink: 1 },
+  lp:           { ...type.statLarge, fontSize: fontSizes.xl, color: colors.text },
   lpUnit:       { ...type.captionStrong, color: colors.textMuted },
   recordRow:    { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
   record:       { ...type.caption, color: colors.textSecondary },

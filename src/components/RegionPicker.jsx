@@ -18,6 +18,7 @@ export function RegionButton({ value, onChange, disabled, options = REGIONS, nam
         onPress={() => setOpen(true)}
         disabled={disabled}
         activeOpacity={0.8}
+        accessibilityRole="button"
         accessibilityLabel={label || t("region.choose")}
       >
         <Text style={[styles.buttonText, { color: accent }]}>{(options.find(o => o.id === value) || options[0]).label}</Text>
@@ -27,7 +28,7 @@ export function RegionButton({ value, onChange, disabled, options = REGIONS, nam
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
           <Pressable style={styles.sheet}>
-            <Text style={styles.title}>{(title || t("region.title")).toUpperCase()}</Text>
+            <Text style={styles.title} accessibilityRole="header">{title || t("region.title")}</Text>
             {options.map(r => {
               const active = r.id === value;
               return (
@@ -35,6 +36,8 @@ export function RegionButton({ value, onChange, disabled, options = REGIONS, nam
                   key={r.id}
                   style={[styles.option, active && { backgroundColor: withAlpha(accent, 0.12) }]}
                   onPress={() => { onChange(r.id); setOpen(false); }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
                 >
                   <Text style={[styles.optionLabel, active && { color: accent }]}>{r.label}</Text>
                   {nameOf ? <Text style={styles.optionName}>{nameOf(r.id)}</Text> : null}
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, borderRadius: radii.xl, padding: spacing.lg,
     borderWidth: sizes.hairline, borderColor: colors.border,
   },
-  title:       { ...type.label, color: colors.textMuted, marginBottom: spacing.md },
+  title:       { ...type.heading, color: colors.text, marginBottom: spacing.md },
   option:      {
     flexDirection: "row", alignItems: "center", gap: spacing.md,
     paddingVertical: spacing.md, paddingHorizontal: spacing.md, borderRadius: radii.md,

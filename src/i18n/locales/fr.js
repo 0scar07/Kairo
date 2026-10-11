@@ -39,13 +39,14 @@ export default {
 
   // --- Accueil
   "home.searchIn": "Rechercher dans {game}",
+  "home.title": "Rechercher",
   "home.placeholderRiotId": "Nom#TAG",
   "home.placeholderTag": "#TAG du joueur",
   "home.badFormat": "Format incorrect",
   "home.badTag": "Saisissez le tag du joueur, par exemple #2PP0. Vous le trouvez sur son profil dans le jeu.",
   "home.badRiotId": "Saisissez le Riot ID complet : Nom#TAG\nExemple : Hide on bush#KR1",
   "home.offline": "Pas de connexion au serveur · touchez pour réessayer",
-  "home.soon": "BIENTÔT",
+  "home.soon": "Bientôt",
   "home.recents": "Récents",
   "home.clear": "Effacer",
   "home.clearError": "Impossible d'effacer les recherches : {error}",

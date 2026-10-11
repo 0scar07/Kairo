@@ -38,7 +38,7 @@ export default function SettingsScreen({ navigation }) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Reveal order={0}>
-        <Text style={styles.title}>{t("settings.title").toUpperCase()}</Text>
+        <Text style={styles.title}>{t("settings.title")}</Text>
       </Reveal>
 
       <Reveal order={1}>
@@ -118,11 +118,11 @@ const styles = StyleSheet.create({
   languages: { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.sm, marginTop: spacing.md },
   container:  { flex: 1, backgroundColor: colors.bg },
   content:    { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
-  title:      { ...type.brand, fontSize: fontSizes.xxl, color: colors.text, marginBottom: spacing.xl },
+  title:      { ...type.largeTitle, color: colors.text, marginBottom: spacing.xl },
   rowLabel:   { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
   rowHint:    { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
   regionHint: { marginBottom: spacing.md },
   divider:    { height: sizes.hairline, backgroundColor: colors.border, marginHorizontal: spacing.lg },
   about:      { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.text },
-  legal:      { ...type.micro, color: colors.textFaint, marginTop: spacing.md, lineHeight: lineHeights.small },
+  legal:      { ...type.micro, color: colors.textMuted, marginTop: spacing.md, lineHeight: lineHeights.small },
 });
