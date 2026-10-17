@@ -403,13 +403,13 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 - [x] Backend desplegado en la nube (Render) y APK de prueba con EAS
 - [ ] Publicar con una *Production API Key* de Riot
 - [ ] Valorant (requiere aprobación de Riot)
-- [ ] Modo sin conexión con el último perfil visto
-- [ ] Notificaciones cuando un favorito cambia de rango
+- [x] Modo sin conexión con el último perfil visto
+- [x] Notificaciones cuando un favorito cambia de rango
 - [x] Cola de salida hacia Riot que respeta el cupo, y juegos no habilitados como "PRONTO"
 - [x] Maestría, rotación gratuita y estado del servidor (LoL)
 - [x] Brawl Stars, Clash Royale y Clash of Clans (API de Supercell)
 - [x] Dota 2, Fortnite, Apex Legends y PUBG (búsqueda por nombre y plataforma)
-- [ ] Comparar dos jugadores
+- [x] Comparar dos jugadores
 
 La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
 
