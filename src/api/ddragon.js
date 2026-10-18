@@ -97,6 +97,12 @@ export const ddBase = () => `https://ddragon.leagueoflegends.com/cdn/${version}`
 
 // Campeón a partir del ID numérico de Riot (7 -> { id: "Leblanc", name: "LeBlanc" }); null si no se conoce
 export const championByKey = key => champKeys[key] || null;
+// Todos los campeones: [{ key (ID numérico de Riot), id (Data Dragon), name }] ordenados por su nombre en el idioma activo
+export const allChampions = () => Object.entries(champKeys)
+  .map(([key, c]) => ({ key: Number(key), id: c.id, name: c.name, label: champLocalNames[c.id] || c.name }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+// Idioma de Data Dragon activo (es_MX, en_US…), para pedir textos de habilidades y runas
+export const ddLanguage = () => ddLocale;
 
 // Normaliza el nombre de campeón de la partida al ID de Data Dragon
 export function championId(name) {

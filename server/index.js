@@ -62,6 +62,7 @@ app.get("/health", (_req, res) => res.json({
   // Qué juegos puede consultar la key (Riot habilita cada API por producto); la app oculta los que no
   games: access.games(),
   watcher: watcher.status(),
+  store: storeStatus,
   regions: Object.keys(REGIONS),
   defaultRegion: DEFAULT_REGION,
 }));
@@ -89,7 +90,15 @@ app.use("/esports", esportsRouter);
 // Dispositivos para las notificaciones (Postgres si hay DATABASE_URL; si no, un archivo JSON local).
 // Si el almacén no arranca, el resto de la API sigue funcionando y solo /devices responde 503.
 storeRef.set(store);
-const storeReady = store.init().then(() => console.log(`   dispositivos: almacén ${store.kind}`)).catch(e => {
+// Estado del almacén para /health: si no arranca, se ve el motivo sin tener que abrir los registros de Render
+const storeStatus = { kind: store.kind, ok: null, error: null };
+const storeReady = store.init().then(() => {
+  storeStatus.ok = true;
+  console.log(`   dispositivos: almacén ${store.kind}`);
+}).catch(e => {
+  storeStatus.ok = false;
+  // Sin la cadena de conexión: se quita cualquier credencial "usuario:clave@" que traiga el mensaje
+  storeStatus.error = `${e.code ? `${e.code}: ` : ""}${String(e.message || e).replace(/\/\/[^@\s]+@/g, "//***@")}`.slice(0, 200);
   console.error("No pude iniciar el almacén de dispositivos:", e.message);
   throw e;
 });

@@ -4,7 +4,7 @@ const builds = require("./builds");
 
 // Proceso de las builds de los Challenger: cada `intervalMs` toma unos pocos jugadores Challenger de una región (rota
 // entre KR, EUW, NA y LAN), mira sus últimas partidas de Solo/Dúo y suma las nuevas al acumulado (lib/builds.js).
-// Gasta poco del cupo de Riot (unas 25 consultas cada 20 min) y guarda el acumulado en el almacén (kv "builds:v1").
+// Gasta poco del cupo de Riot (unas 45 consultas cada 20 min, con la línea de tiempo de cada partida) y guarda el acumulado en el almacén (kv "builds:v1").
 
 const KEY = "builds:v1";
 const SEEN_KEY = "builds:seen:v1";
@@ -64,8 +64,10 @@ class BuildsJob {
       }
       for (const id of ids.slice(0, this.matchesPerRun)) {
         const match = await this.get(`${routingHost(region)}/lol/match/v5/matches/${id}`, { ttl: 60 * MIN }).catch(() => null);
+        // La línea de tiempo trae el orden de habilidades; si falla, la partida cuenta igual sin ese dato
+        const timeline = match ? await this.get(`${routingHost(region)}/lol/match/v5/matches/${id}/timeline`, { ttl: 60 * MIN }).catch(() => null) : null;
         this.seen.add(id);
-        if (match && builds.addMatch(this.agg, match)) added++;
+        if (match && builds.addMatch(this.agg, match, timeline)) added++;
       }
       if (this.seen.size > MAX_SEEN) this.seen = new Set([...this.seen].slice(-MAX_SEEN));
       this.agg.updatedAt = new Date(this.now()).toISOString();
