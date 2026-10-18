@@ -20,6 +20,10 @@ on:
         description: "Mensaje de la actualización"
         required: false
 
+# Solo lee el repositorio: el token de GitHub del flujo no puede escribir nada
+permissions:
+  contents: read
+
 concurrency:
   group: eas-update
   cancel-in-progress: false

@@ -100,8 +100,8 @@ export function loadAbilities(championKey) {
       .then(({ data }) => (data.data?.[champ.id]?.spells || []).map((s, i) => ({
         key: "QWER"[i],
         name: s.name,
-        // La descripción trae etiquetas propias del juego (<br>, <magicDamage>…): se dejan solo las palabras
-        text: String(s.description || "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim(),
+        // La descripción trae etiquetas propias del juego (<br>, <magicDamage>…): se dejan solo las palabras (y ningún < o > suelto)
+        text: String(s.description || "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]*>/g, "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim(),
         cooldown: s.cooldownBurn || null,
         icon: `${ddBase()}/img/spell/${s.image.full}`,
       })))
