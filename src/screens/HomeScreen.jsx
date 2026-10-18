@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity, Platform, RefreshControl } from "react-native";
+import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity, Platform, RefreshControl, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { GAMES, UPCOMING_GAMES, getGame } from "../games";
 import { regionName } from "../constants/regions";
@@ -15,13 +15,16 @@ import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
 import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
-import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequence, withSpring } from "react-native-reanimated";
-import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
-import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
+import Animated, { FadeIn, FadeOut, ReduceMotion, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
+import { CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
+import { APP_NAME } from "../constants/config";
 import GameLogo from "../components/GameLogo";
 import { useBootData } from "../boot/BootContext";
+import { homeArtFor } from "../utils/homeArt";
+import { getRotation } from "../games/lol/api";
 import {
-  colors, radii, sizes, spacing, fontSizes, lineHeights, type, withAlpha, useActiveGame,
+  colors, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, textGlow, withAlpha, useActiveGame,
 } from "../theme";
 
 // Espera a que la pantalla de carga se desvanezca antes de empezar la aparición escalonada
@@ -61,6 +64,15 @@ export default function HomeScreen({ navigation }) {
 
   const game = getGame(gameId) || GAMES[0];
   const Extras = game.HomeExtras;
+
+  // Arte de fondo del juego activo (ver utils/homeArt.js); cambia al cambiar de juego. Sin arte, el logo del juego.
+  const [art, setArt] = useState(null);
+  useEffect(() => {
+    setArt(null);
+    let alive = true;
+    homeArtFor(game.id, { region, rotation: getRotation }).then(a => { if (alive) setArt(a); }).catch(() => {});
+    return () => { alive = false; };
+  }, [game.id, region]);
   const platform = game.platforms ? (platforms[game.id] || game.platforms[0].id) : null;
 
   useEffect(() => { loadPlatforms().then(setPlatforms); }, []);
@@ -138,8 +150,10 @@ export default function HomeScreen({ navigation }) {
         contentContainerStyle={styles.inner} keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} progressBackgroundColor={colors.surface} />}
       >
+        {art?.uri || art?.source ? <HomeArt key={art.uri || String(art.source)} art={art} /> : null}
+        {art?.logo ? <LogoMark key={`logo-${game.id}`} game={game.id} color={game.accent} /> : null}
         {/* Brillo ambiental del juego activo: cambia con un fundido al elegir otro juego */}
-        <Animated.View key={game.id} entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)} pointerEvents="none" style={styles.ambient}>
+        <Animated.View key={game.id} entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)} pointerEvents="none" style={[styles.ambient, (art?.uri || art?.source) && styles.ambientSoft]}>
           <Svg width="100%" height="100%">
             <Defs>
               <RadialGradient id={`amb-${game.id}`} cx="30%" cy="0%" r="75%">
@@ -162,8 +176,9 @@ export default function HomeScreen({ navigation }) {
 
         {/* Encabezado */}
         <Reveal order={0} baseDelay={HANDOFF_MS} style={styles.header}>
-          <LargeTitle y={y}>{t("home.title")}</LargeTitle>
-          <Text style={styles.subtitle}>{t("app.tagline")}</Text>
+          {/* La marca de la app con el color del juego activo, como en la pantalla de carga */}
+          <Text style={[styles.logoText, { color: accent }, textGlow(accent, spacing.lg)]} accessibilityRole="header">{APP_NAME.toUpperCase()}</Text>
+          <Text style={styles.logoSub}>{t("app.tagline").toUpperCase()}</Text>
         </Reveal>
 
         {/* Buscador destacado */}
@@ -345,8 +360,51 @@ export default function HomeScreen({ navigation }) {
           onPress={() => { const r = recentMenu; setRecentMenu(null); onRemoveRecent(r); }}
         />
       </Sheet>
-      <CompactTitleBar y={y} title={t("home.title")} />
+      <CompactTitleBar y={y} title={APP_NAME} />
     </View>
+  );
+}
+
+// Arte sutil de fondo: solo arriba, oscurecido y fundido hacia el fondo para que el buscador y las tarjetas no pierdan
+// contraste. Entra con un fundido (también con "Reducir movimiento": es solo opacidad).
+function HomeArt({ art }) {
+  const [uri, setUri] = useState(art.uri);
+  const source = art.source || { uri };
+  const shown = useSharedValue(0);
+  const fade = useAnimatedStyle(() => ({ opacity: shown.value }));
+  const onLoad = () => { shown.value = withTiming(1, { duration: 400, reduceMotion: ReduceMotion.Never }); };
+  return (
+    <Animated.View pointerEvents="none" style={[styles.art, fade]}>
+      {/* Igual en todos los juegos: la ilustración a lo ancho, o el personaje grande a la derecha; encima, el mismo
+          degradado que la funde con el fondo */}
+      <Image
+        source={source}
+        style={art.fit === "hero" ? styles.artHero : [StyleSheet.absoluteFill, styles.artImage]}
+        resizeMode={art.fit === "hero" ? "contain" : "cover"}
+        onLoad={onLoad}
+        onError={() => { if (art.fallback && uri !== art.fallback) setUri(art.fallback); }}
+        accessibilityIgnoresInvertColors
+      />
+      <Svg style={StyleSheet.absoluteFill} width="100%" height="100%">
+        <Defs>
+          <LinearGradient id="homeShade" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={colors.bg} stopOpacity="0.45" />
+            <Stop offset="0.5" stopColor={colors.bg} stopOpacity="0.75" />
+            <Stop offset="1" stopColor={colors.bg} stopOpacity="1" />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#homeShade)" />
+      </Svg>
+    </Animated.View>
+  );
+}
+
+// Juegos sin arte: su logo grande, muy tenue, arriba a la derecha
+function LogoMark({ game, color }) {
+  return (
+    <Animated.View entering={FadeIn.duration(400).reduceMotion(ReduceMotion.Never)} pointerEvents="none" style={styles.logoMark}>
+      <GameLogo game={game} size={sizes.iconHero * 2.2} color={color} />
+    </Animated.View>
   );
 }
 
@@ -363,6 +421,12 @@ function GamePop({ active, children }) {
 const styles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: colors.bg },
   ambient:       { position: "absolute", top: 0, left: 0, right: 0, height: sizes.iconHero * 4 },
+  ambientSoft:   { opacity: 0.5 },
+  // overflow: el fondo desenfocado va ampliado y no debe salirse por debajo del degradado que lo funde con el fondo
+  art:           { position: "absolute", top: 0, left: 0, right: 0, height: sizes.iconHero * 4 + spacing.xxxl, overflow: "hidden" },
+  artImage:      { opacity: 0.6 },
+  artHero:       { position: "absolute", top: 0, bottom: 0, right: -spacing.xl, width: "70%", opacity: 0.75 },
+  logoMark:      { position: "absolute", top: spacing.xxxl, right: -spacing.xxl, opacity: 0.08, transform: [{ rotate: "-12deg" }] },
   inner:         { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
   offline:       {
     flexDirection: "row", alignItems: "center", alignSelf: "center", gap: spacing.sm,
@@ -373,7 +437,8 @@ const styles = StyleSheet.create({
   offlineDot:    { width: sizes.dot, height: sizes.dot, borderRadius: sizes.dot / 2, backgroundColor: colors.loss },
   offlineText:   { ...type.caption, color: colors.textSecondary },
   header:        { marginBottom: spacing.xl },
-  subtitle:      { ...type.body, color: colors.textSecondary, marginTop: spacing.xs },
+  logoText:      { ...type.brand, fontSize: fontSizes.hero, letterSpacing: tracking.brand },
+  logoSub:       { ...type.label, color: colors.textMuted, letterSpacing: tracking.widest, marginTop: spacing.sm },
   searchCard:    { padding: spacing.lg },
   searchCardError: { borderColor: withAlpha(colors.loss, 0.6) },
   errorRow:      { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, marginTop: spacing.md },

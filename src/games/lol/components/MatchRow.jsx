@@ -1,6 +1,7 @@
 import React from "react";
 import { useT } from "../../../i18n/I18nProvider";
 import { View, Text, Image, StyleSheet } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { PressableScale } from "../../../components/ui";
 import { championIcon, championLabel } from "../../../api/ddragon";
 import { csOf, queueLabel, kdaRatio as calcKda } from "../utils";
@@ -9,8 +10,12 @@ import { colors, radii, sizes, spacing, fontSizes, type, tracking, kdaColor } fr
 
 // Fila de una partida de LoL: lo más grande es el K/D/A; el resultado lo marca la franja lateral y la etiqueta.
 // Al tocarla se expande el detalle.
+const STRIPE_SPRING = { damping: 18, stiffness: 380, mass: 0.5 };
+
 export default function MatchRow({ match, myPuuid, onPress, expanded }) {
   const t = useT();
+  const press = useSharedValue(0);
+  const stripe = useAnimatedStyle(() => ({ width: sizes.bar + press.value * sizes.bar, opacity: 0.85 + press.value * 0.15 }));
   if (!match?.info) return null;
   const me = match.info.participants.find(p => p.puuid === myPuuid);
   if (!me) return null;
@@ -24,12 +29,14 @@ export default function MatchRow({ match, myPuuid, onPress, expanded }) {
   return (
     <PressableScale
       onPress={onPress}
+      onPressIn={() => { press.value = withSpring(1, STRIPE_SPRING); }}
+      onPressOut={() => { press.value = withSpring(0, STRIPE_SPRING); }}
       scaleTo={0.985}
       accessibilityLabel={`${win ? t("results.victory") : t("results.defeat")}, ${champ}, ${me.kills}/${me.deaths}/${me.assists}, ${kdaRatio} KDA`}
       accessibilityState={{ expanded: !!expanded }}
       style={[styles.row, expanded && styles.rowOpen]}
     >
-      <View style={[styles.stripe, { backgroundColor: resultColor }]} />
+      <Animated.View style={[styles.stripe, { backgroundColor: resultColor }, stripe]} />
       <View>
         <Image source={{ uri: championIcon(me.championName) }} style={styles.champImg} />
         <View style={styles.levelBadge}><Text style={styles.levelText}>{me.champLevel}</Text></View>

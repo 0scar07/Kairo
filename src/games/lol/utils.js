@@ -139,3 +139,24 @@ export function getPaceStats(matches, puuid) {
     avgDuration: Math.round(seconds / games),
   };
 }
+
+// Compañeros de equipo que repiten en las partidas cargadas (al menos `min` juntos), de más a menos partidas:
+// [{ puuid, gameName, tagLine, iconId, games, wins, champions: [nombre…] }]
+export function getTeammates(matches, puuid, { min = 2, limit = 5 } = {}) {
+  const acc = {};
+  (matches || []).forEach(m => {
+    const me = findMe(m, puuid);
+    if (!me) return;
+    for (const p of m.info.participants) {
+      if (p.puuid === puuid || p.teamId !== me.teamId || !p.puuid || !p.riotIdGameName) continue;
+      const a = acc[p.puuid] || (acc[p.puuid] = { puuid: p.puuid, gameName: p.riotIdGameName, tagLine: p.riotIdTagline || "", iconId: p.profileIcon ?? null, games: 0, wins: 0, champions: [] });
+      a.games++;
+      if (me.win) a.wins++;
+      if (!a.champions.includes(p.championName)) a.champions.push(p.championName);
+    }
+  });
+  return Object.values(acc)
+    .filter(a => a.games >= min)
+    .sort((x, y) => y.games - x.games || y.wins - x.wins)
+    .slice(0, limit);
+}

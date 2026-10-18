@@ -9,6 +9,19 @@ export async function loadRegion() {
 
 export const saveRegion = id => AsyncStorage.setItem(REGION_KEY, id);
 
+// Campeón principal de "Mi perfil" por juego (el que más juega en sus últimas partidas): lo usa el fondo de Inicio
+const MAIN_CHAMP_KEY = "kairo_main_champ";
+export async function loadMainChampion(gameId) {
+  try { return JSON.parse((await AsyncStorage.getItem(MAIN_CHAMP_KEY)) || "{}")[gameId] || null; } catch { return null; }
+}
+export async function saveMainChampion(gameId, champ) {
+  try {
+    const all = JSON.parse((await AsyncStorage.getItem(MAIN_CHAMP_KEY)) || "{}");
+    if (all[gameId] === champ) return;
+    await AsyncStorage.setItem(MAIN_CHAMP_KEY, JSON.stringify({ ...all, [gameId]: champ }));
+  } catch (e) { console.warn("No se pudo guardar el campeón principal:", e.message); }
+}
+
 // La háptica está activada salvo que el usuario la apague
 export async function loadHaptics() {
   return (await AsyncStorage.getItem(HAPTICS_KEY)) !== "off";

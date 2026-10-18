@@ -4,6 +4,7 @@ import { searchPlayer, findPlayers } from "./api";
 import ProfileBody from "./ProfileBody";
 import DotaMedal from "./DotaMedal";
 import { rankLabel } from "./utils";
+import { heroImage } from "./heroes";
 import AvatarImage from "../../components/AvatarImage";
 import { sizes } from "../../theme";
 
@@ -39,6 +40,9 @@ export default {
 
   // Texto que muestra la tarjeta de favorito (se calcula al pintar, en el idioma activo)
   favoriteStat: fav => rankLabel(fav.rankTier, fav.leaderboardRank),
+
+  // Héroe más jugado: su imagen es el fondo de Inicio
+  backdropKey: data => heroImage(data.player?.heroes?.[0]?.heroId),
 
   ProfileBody,
 };

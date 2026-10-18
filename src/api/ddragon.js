@@ -11,6 +11,8 @@ let champIds = {}; // nombre normalizado -> ID de Data Dragon
 let champKeys = {}; // clave numérica (championId de Riot) -> { id, name }
 let champEnNames = {}; // id de Data Dragon -> nombre en inglés
 let champLocalNames = {}; // id de Data Dragon -> nombre en el idioma activo
+let ddLocale = "en_US";   // idioma de Data Dragon activo (para los nombres de las skins)
+const artCache = {};      // id -> promesa de { uri, fallback, skin }
 
 const norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -62,6 +64,7 @@ async function loadChampions() {
 
 // Nombres de campeón en un idioma de Data Dragon (es_MX, pt_BR…). Se guardan por versión e idioma; si falla, se sigue en inglés.
 export async function loadChampionNames(locale) {
+  ddLocale = locale || "en_US";
   if (!locale || locale === "en_US") { champLocalNames = {}; return; }
   const cacheKey = `dd_champion_names_${locale}_${version}`;
   let names = null;
@@ -111,3 +114,25 @@ export const championIcon    = name => `${ddBase()}/img/champion/${championId(na
 export const championSplash  = name => `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championId(name)}_0.jpg`;
 export const itemIcon        = id   => `${ddBase()}/img/item/${id}.png`;
 export const profileIconUrl  = id   => `${ddBase()}/img/profileicon/${id}.png`;
+
+/**
+ * Arte para el fondo del perfil: el splash de la skin más reciente del campeón (las variantes "(…)" se omiten porque
+ * a menudo no tienen splash propio) y su nombre. `fallback` es el splash clásico por si la imagen de la skin falla.
+ * La API de Riot no dice qué skin usa cada jugador: es solo decorativo (la de su main más reciente, no necesariamente la suya).
+ */
+export function championArt(name) {
+  const id = championId(name);
+  if (!id) return Promise.resolve(null);
+  const key = `${id}_${ddLocale}`;
+  if (!artCache[key]) {
+    artCache[key] = axios.get(`${ddBase()}/data/${ddLocale}/champion/${id}.json`, { timeout: 8000 })
+      .then(({ data }) => {
+        const skins = (data.data?.[id]?.skins || []).filter(sk => sk.num > 0 && !/\(/.test(sk.name));
+        const skin = skins.sort((a, b) => b.num - a.num)[0];
+        const base = `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${id}`;
+        return { uri: `${base}_${skin ? skin.num : 0}.jpg`, fallback: `${base}_0.jpg`, skin: skin ? skin.name : championLabel(id) };
+      })
+      .catch(e => { delete artCache[key]; console.warn("Data Dragon: sin skins de", id, "-", e.message); return { uri: championSplash(id), fallback: null, skin: championLabel(id) }; });
+  }
+  return artCache[key];
+}

@@ -45,6 +45,19 @@ export default {
     };
   },
 
+  // Unidad que más usa en sus partidas cargadas, como campeón de LoL (para el fondo de Inicio)
+  backdropKey: data => {
+    const counts = {};
+    for (const m of data.matches || []) {
+      const me = m.info?.participants?.find(p => p.puuid === data.account?.puuid);
+      for (const u of me?.units || []) {
+        const champ = String(u.character_id || "").replace(/^TFT\d+[a-z]*_/i, "");
+        if (champ) counts[champ] = (counts[champ] || 0) + 1;
+      }
+    }
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  },
+
   ProfileBody,
 };
 

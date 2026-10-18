@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
-import { ScrollView, StyleSheet, RefreshControl, Text } from "react-native";
+import { ScrollView, StyleSheet, RefreshControl } from "react-native";
+import Animated, { ReduceMotion, interpolateColor, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import Reveal from "./Reveal";
 import { ErrorBanner, Notice, ProfileHeader } from "./ui";
 import { activeLanguage } from "../i18n";
@@ -10,6 +11,7 @@ import { errorMessage, tierLabel } from "../utils/format";
 import Icon from "./Icon";
 import FavoriteStar from "./FavoriteStar";
 import { canAlert, hasAlerts, isFavoriteIn, loadFavorites, refreshFavorite, sameFavorite, toggleFavorite } from "../utils/favorites";
+import { saveMainChampion } from "../utils/prefs";
 import BellButton from "../notifications/BellButton";
 import ShareButton from "../share/ShareButton";
 import { useNavigation } from "@react-navigation/native";
@@ -38,11 +40,24 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
   const [alerts, setAlerts] = useState(false);
   const [updatedAt, setUpdatedAt] = useState(() => (offlineAt ? new Date(offlineAt).getTime() : Date.now()));
   const [, setTick] = useState(0);   // vuelve a pintar "hace X min" cada 30 s
+  const flash = useSharedValue(0);   // destello verde de "Actualizado" al refrescar bien
+  const updatedStyle = useAnimatedStyle(() => ({ color: interpolateColor(flash.value, [0, 1], [colors.textMuted, colors.win]) }));
   useEffect(() => { const id = setInterval(() => setTick(n => n + 1), 30000); return () => clearInterval(id); }, []);
   const { supported, toggleAlerts, favoritesVersion } = useNotifications();
 
   const { account, region } = data;
   const profile = game.getProfile(data);
+
+  // Arte de fondo de la cabecera (en LoL, el del campeón que más juega): se vuelve a pedir solo si cambia su main
+  const backdropKey = game.backdropKey ? game.backdropKey(data) : null;
+  const [backdrop, setBackdrop] = useState(null);
+  useEffect(() => {
+    if (mine && backdropKey) saveMainChampion(gameId, backdropKey);   // en tu perfil, tu main también es el fondo de Inicio
+    if (!backdropKey || !game.backdrop) { setBackdrop(null); return undefined; }
+    let alive = true;
+    game.backdrop(backdropKey).then(art => { if (alive) setBackdrop(art); }).catch(() => {});
+    return () => { alive = false; };
+  }, [backdropKey]);
 
   useEffect(() => {
     const me = { ...game.toFavorite(data), gameId, region };
@@ -85,6 +100,10 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
       setData(await game.api.search(account.lookup ?? account.gameName, account.tagLine, region));
       setOffline(null);
       setUpdatedAt(Date.now());
+      flash.value = withSequence(
+        withTiming(1, { duration: 120, reduceMotion: ReduceMotion.Never }),
+        withTiming(0, { duration: 700, reduceMotion: ReduceMotion.Never }),
+      );
       success();
     } catch (e) {
       warning();
@@ -118,6 +137,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
 
       <Reveal order={0}>
         <ProfileHeader
+          backdrop={backdrop}
           game={gameId}
           avatar={profile.avatar}
           name={profile.name}
@@ -148,7 +168,7 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
             </>
           )}
         />
-        <Text style={styles.updated} accessibilityLiveRegion="polite">{t("profile.updated", { time: relativeTime(updatedAt) })}</Text>
+        <Animated.Text style={[styles.updated, updatedStyle]} accessibilityLiveRegion="polite">{t("profile.updated", { time: relativeTime(updatedAt) })}</Animated.Text>
       </Reveal>
 
       <game.ProfileBody data={data} setData={setData} setError={setError} mine={mine} />

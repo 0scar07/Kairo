@@ -8,7 +8,7 @@ const SPRING = { damping: 16, stiffness: 320, mass: 0.6 };
 
 // Pulsable con escala sutil al presionar (y háptica ligera opcional)
 export default function PressableScale({
-  onPress, onLongPress, scaleTo = 0.97, haptic = false, disabled, style, children,
+  onPress, onLongPress, onPressIn, onPressOut, scaleTo = 0.97, haptic = false, disabled, style, children,
   accessibilityRole = onPress ? "button" : undefined, accessibilityState, ...rest
 }) {
   const scale = useSharedValue(1);
@@ -20,8 +20,8 @@ export default function PressableScale({
       accessibilityRole={accessibilityRole}
       accessibilityState={disabled ? { ...accessibilityState, disabled: true } : accessibilityState}
       disabled={disabled}
-      onPressIn={() => { scale.value = withSpring(scaleTo, SPRING); }}
-      onPressOut={() => { scale.value = withSpring(1, SPRING); }}
+      onPressIn={e => { scale.value = withSpring(scaleTo, SPRING); onPressIn?.(e); }}
+      onPressOut={e => { scale.value = withSpring(1, SPRING); onPressOut?.(e); }}
       onPress={onPress ? () => { if (haptic) tap(); onPress(); } : undefined}
       onLongPress={onLongPress}
       style={[animated, style]}

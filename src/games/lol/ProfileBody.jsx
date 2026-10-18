@@ -4,17 +4,19 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import Reveal from "../../components/Reveal";
 import {
   SectionLabel, SegmentedTabs, Chip, LoadMoreButton, Notice,
-  Expandable, ResultsStrip, EmptyState, RowSkeleton,
+  Expandable, EmptyState, RowSkeleton,
 } from "../../components/ui";
 import MatchRow from "./components/MatchRow";
 import MatchDetail from "./components/MatchDetail";
 import ChampionTable from "./components/ChampionTable";
 import QueueColumns from "./components/QueueColumns";
+import Teammates from "./components/Teammates";
+import RecentChampions from "./components/RecentChampions";
 import SummaryRings from "./components/SummaryRings";
 import MineExtras from "./MineExtras";
 import MasteryCard from "./components/MasteryCard";
 import { getMoreMatches, PROFILE_MATCHES } from "./api";
-import { QUEUE_FLEX, QUEUE_SOLO, findMe, getBestChampions, getChampionStats, getOverallStats, getPaceStats, getStreak } from "./utils";
+import { QUEUE_FLEX, QUEUE_SOLO, findMe, getBestChampions, getChampionStats, getOverallStats, getPaceStats, getStreak, getTeammates } from "./utils";
 import { championIcon, championLabel } from "../../api/ddragon";
 import Icon from "../../components/Icon";
 import LiveBanner from "./components/LiveBanner";
@@ -57,8 +59,9 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
   const streak     = getStreak(matches || [], account.puuid);
   const topChamp   = champStats[0];
 
-  const recent = (matches || []).map(m => findMe(m, account.puuid)).filter(Boolean).slice(0, STRIP_MAX);
-  const stripItems = recent.map(p => ({ color: p.win ? colors.win : colors.loss }));
+  const recentGames = (matches || []).slice(0, STRIP_MAX)
+    .map(m => { const me = findMe(m, account.puuid); return me ? { id: m.metadata.matchId, champion: me.championName, win: me.win } : null; })
+    .filter(Boolean);
 
   const uniqueChamps = [...new Set(
     (matches || []).map(m => findMe(m, account.puuid)?.championName).filter(Boolean)
@@ -146,11 +149,8 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
       {overall && (
         <Reveal order={3}>
           <SummaryRings overall={overall} pace={pace} topChamp={topChamp} />
-          <ResultsStrip
-            label={t("results.recent")}
-            summary={t("results.summary", { wins: recent.filter(p => p.win).length, losses: recent.filter(p => !p.win).length })}
-            items={stripItems}
-          />
+          <RecentChampions games={recentGames} onOpen={id => { setActiveTab("partidas"); setFilterWin("all"); setFilterChamp("all"); setActiveMatch(id); }} />
+          <Teammates mates={getTeammates(matches, account.puuid)} games={matches?.length || 0} region={region} />
         </Reveal>
       )}
 

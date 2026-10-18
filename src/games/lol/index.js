@@ -4,7 +4,8 @@ import { searchPlayer } from "./api";
 import ProfileIcon from "./components/ProfileIcon";
 import ProfileBody from "./ProfileBody";
 import HomeExtras from "./HomeExtras";
-import { getOverallStats } from "./utils";
+import { getChampionStats, getOverallStats } from "./utils";
+import { championArt } from "../../api/ddragon";
 import { sizes, spacing } from "../../theme";
 
 // Módulo de League of Legends: lo que las pantallas genéricas necesitan saber del juego.
@@ -20,6 +21,11 @@ export default {
     subtitle: null,
     ranked: data.ranked?.find(r => r.queueType === "RANKED_SOLO_5x5") || null,
   }),
+
+  // Fondo de la cabecera del perfil: el arte del campeón que más juega en sus partidas cargadas (cambia al cambiar su main)
+  backdropKey: data => getChampionStats(data.matches || [], data.account.puuid)[0]?.name || null,
+  backdrop: champ => championArt(champ),
+
 
   // Lo que se guarda de un jugador al marcarlo favorito
   toFavorite: data => {
