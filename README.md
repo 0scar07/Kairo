@@ -35,7 +35,11 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 <a href="https://0scar07.github.io/Kairo/demo/kairo-demo.mp4"><img src="docs/demo/kairo-demo-preview.webp" alt="Kairo en movimiento: los juegos, el perfil, el detalle de partida, Explorar y los pros" width="100%" /></a>
 
-<sub>Lo mejor de la demostración, en bucle y sin sonido. Tócalo para ver el recorrido completo de 90 segundos con música o <a href="docs/demo/kairo-demo.mp4">descárgalo</a>.</sub>
+<sub>Lo mejor de la demostración, en bucle y sin sonido. Debajo está el recorrido completo de 90 segundos con música, o <a href="docs/demo/kairo-demo.mp4">descárgalo</a>.</sub>
+
+<br />
+
+https://github.com/user-attachments/assets/d742c1f1-c26e-4f44-955c-a063e2840adc
 
 </div>
 
