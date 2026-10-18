@@ -9,6 +9,7 @@ import { LeaderboardHead, LeaderboardRow } from "../games/lol/components/Leaderb
 import { getLeaderboard, getLive } from "../games/lol/api";
 import { getProLeague, getProLeagues, tournamentLabel } from "../games/lol/esports";
 import ProStandings from "../games/lol/components/ProStandings";
+import MatchupsTab from "../games/lol/components/MatchupsTab";
 import { queueLabel } from "../games/lol/utils";
 import { championByKey, championIcon, profileIconUrl } from "../api/ddragon";
 import { getRegion } from "../constants/regions";
@@ -27,6 +28,7 @@ const QUEUES = ["RANKED_SOLO_5x5", "RANKED_FLEX_SR"];
  * Hoja "Explorar" del botón de la lupa: descubrir jugadores de League of Legends sin escribir su nombre.
  *  - Ranking: el top de la región (Challenger, Gran Maestro o Maestro; Solo/Dúo o Flex) como tabla.
  *  - En vivo: los favoritos de LoL que están en partida ahora.
+ *  - Enfrentamientos: tu campeón contra un rival (build, habilidades y counters; ver games/lol/MatchupScreen.jsx).
  * Arriba lleva a la búsqueda por Riot ID y abajo hay atajos a Mi perfil y Comparar.
  */
 export default function ExploreSheet({ visible, onClose, navigation }) {
@@ -93,6 +95,7 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
     { key: "ranking", label: t("explore.tabRanking") },
     { key: "live", label: live.list.length ? `${t("explore.tabLive")} · ${live.list.length}` : t("explore.tabLive") },
     { key: "pros", label: t("explore.tabPros") },
+    { key: "matchups", label: t("explore.tabMatchups") },
   ];
 
   return (
@@ -117,7 +120,7 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
           <Text style={styles.findText}>{t("explore.find")}</Text>
         </Pressable>
 
-        <View style={styles.tabs}><SegmentedTabs tabs={tabs} value={tab} onChange={setTab} game="lol" /></View>
+        <View style={styles.tabs}><SegmentedTabs tabs={tabs} value={tab} onChange={setTab} game="lol" scroll /></View>
 
         {tab === "ranking" ? (
           <>
@@ -198,7 +201,9 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
               </View>
             ) : null}
           </View>
-        ) : <ProsTab visible={visible} onTeam={(team, ctx) => go("ProTeam", { slug: team.slug, ...ctx })} />}
+        ) : tab === "pros" ? (
+          <ProsTab visible={visible} onTeam={(team, ctx) => go("ProTeam", { slug: team.slug, ...ctx })} />
+        ) : <MatchupsTab visible={visible && tab === "matchups"} onOpen={params => go("Matchup", params)} />}
 
         <View style={styles.shortcuts}>
           <Shortcut icon="user" color="#0A84FF" label={t("explore.myProfile")} hint={t("explore.myProfileHint")} onPress={() => go("MyProfile")} />

@@ -7,6 +7,7 @@ import Reveal from "../../components/Reveal";
 import RankEmblem from "../../components/RankEmblem";
 import Icon from "../../components/Icon";
 import Mini from "./components/Mini";
+import LiveMatchupCard from "./components/LiveMatchupCard";
 import { getLive } from "./api";
 import { ensureLolAssets, spellIcon, perkIcon } from "./assets";
 import { queueLabel } from "./utils";
@@ -191,6 +192,10 @@ export default function LiveGameScreen({ route }) {
         <Text style={styles.timer} accessibilityRole="timer">{elapsed == null ? t("live.loading") : formatDuration(elapsed)}</Text>
       </View>
       </Reveal>
+
+      {live.gameMode === "CLASSIC" && me ? (
+        <LiveMatchupCard me={me} enemies={live.participants.filter(p => p.teamId !== me.teamId)} onOpen={params => navigation.navigate("Matchup", params)} />
+      ) : null}
 
       {TEAMS.map((team, ti) => {
         const players = live.participants.filter(p => p.teamId === team.id);

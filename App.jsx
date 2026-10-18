@@ -19,6 +19,7 @@ import LeaderboardScreen from "./src/games/lol/LeaderboardScreen";
 import ProTeamScreen from "./src/games/lol/ProTeamScreen";
 import ProPlayerScreen from "./src/games/lol/ProPlayerScreen";
 import RankHistoryScreen from "./src/games/lol/RankHistoryScreen";
+import MatchupScreen from "./src/games/lol/MatchupScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
 import LoadingScreen from "./src/screens/LoadingScreen";
 import FloatingTabBar from "./src/components/FloatingTabBar";
@@ -94,6 +95,7 @@ function RootStack() {
       <Stack.Screen name="ProTeam" component={ProTeamScreen} options={{ title: t("explore.tabPros") }} />
       <Stack.Screen name="ProPlayer" component={ProPlayerScreen} options={{ title: t("explore.tabPros") }} />
       <Stack.Screen name="RankHistory" component={RankHistoryScreen} options={{ title: t("lpHistory.title") }} />
+      <Stack.Screen name="Matchup" component={MatchupScreen} options={{ title: t("matchup.title") }} />
       {/* Buscar desde cualquier pestaña: hoja en iOS (se cierra deslizando), pantalla que sube en Android */}
       <Stack.Screen name="Search" component={SearchScreen} options={{ presentation: "modal", headerShown: false, title: t("tabs.search") }} />
     </Stack.Navigator>
