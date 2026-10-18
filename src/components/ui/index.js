@@ -2,7 +2,7 @@ export { default as Card } from "./Card";
 export { default as SectionLabel } from "./SectionLabel";
 export { default as ProgressBar } from "./ProgressBar";
 export { default as CountUp } from "./CountUp";
-export { default as Glass } from "./Glass";
+export { default as Glass, GLASS_RIM, GLASS_LIFT, GLASS_EDGE } from "./Glass";
 export { default as Sheet, SheetAction } from "./Sheet";
 export { HudHost, showHud } from "./Hud";
 export { default as SegmentedTabs } from "./SegmentedTabs";

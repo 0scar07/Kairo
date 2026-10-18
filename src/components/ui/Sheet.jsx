@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Modal, PanResponder, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Glass from "./Glass";
+import Glass, { GLASS_EDGE } from "./Glass";
 import { useT } from "../../i18n/I18nProvider";
-import { colors, radii, sizes, spacing, type } from "../../theme";
+import { colors, radii, sizes, spacing, type, withAlpha } from "../../theme";
 
 const SPRING = { damping: 24, stiffness: 260, mass: 0.9 };
 
@@ -57,7 +57,7 @@ export default function Sheet({ visible, onClose, title, children }) {
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityRole="button" accessibilityLabel={t("common.close")} />
       </Animated.View>
       <Animated.View style={[styles.sheet, { maxHeight: height * 0.88, paddingBottom: insets.bottom + spacing.lg }, sheetStyle]} accessibilityViewIsModal>
-        <Glass style={StyleSheet.absoluteFill} intensity={80} fill={0.6} />
+        <Glass style={[StyleSheet.absoluteFill, styles.glass]} intensity={80} fill={0.6} />
         <View {...pan.panHandlers} style={styles.handleArea}>
           <View style={styles.grabber} />
           {title ? <Text style={styles.title} accessibilityRole="header">{title}</Text> : null}
@@ -90,11 +90,12 @@ const styles = StyleSheet.create({
   sheet:      {
     position: "absolute", left: 0, right: 0, bottom: 0, overflow: "hidden",
     borderTopLeftRadius: radii.xl + spacing.sm, borderTopRightRadius: radii.xl + spacing.sm,
-    borderWidth: sizes.hairline, borderBottomWidth: 0, borderColor: colors.borderStrong,
+    borderWidth: sizes.hairline, borderBottomWidth: 0, borderColor: GLASS_EDGE,
     paddingHorizontal: spacing.lg,
   },
+  glass:      { borderTopLeftRadius: radii.xl + spacing.sm, borderTopRightRadius: radii.xl + spacing.sm },
   handleArea: { alignItems: "center", paddingTop: spacing.sm, paddingBottom: spacing.md },
-  grabber:    { width: spacing.xxxl - spacing.md, height: spacing.xs + 1, borderRadius: radii.pill, backgroundColor: colors.borderStrong, marginBottom: spacing.md },
+  grabber:    { width: spacing.xxxl - spacing.md, height: spacing.xs + 1, borderRadius: radii.pill, backgroundColor: withAlpha(colors.text, 0.22), marginBottom: spacing.md },
   title:      { ...type.heading, color: colors.text, alignSelf: "flex-start" },
   action:     {
     flexDirection: "row", alignItems: "center", gap: spacing.md, minHeight: sizes.placement + spacing.xs,

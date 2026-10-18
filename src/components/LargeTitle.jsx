@@ -49,7 +49,8 @@ export function CompactTitleBar({ y, title, threshold = 56 }) {
       importantForAccessibility="no-hide-descendants"
       style={[styles.bar, { paddingTop: insets.top, height: insets.top + BAR_HEIGHT }, bar]}
     >
-      <Glass style={StyleSheet.absoluteFill} intensity={70} />
+      {/* Barra pegada al borde: sin cantos iluminados, solo la línea inferior que la separa del contenido */}
+      <Glass style={StyleSheet.absoluteFill} intensity={70} rim={false} />
       <Animated.Text style={[styles.compact, text]} numberOfLines={1}>{title}</Animated.Text>
     </Animated.View>
   );

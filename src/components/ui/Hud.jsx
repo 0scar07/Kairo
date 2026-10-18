@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, StyleSheet, Text, View } from "react-native";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
-import Glass from "./Glass";
+import Glass, { GLASS_EDGE, GLASS_LIFT } from "./Glass";
 import Icon from "../Icon";
 import { colors, radii, sizes, spacing, type } from "../../theme";
 
@@ -39,7 +39,7 @@ export function HudHost() {
   return (
     <View pointerEvents="none" style={styles.host} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Animated.View style={[styles.box, style]}>
-        <Glass style={StyleSheet.absoluteFill} intensity={80} fill={0.72} />
+        <Glass style={[StyleSheet.absoluteFill, styles.glass]} intensity={80} fill={0.72} />
         <Icon name={item.icon} size={sizes.avatarLg} color={colors.text} strokeWidth={2.4} />
         <Text style={styles.text}>{item.text}</Text>
       </Animated.View>
@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
   box:  {
     width: sizes.iconHero * 1.7, minHeight: sizes.iconHero * 1.5, overflow: "hidden",
     alignItems: "center", justifyContent: "center", gap: spacing.md, padding: spacing.lg,
-    borderRadius: radii.xl, borderWidth: sizes.hairline, borderColor: colors.borderStrong,
+    borderRadius: radii.xl, borderWidth: sizes.hairline, borderColor: GLASS_EDGE, ...GLASS_LIFT,
   },
+  glass: { borderRadius: radii.xl },
   text: { ...type.smallStrong, color: colors.text, textAlign: "center" },
 });
