@@ -7,6 +7,7 @@ const { REGIONS, DEFAULT_REGION } = require("./lib/regions");
 const { securityHeaders, requestLogger, corsMiddleware, limiter } = require("./lib/middleware");
 const lolRouter = require("./routes/lol");
 const tftRouter = require("./routes/tft");
+const esportsRouter = require("./routes/esports");
 const { createSupercellRouter } = require("./routes/supercell");
 const extra = require("./lib/extra");
 const { createStore } = require("./lib/store");
@@ -82,6 +83,8 @@ app.use("/clashroyale", createSupercellRouter("clashroyale"));
 app.use("/clashofclans", createSupercellRouter("clashofclans"));
 // Dota 2, Fortnite, Apex Legends y PUBG (APIs de terceros; se activan al configurar su key, salvo Dota 2)
 for (const [id, module] of Object.entries(extra.ROUTES)) app.use(`/${id}`, module.router);
+// Esports de LoL (ligas profesionales, rosters y estadísticas por torneo; ver routes/esports.js)
+app.use("/esports", esportsRouter);
 
 // Dispositivos para las notificaciones (Postgres si hay DATABASE_URL; si no, un archivo JSON local).
 // Si el almacén no arranca, el resto de la API sigue funcionando y solo /devices responde 503.

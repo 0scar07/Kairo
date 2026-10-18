@@ -14,6 +14,10 @@ import ProfileScreen   from "./src/screens/ProfileScreen";
 import LiveGameScreen  from "./src/games/lol/LiveGameScreen";
 import CompareScreen   from "./src/games/lol/CompareScreen";
 import SearchResultsScreen from "./src/screens/SearchResultsScreen";
+import SearchScreen from "./src/screens/SearchScreen";
+import LeaderboardScreen from "./src/games/lol/LeaderboardScreen";
+import ProTeamScreen from "./src/games/lol/ProTeamScreen";
+import ProPlayerScreen from "./src/games/lol/ProPlayerScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
 import LoadingScreen from "./src/screens/LoadingScreen";
 import FloatingTabBar from "./src/components/FloatingTabBar";
@@ -85,6 +89,11 @@ function RootStack() {
       <Stack.Screen name="SearchResults" component={SearchResultsScreen} options={({ route }) => ({ title: getGame(route.params.gameId)?.name ?? t("screens.results") })} />
       <Stack.Screen name="LiveGame" component={LiveGameScreen} options={{ title: t("screens.live") }} />
       <Stack.Screen name="Compare" component={CompareScreen} options={{ title: t("screens.compare") }} />
+      <Stack.Screen name="Leaderboard" component={LeaderboardScreen} options={{ title: t("explore.tabRanking") }} />
+      <Stack.Screen name="ProTeam" component={ProTeamScreen} options={{ title: t("explore.tabPros") }} />
+      <Stack.Screen name="ProPlayer" component={ProPlayerScreen} options={{ title: t("explore.tabPros") }} />
+      {/* Buscar desde cualquier pestaña: hoja en iOS (se cierra deslizando), pantalla que sube en Android */}
+      <Stack.Screen name="Search" component={SearchScreen} options={{ presentation: "modal", headerShown: false, title: t("tabs.search") }} />
     </Stack.Navigator>
   );
 }

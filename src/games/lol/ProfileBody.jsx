@@ -1,25 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useT } from "../../i18n/I18nProvider";
-import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
-import RankedCard from "../../components/RankedCard";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import Reveal from "../../components/Reveal";
 import {
-  Card, SectionLabel, SegmentedTabs, Chip, OverallCard, LoadMoreButton, Notice,
+  SectionLabel, SegmentedTabs, Chip, LoadMoreButton, Notice,
   Expandable, ResultsStrip, EmptyState, RowSkeleton,
 } from "../../components/ui";
 import MatchRow from "./components/MatchRow";
 import MatchDetail from "./components/MatchDetail";
-import ChampionStatsRow from "./components/ChampionStatsRow";
+import ChampionTable from "./components/ChampionTable";
+import QueueColumns from "./components/QueueColumns";
+import SummaryRings from "./components/SummaryRings";
 import MineExtras from "./MineExtras";
 import MasteryCard from "./components/MasteryCard";
-import { getMoreMatches } from "./api";
-import { findMe, getChampionStats, getOverallStats, getStreak } from "./utils";
+import { getMoreMatches, PROFILE_MATCHES } from "./api";
+import { QUEUE_FLEX, QUEUE_SOLO, findMe, getBestChampions, getChampionStats, getOverallStats, getPaceStats, getStreak } from "./utils";
 import { championIcon, championLabel } from "../../api/ddragon";
 import Icon from "../../components/Icon";
 import LiveBanner from "./components/LiveBanner";
 import RankHistoryCard from "./components/RankHistoryCard";
 import { errorMessage } from "../../utils/format";
-import { colors, radii, sizes, spacing, fontSizes, type, kdaColor, winrateColor, useAccent } from "../../theme";
+import { colors, radii, sizes, spacing, fontSizes, type } from "../../theme";
 
 const GAME = "lol";
 const STRIP_MAX = 20;
@@ -27,7 +28,6 @@ const STRIP_MAX = 20;
 // Contenido del perfil de League of Legends (la cabecera, favoritos y refresco los pone el perfil genérico)
 export default function LolProfileBody({ data, setData, setError, mine }) {
   const t = useT();
-  const accent = useAccent(GAME);
   const tabs = [
     { key: "partidas",  label: t("lol.tabMatches"), icon: "gamepad" },
     { key: "campeones", label: t("lol.tabChampions"), icon: "trophy" },
@@ -48,6 +48,12 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
   const flex       = ranked?.find(r => r.queueType === "RANKED_FLEX_SR");
   const champStats = getChampionStats(matches || [], account.puuid).slice(0, 5);
   const overall    = getOverallStats(matches || [], account.puuid);
+  const pace       = getPaceStats(matches || [], account.puuid);
+  const loaded     = matches?.length || 0;
+  const queues     = [
+    { key: "solo", label: t("ranked.solo"), entry: soloQ, best: getBestChampions(matches, account.puuid, QUEUE_SOLO), games: loaded },
+    { key: "flex", label: t("ranked.flex"), entry: flex,  best: getBestChampions(matches, account.puuid, QUEUE_FLEX), games: loaded },
+  ];
   const streak     = getStreak(matches || [], account.puuid);
   const topChamp   = champStats[0];
 
@@ -67,6 +73,26 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
     return true;
   });
 
+  // Completa en segundo plano hasta PROFILE_MATCHES partidas (el mejor winrate por cola necesita más muestra).
+  // Un intento por cada lista nueva (al abrir y al refrescar); si falla, el perfil sigue con lo que ya tiene.
+  const toppedUp = useRef(null);
+  useEffect(() => {
+    if (!hasMore || loaded === 0 || loaded >= PROFILE_MATCHES || toppedUp.current === matches) return;
+    toppedUp.current = matches;
+    let alive = true;
+    getMoreMatches(account.puuid, nextStart, region, PROFILE_MATCHES - loaded)
+      .then(page => {
+        if (!alive) return;
+        setData(prev => {
+          const known = new Set(prev.matches.map(m => m.metadata.matchId));
+          const fresh = page.matches.filter(m => !known.has(m.metadata.matchId));
+          return { ...prev, matches: [...prev.matches, ...fresh], hasMore: page.hasMore, nextStart: page.nextStart };
+        });
+      })
+      .catch(e => console.warn("No se pudieron completar las partidas del perfil:", e.message));
+    return () => { alive = false; };
+  }, [matches, hasMore]);
+
   async function loadMore() {
     setLoadingMore(true);
     setError(null);
@@ -83,16 +109,6 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
     setLoadingMore(false);
   }
 
-  const summaryBlocks = overall && [
-    { title: t("stats.winrate"), value: `${overall.wr}%`, color: winrateColor(overall.wr, accent), sub: `${overall.wins}V ${overall.losses}D` },
-    { title: t("stats.avgKda"), value: overall.kda, color: kdaColor(overall.kda, colors.text), sub: `${overall.avgKills}/${overall.avgDeaths}/${overall.avgAssists}` },
-    ...(topChamp ? [{
-      title: t("stats.mostPlayed"),
-      sub: t("common.games", { count: topChamp.games }),
-      node: <Image source={{ uri: championIcon(topChamp.name) }} style={styles.topChampImg} />,
-    }] : []),
-  ];
-
   return (
     <>
       <LiveBanner puuid={account.puuid} region={region} />
@@ -100,12 +116,7 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
       <Reveal order={1}>
         {rankedError
           ? <Notice tone="warn">{t("ranked.error", { error: rankedError })}</Notice>
-          : (
-            <View style={styles.rankedRow}>
-              <RankedCard entry={soloQ} label={t("ranked.solo")} game={GAME} />
-              <RankedCard entry={flex}  label={t("ranked.flex")} game={GAME} />
-            </View>
-          )}
+          : <QueueColumns queues={queues} />}
       </Reveal>
 
       <Reveal order={2}>
@@ -134,11 +145,7 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
 
       {overall && (
         <Reveal order={3}>
-          <OverallCard
-            label={t("stats.summaryLast", { count: overall.games })}
-            blocks={summaryBlocks}
-            bar={{ value: overall.wr, color: winrateColor(overall.wr, accent) }}
-          />
+          <SummaryRings overall={overall} pace={pace} topChamp={topChamp} />
           <ResultsStrip
             label={t("results.recent")}
             summary={t("results.summary", { wins: recent.filter(p => p.win).length, losses: recent.filter(p => !p.win).length })}
@@ -156,12 +163,10 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
       <Reveal order={5}>
         {activeTab === "campeones" && (
           champStats.length ? (
-            <Card>
+            <>
               <SectionLabel>{t("lol.mostPlayed", { count: matches?.length })}</SectionLabel>
-              {champStats.map((c, i) => (
-                <ChampionStatsRow key={c.name} champ={c} game={GAME} rank={mine ? i : undefined} />
-              ))}
-            </Card>
+              <ChampionTable champs={champStats} ranked={mine} />
+            </>
           ) : (
             <EmptyState icon="trophy" title={t("lol.noChampions")} text={t("lol.noChampionsText")} />
           )
@@ -225,8 +230,6 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
 }
 
 const styles = StyleSheet.create({
-  topChampImg:  { width: sizes.avatarLg, height: sizes.avatarLg, borderRadius: radii.md, backgroundColor: colors.surfaceHigh },
-  rankedRow:    { flexDirection: "row", gap: spacing.md, marginBottom: spacing.lg },
   streak:       {
     padding: spacing.md, borderRadius: radii.md, borderWidth: sizes.hairline,
     marginBottom: spacing.lg, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: spacing.sm,

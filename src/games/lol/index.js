@@ -5,6 +5,7 @@ import ProfileIcon from "./components/ProfileIcon";
 import ProfileBody from "./ProfileBody";
 import HomeExtras from "./HomeExtras";
 import { getOverallStats } from "./utils";
+import { sizes, spacing } from "../../theme";
 
 // Módulo de League of Legends: lo que las pantallas genéricas necesitan saber del juego.
 export default {
@@ -13,7 +14,7 @@ export default {
 
   // Datos para la cabecera del perfil
   getProfile: data => ({
-    avatar: <ProfileIcon iconId={data.summoner.profileIconId} level={data.summoner.summonerLevel} game={meta.id} />,
+    avatar: <ProfileIcon iconId={data.summoner.profileIconId} level={data.summoner.summonerLevel} game={meta.id} size={sizes.avatarXl - spacing.sm} />,
     name: data.account.gameName,
     tag: data.account.tagLine,
     subtitle: null,

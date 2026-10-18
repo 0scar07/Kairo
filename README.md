@@ -56,10 +56,10 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 | | League of Legends | Teamfight Tactics |
 |---|---|---|
-| **Rango** | Solo/Dúo y Flex con **emblema oficial**, LP, winrate y color del tier | Ranked, Double Up y Hyper Roll |
-| **Historial** | Resultado, campeón, cola, KDA, CS y daño; carga más partidas y filtra por resultado y campeón | Posición final 1–8, cola y duración |
+| **Rango** | Solo/Dúo y Flex con **emblema oficial**, LP, winrate y color del tier; el rango es el protagonista de la cabecera y cada cola muestra sus **3 campeones con mejor winrate** | Ranked, Double Up y Hyper Roll |
+| **Historial** | Resultado, campeón, cola, KDA, CS y daño (las **últimas 20** se completan en segundo plano); carga más partidas y filtra por resultado y campeón | Posición final 1–8, cola y duración |
 | **Detalle** | Los 10 jugadores con objetos, **hechizos y runas** | Los 8 jugadores con **rasgos y unidades con estrellas** |
-| **Resumen** | Winrate, KDA promedio, racha y campeón más jugado; estadísticas por campeón | Posición promedio, top 4, victorias y gráfico de posiciones |
+| **Resumen** | **Anillos** de winrate y KDA; totales de K/D/A, participación en kills, daño, oro, CS y visión por minuto; racha y campeón más jugado; **tabla por campeón** | Posición promedio, top 4, victorias y gráfico de posiciones |
 | **Maestría y rotación** | Top 3 de campeones con nivel y puntos, rotación gratuita de la semana y aviso de mantenimiento de tu región | (no aplica) |
 | **En vivo** | **Partida en vivo**: aviso en el perfil y pantalla con splash art del campeón, los dos equipos, hechizos, runas, rango de cada jugador, baneos y cronómetro; **notificaciones** cuando un favorito entra en partida y su resultado (Android) | (la API aún no está habilitada) |
 | **Mi perfil** | Tu Riot ID con insignias y gráfico de KDA | Tu Riot ID |
@@ -71,6 +71,8 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 - **Resumen semanal:** el domingo por la tarde (hora de tu celular) una notificación con tus partidas, victorias y LP de la semana.
 - **Avisos de progreso:** cuando un favorito de LoL sube o baja de rango o entra en promoción, y cuando un favorito de **Brawl Stars** o **Clash Royale** bate su récord de trofeos.
 - **Comparar dos jugadores** de LoL cara a cara (rango, winrate, KDA, nivel, maestría, campeón más jugado).
+- **Explorar (la lupa de la barra):** el **ranking** Challenger, Gran Maestro o Maestro de tu región (Solo/Dúo o Flex) con su tabla completa, tus **favoritos en partida ahora** con cronómetro, la búsqueda por Riot ID y atajos a Mi perfil y Comparar.
+- **Jugadores profesionales:** LCK, LPL, LEC, LCS, LTA Norte y Sur, LLA, Mundial y MSI con la **clasificación** de cada torneo, la **plantilla** de cada equipo y el perfil de cada pro (winrate, KDA, participación en kills, oro y CS por minuto, % del daño y campeones) por split. Datos de lolesports.com.
 - **Compartir el perfil como imagen** lista para redes (Android e iPhone nativo).
 - **Perfiles sin conexión:** la app guarda lo último que viste de cada jugador y lo abre aunque no haya internet.
 - **Actualizaciones sin reinstalar:** los cambios de pantallas y textos llegan al abrir la app (ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)); solo los cambios nativos piden un APK nuevo.
@@ -105,7 +107,7 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
 - **Favoritos** con tarjetas (ícono, rango o trofeos con el color del juego) y **búsquedas recientes**; funcionan igual en los cinco juegos.
 - **Identidad visual:** acento propio por juego con transición suave, logos e íconos oficiales de cada juego y **cero emojis** (íconos vectoriales propios en SVG que toman el color del juego).
 - **Pantalla de carga animada** con progreso real de arranque, aparición escalonada de las secciones, skeletons, estados vacíos amables y errores con botón de reintentar.
-- **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*.
+- **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*, neutra, con el botón de la lupa al lado; pestañas subrayadas.
 
 ### Backend
 
@@ -195,7 +197,7 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
 | App | React Native 0.86 · Expo SDK 57 · React Navigation 7 |
 | Animación | Reanimated 4 · Skia (`@shopify/react-native-skia`, banner líquido) · SVG (`react-native-svg`) · `expo-haptics` |
 | Diseño | Sistema propio de *tokens* (`src/theme`) · Sora + Inter (`@expo-google-fonts`) |
-| Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · OpenDota · Fortnite-API · Apex Legends Status · API de PUBG · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) |
+| Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · OpenDota · Fortnite-API · Apex Legends Status · API de PUBG · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) · LoL Esports (lolesports.com y su feed de estadísticas) |
 | Notificaciones | `expo-notifications` + Expo Push (FCM en Android) · vigilante de partidas en el backend · Postgres (Neon) para los dispositivos |
 | Almacenamiento | AsyncStorage (favoritos, recientes, preferencias) |
 
@@ -287,6 +289,7 @@ Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad
 | `*_API_BASE` | Otra URL base para esos juegos (por defecto los proxies de RoyaleAPI, que dan una IP fija) |
 | `FORTNITE_API_KEY` · `APEX_API_KEY` · `PUBG_API_KEY` | Keys gratuitas de Fortnite-API, Apex Legends Status y PUBG (opcionales: cada juego se activa al ponerla) |
 | `OPENDOTA_API_KEY` | Opcional: Dota 2 funciona sin key; con ella suben los límites de OpenDota |
+| `LOLESPORTS_API_KEY` | Opcional: key de la API de lolesports.com (por defecto la pública que usa su web) |
 
 App
 
@@ -310,7 +313,16 @@ Todas las rutas aceptan `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1
 | `GET /lol/rotation` | Rotación semanal gratuita (IDs de campeón) |
 | `GET /lol/status` | Mantenimientos e incidencias del servidor de la región |
 | `GET /lol/live/:puuid` | Partida en curso con el rango Solo/Dúo de cada jugador (`{ inGame: false }` si no está jugando) |
-| `GET /lol/leaderboard?region=&queue=&limit=` | Clasificación Challenger (Solo/Dúo o Flex): los N mejores por LP con su Riot ID (máx. 50; liga 10 min y cuentas 24 h en caché). La usa [Kairo Web](https://github.com/0scar07/kairo-web) |
+| `GET /lol/leaderboard?region=&tier=&queue=&start=&limit=` | Clasificación Challenger, Gran Maestro o Maestro (Solo/Dúo o Flex): los N mejores por LP con su Riot ID, paginada (máx. 50; liga 10 min y cuentas 24 h en caché; `X-Total-Count` = jugadores de la liga). La usan la pestaña Explorar de la app y [Kairo Web](https://github.com/0scar07/kairo-web) |
+
+Esports de LoL (datos de lolesports.com; todas aceptan `?hl=es|en|pt|fr|de`):
+
+| Ruta | Descripción |
+|---|---|
+| `GET /esports/leagues` | Ligas de la app: LCK, LPL, LEC, LCS, LTA Norte y Sur, LLA, Mundial y MSI |
+| `GET /esports/leagues/:slug?tournamentId=` | Torneos de la liga y la clasificación del elegido (el más reciente por defecto); en formato suizo o eliminatorias se arma con las series terminadas (`fromResults`) |
+| `GET /esports/teams/:slug` | Equipo con su plantilla (foto, nombre y rol) |
+| `GET /esports/teams/:slug/stats?tournamentId=` | Estadísticas de cada jugador en el torneo a partir del feed de cada partida (partidas terminadas en caché 7 días; el resultado, 1 h) |
 
 Supercell (sin región; el tag se acepta con o sin `#`):
 

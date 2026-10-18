@@ -98,3 +98,44 @@ export function getStreak(matches, puuid) {
   if (count < 2) return null;
   return { isWin, count };
 }
+
+export const QUEUE_SOLO = 420;
+export const QUEUE_FLEX = 440;
+
+// Los campeones con mejor winrate en una cola: a igual winrate gana el que tiene más partidas y luego mejor KDA
+export function getBestChampions(matches, puuid, queueId, limit = 3) {
+  const games = (matches || []).filter(m => m.info?.queueId === queueId);
+  const kdaNum = c => (c.kda === t("match.perfect") ? Infinity : parseFloat(c.kda));
+  return getChampionStats(games, puuid)
+    .sort((a, b) => b.wr - a.wr || b.games - a.games || kdaNum(b) - kdaNum(a))
+    .slice(0, limit);
+}
+
+// Ritmo y aporte en las partidas: totales de K/D/A, participación en kills (asesinatos + asistencias sobre los
+// asesinatos del equipo), CS, daño, oro y visión por minuto, y duración media de las partidas (en segundos)
+export function getPaceStats(matches, puuid) {
+  let kills = 0, deaths = 0, assists = 0, teamKills = 0, cs = 0, damage = 0, gold = 0, vision = 0, seconds = 0, games = 0;
+  (matches || []).forEach(m => {
+    const me = findMe(m, puuid);
+    if (!me || !m.info.gameDuration) return;
+    kills += me.kills; deaths += me.deaths; assists += me.assists;
+    teamKills += m.info.participants.filter(p => p.teamId === me.teamId).reduce((sum, p) => sum + (p.kills || 0), 0);
+    cs += csOf(me);
+    damage += me.totalDamageDealtToChampions || 0;
+    gold += me.goldEarned || 0;
+    vision += me.visionScore || 0;
+    seconds += m.info.gameDuration;
+    games++;
+  });
+  if (!games) return null;
+  const minutes = seconds / 60;
+  return {
+    kills, deaths, assists,
+    killParticipation: teamKills ? Math.round(((kills + assists) / teamKills) * 100) : null,
+    csPerMin:  (cs / minutes).toFixed(1),
+    dmgPerMin: Math.round(damage / minutes),
+    goldPerMin: Math.round(gold / minutes),
+    visionPerMin: (vision / minutes).toFixed(1),
+    avgDuration: Math.round(seconds / games),
+  };
+}

@@ -124,7 +124,9 @@ export default function ProfileView({ gameId, initialData, mine, headerAction, o
           tag={profile.tag}
           subtitle={profile.subtitle}
           badge={badge}
+          badgeDetail={ranked ? `${ranked.leaguePoints} LP` : null}
           badgeIcon={ranked ? <RankEmblem tier={ranked.tier} size={sizes.item} /> : profile.badgeIcon || null}
+          emblem={ranked ? <RankEmblem tier={ranked.tier} size={sizes.iconHero + spacing.md} /> : null}
           glowColor={colors.tier[ranked?.tier]}
           action={headerAction ? headerAction.icon : (
             <FavoriteStar active={isFav} size={sizes.avatarSm} />
@@ -173,7 +175,7 @@ function relativeTime(ts) {
 }
 
 const styles = StyleSheet.create({
-  updated:   { ...type.caption, color: colors.textMuted, textAlign: "center", marginTop: -spacing.sm, marginBottom: spacing.md },
+  updated:   { ...type.caption, color: colors.textMuted, marginBottom: spacing.lg },
   iconButton: { padding: spacing.xs + spacing.xxs },
   container: { flex: 1, backgroundColor: colors.bg },
   content:   { padding: spacing.lg },

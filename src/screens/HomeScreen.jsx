@@ -5,8 +5,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { GAMES, UPCOMING_GAMES, getGame } from "../games";
 import { regionName } from "../constants/regions";
 import { errorMessage } from "../utils/format";
-import { GLOBAL_REGION, tagOf } from "../utils/supercell";
-import { profileTarget } from "../utils/target";
+import { profileTarget, searchPlaceholder, searchTarget } from "../utils/target";
 import { loadPlatforms, savePlatform } from "../utils/prefs";
 import { loadFavorites, removeFavorite } from "../utils/favorites";
 import { loadRecents, clearRecents, removeRecent } from "../utils/recents";
@@ -95,41 +94,10 @@ export default function HomeScreen({ navigation }) {
   }
 
   function handleSearch() {
-    const text = input.trim();
     setError(null);
-
-    // Juegos de Supercell: se busca solo por el tag (#2PP0) y no hay regiones
-    if (game.tagSearch) {
-      const tag = tagOf(text);
-      if (tag.length < 3) {
-        invalid(t("home.badTag"));
-        return;
-      }
-      openProfile({ gameId: game.id, gameName: "", tagLine: tag, region: GLOBAL_REGION });
-      return;
-    }
-
-    // Juegos que se buscan por nombre (Dota 2, Fortnite, Apex, PUBG): una plataforma opcional y, en Dota 2, una lista de resultados
-    if (game.search === "name") {
-      if (text.length < 2) {
-        invalid(t("home.badName"));
-        return;
-      }
-      const target = { gameId: game.id, gameName: text, tagLine: "", region: platform || GLOBAL_REGION };
-      if (game.searchResults && !/^\d+$/.test(text)) navigation.navigate("SearchResults", { gameId: game.id, query: text, region: target.region });
-      else openProfile(target);
-      return;
-    }
-
-    const cut  = text.lastIndexOf("#");
-    const name = (cut < 0 ? text : text.slice(0, cut)).trim();
-    const tag  = cut < 0 ? "" : text.slice(cut + 1).trim();
-
-    if (!name || !tag) {
-      invalid(t("home.badRiotId"));
-      return;
-    }
-    openProfile({ gameId: game.id, gameName: name, tagLine: tag, region });
+    const result = searchTarget(game, input, { region, platform });
+    if (result.error) { invalid(result.error); return; }
+    navigation.navigate(result.screen, result.params);
   }
 
   async function onRemoveFavorite(fav) {
@@ -221,7 +189,7 @@ export default function HomeScreen({ navigation }) {
                 onBlur={() => setFocused(false)}
                 accessibilityLabel={t("home.searchIn", { game: game.name })}
                 accessibilityHint={error || undefined}
-                placeholder={game.tagSearch ? t("home.placeholderTag") : game.search === "name" ? t(game.searchResults ? "home.placeholderNameOrId" : "home.placeholderName") : t("home.placeholderRiotId")}
+                placeholder={searchPlaceholder(game)}
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
                 autoCapitalize="none"

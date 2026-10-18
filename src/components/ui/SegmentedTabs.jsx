@@ -2,64 +2,57 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import PressableScale from "./PressableScale";
-import Icon from "../Icon";
 import { select } from "../../utils/haptics";
-import { colors, radii, sizes, spacing, fontSizes, type, useAccent, withAlpha } from "../../theme";
+import { colors, radii, sizes, spacing, fontSizes, type, useAccent } from "../../theme";
 
-const SPRING = { damping: 18, stiffness: 220, mass: 0.7 };
+const SPRING = { damping: 20, stiffness: 240, mass: 0.7 };
 
-// tabs: [{ key, label, icon? }]. Un indicador se desliza hasta el tab activo, que toma el acento del juego.
+// tabs: [{ key, label }]. Pestañas subrayadas: una línea del acento del juego se desliza bajo la activa.
 export default function SegmentedTabs({ tabs, value, onChange, game }) {
   const accent = useAccent(game);
-  const [width, setWidth] = useState(0);
-  const index = Math.max(0, tabs.findIndex(t => t.key === value));
-  const tabWidth = width ? (width - spacing.xs * 2) / tabs.length : 0;
+  const [layouts, setLayouts] = useState({});   // key -> { x, width } de cada pestaña
+  const active = layouts[value];
 
   const x = useSharedValue(0);
-  const indicator = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
+  const w = useSharedValue(0);
+  const indicator = useAnimatedStyle(() => ({ width: w.value, transform: [{ translateX: x.value }] }));
 
   React.useEffect(() => {
-    x.value = withSpring(index * tabWidth, SPRING);
-  }, [index, tabWidth]);
+    if (!active) return;
+    x.value = withSpring(active.x, SPRING);
+    w.value = withSpring(active.width, SPRING);
+  }, [active?.x, active?.width]);
 
   return (
-    <View style={styles.wrap} accessibilityRole="tablist" onLayout={e => setWidth(e.nativeEvent.layout.width)}>
-      {tabWidth > 0 && (
-        <Animated.View style={[
-          styles.indicator,
-          { width: tabWidth, backgroundColor: withAlpha(accent, 0.14), borderColor: withAlpha(accent, 0.35) },
-          indicator,
-        ]} />
-      )}
+    <View style={styles.wrap} accessibilityRole="tablist">
       {tabs.map(t => {
-        const active = t.key === value;
+        const on = t.key === value;
         return (
           <PressableScale
             key={t.key}
             scaleTo={0.96}
             style={styles.tab}
             accessibilityRole="tab"
-            accessibilityState={{ selected: active }}
-            onPress={() => { if (!active) { select(); onChange(t.key); } }}
+            accessibilityState={{ selected: on }}
+            onLayout={e => { const { x: lx, width } = e.nativeEvent.layout; setLayouts(prev => ({ ...prev, [t.key]: { x: lx, width } })); }}
+            onPress={() => { if (!on) { select(); onChange(t.key); } }}
           >
-            {t.icon ? <Icon name={t.icon} size={fontSizes.base} color={active ? accent : colors.textMuted} /> : null}
-            <Text style={[styles.text, active && { color: accent }]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{t.label}</Text>
+            <Text style={[styles.text, on && styles.textOn]} maxFontSizeMultiplier={1.4} numberOfLines={1}>{t.label}</Text>
           </PressableScale>
         );
       })}
+      {active ? <Animated.View style={[styles.indicator, { backgroundColor: accent }, indicator]} /> : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap:      {
-    flexDirection: "row", marginBottom: spacing.lg,
-    backgroundColor: colors.surface, borderRadius: radii.md, padding: spacing.xs,
+    flexDirection: "row", gap: spacing.xl, marginBottom: spacing.lg,
+    borderBottomWidth: sizes.hairline, borderBottomColor: colors.border,
   },
-  indicator: {
-    position: "absolute", top: spacing.xs, bottom: spacing.xs, left: spacing.xs,
-    borderRadius: radii.sm, borderWidth: sizes.hairline,
-  },
-  tab:       { flex: 1, flexDirection: "row", gap: spacing.sm, minHeight: sizes.placement - spacing.sm, paddingVertical: spacing.sm, alignItems: "center", justifyContent: "center", borderRadius: radii.sm },
-  text:      { ...type.label, fontSize: fontSizes.sm, color: colors.textMuted },
+  tab:       { minHeight: sizes.placement + spacing.xs, justifyContent: "center", paddingTop: spacing.xs },
+  text:      { ...type.bodyStrong, fontSize: fontSizes.base, color: colors.textMuted },
+  textOn:    { color: colors.text },
+  indicator: { position: "absolute", left: 0, bottom: -sizes.hairline, height: sizes.barThin, borderTopLeftRadius: radii.xs, borderTopRightRadius: radii.xs },
 });

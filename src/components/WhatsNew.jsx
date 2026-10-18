@@ -10,12 +10,16 @@ import { LAST_SEEN_VERSION_KEY } from "../constants/config";
 import { colors, radii, sizes, spacing, type, useAccent, withAlpha } from "../theme";
 
 const VERSION = Constants.expoConfig?.version || "";
+// Revisión de las novedades dentro de la misma versión: las actualizaciones por aire no cambian la versión de la app,
+// así que al cambiar las novedades se sube este número para que vuelvan a mostrarse una vez
+const REVISION = 2;
+const SEEN_ID = `${VERSION}#${REVISION}`;
 const ITEMS = [
-  { icon: "eye",      title: "whatsNew.readable.title",  text: "whatsNew.readable.text" },
-  { icon: "zap",      title: "whatsNew.fast.title",      text: "whatsNew.fast.text" },
-  { icon: "star",     title: "whatsNew.favorites.title", text: "whatsNew.favorites.text" },
-  { icon: "search",   title: "whatsNew.search.title",    text: "whatsNew.search.text" },
-  { icon: "trending", title: "whatsNew.ios.title",       text: "whatsNew.ios.text" },
+  { icon: "award",    title: "whatsNew.profile.title", text: "whatsNew.profile.text" },
+  { icon: "trophy",   title: "whatsNew.queues.title",  text: "whatsNew.queues.text" },
+  { icon: "search",   title: "whatsNew.explore.title", text: "whatsNew.explore.text" },
+  { icon: "crown",    title: "whatsNew.pros.title",    text: "whatsNew.pros.text" },
+  { icon: "barChart", title: "whatsNew.matches.title", text: "whatsNew.matches.text" },
 ];
 
 // Abrir la hoja desde otra pantalla (Ajustes › Novedades)
@@ -37,9 +41,9 @@ export default function WhatsNew() {
     let timer;
     AsyncStorage.getItem(LAST_SEEN_VERSION_KEY)
       .then(seen => {
-        if (seen === VERSION) return;
+        if (seen === SEEN_ID) return;
         const existingUser = seen != null || favorites.length > 0 || recents.length > 0;
-        AsyncStorage.setItem(LAST_SEEN_VERSION_KEY, VERSION).catch(e => console.warn("Novedades:", e.message));
+        AsyncStorage.setItem(LAST_SEEN_VERSION_KEY, SEEN_ID).catch(e => console.warn("Novedades:", e.message));
         if (existingUser) timer = setTimeout(() => setOpen(true), 900);   // tras el fundido de la pantalla de carga
       })
       .catch(e => console.warn("Novedades:", e.message));
