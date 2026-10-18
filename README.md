@@ -67,20 +67,28 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 |---|---|---|
 | **Rango** | Solo/Dúo y Flex con **emblema oficial**, LP, winrate y color del tier; el rango es el protagonista de la cabecera y cada cola muestra sus **3 campeones con mejor winrate** | Ranked, Double Up y Hyper Roll |
 | **Historial** | Resultado, campeón, cola, KDA, CS y daño (las **últimas 20** se completan en segundo plano); carga más partidas y filtra por resultado y campeón | Posición final 1–8, cola y duración |
-| **Detalle** | Los 10 jugadores con objetos, **hechizos y runas** | Los 8 jugadores con **rasgos y unidades con estrellas** |
+| **Detalle** | Los 10 jugadores con objetos, **hechizos y runas**; **diferencia de oro minuto a minuto** y **orden de compra** de los objetos | Los 8 jugadores con **rasgos y unidades con estrellas** |
 | **Resumen** | **Anillos** de winrate y KDA; totales de K/D/A, participación en kills, daño, oro, CS y visión por minuto; racha y campeón más jugado; **tabla por campeón** | Posición promedio, top 4, victorias y gráfico de posiciones |
 | **Maestría y rotación** | Top 3 de campeones con nivel y puntos, rotación gratuita de la semana y aviso de mantenimiento de tu región | (no aplica) |
-| **En vivo** | **Partida en vivo**: aviso en el perfil y pantalla con splash art del campeón, los dos equipos, hechizos, runas, rango de cada jugador, baneos y cronómetro; **notificaciones** cuando un favorito entra en partida y su resultado (Android) | (la API aún no está habilitada) |
+| **En vivo** | **Partida en vivo**: aviso en el perfil y pantalla con splash art del campeón, los dos equipos, hechizos, runas, rango de cada jugador, baneos y cronómetro; atajo **«Cómo jugar contra…»** a tu rival de línea; **notificaciones** cuando un favorito entra en partida y su resultado (Android) | (la API aún no está habilitada) |
 | **Mi perfil** | Tu Riot ID con insignias y gráfico de KDA | Tu Riot ID |
 
 **Notificaciones de partida en vivo (LoL, Android):** toca la campanita de un favorito y Kairo te avisa cuando entra en partida y cuando termina, con el resultado, aunque la app esté cerrada. Con la app abierta el aviso aparece como un **banner fluido** (una gota de vidrio que se estira en cápsula, con efecto líquido dibujado con Skia) y queda un indicador «N en vivo». En Ajustes eliges qué avisar, el horario silencioso y puedes enviarte una prueba. Sin cuentas: cada celular se registra con su token y un secreto propio. Los detalles están en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
+**Nuevo en la v1.5** (llega por aire, sin reinstalar):
+- **Enfrentamientos (LoL):** en la lupa eliges tu campeón y tu rival, y ves la build que más gana contra él, la runa principal y los hechizos, el orden de habilidades (qué subir primero y los primeros 11 niveles), sus **counters** en la línea y las habilidades del rival con su enfriamiento y tipo de daño. Todo sale de partidas de Challenger y cada dato dice cuántas partidas lo respaldan; si hay pocas de ese cruce, muestra la build general y lo avisa. En **Partida en vivo** aparece el atajo «Cómo jugar contra X» con tu rival de línea.
+- **Progreso de LP:** toca Solo/Dúo o Flex en el perfil y se abre su gráfico de 7 días, 30 días o la temporada.
+- **Cada partida, minuto a minuto:** el detalle de partida muestra la diferencia de oro y el orden de compra de los objetos.
+- **Seguir a un pro:** desde Pros, su próxima partida oficial y un aviso 15 minutos antes; los pros que sigues aparecen en Favoritos.
+- **Sugeridos del ranking:** si aún no tienes favoritos, Kairo te propone jugadores Challenger de tu región.
+- **Más pulida:** barras de cristal al estilo de iOS, carga con la forma exacta del perfil y contenido que se funde bajo las barras.
+
 **Más funciones (v1.4):**
-- **Historial de rango (LoL):** el servidor guarda una foto diaria del rango de cada jugador que consultas y el perfil dibuja el gráfico de LP (Solo/Dúo y Flex) con el cambio de 7 y 30 días. No hay historial anterior a la primera consulta: se va llenando cada día.
+- **Historial de rango (LoL):** el servidor guarda una foto diaria del rango de tu perfil y de tus favoritos, y la pantalla **Progreso de LP** dibuja el gráfico (Solo/Dúo y Flex). Riot no da historial: no hay datos anteriores a la primera foto y se va llenando cada día.
 - **Resumen semanal:** el domingo por la tarde (hora de tu celular) una notificación con tus partidas, victorias y LP de la semana.
 - **Avisos de progreso:** cuando un favorito de LoL sube o baja de rango o entra en promoción, y cuando un favorito de **Brawl Stars** o **Clash Royale** bate su récord de trofeos.
 - **Comparar dos jugadores** de LoL cara a cara (rango, winrate, KDA, nivel, maestría, campeón más jugado).
-- **Explorar (la lupa de la barra):** el **ranking** Challenger, Gran Maestro o Maestro de tu región (Solo/Dúo o Flex) con su tabla completa, tus **favoritos en partida ahora** con cronómetro, la búsqueda por Riot ID y atajos a Mi perfil y Comparar.
+- **Explorar (la lupa de la barra):** el **ranking** Challenger, Gran Maestro o Maestro de tu región (Solo/Dúo o Flex) con su tabla completa, tus **favoritos en partida ahora** con cronómetro, los **pros**, los **enfrentamientos**, la búsqueda por Riot ID y atajos a Mi perfil y Comparar.
 - **Jugadores profesionales:** LCK, LPL, LEC, LCS, LTA Norte y Sur, LLA, Mundial y MSI con la **clasificación** de cada torneo, la **plantilla** de cada equipo y el perfil de cada pro (winrate, KDA, participación en kills, oro y CS por minuto, % del daño y campeones) por split. Datos de lolesports.com.
 - **Compartir el perfil como imagen** lista para redes (Android e iPhone nativo).
 - **Perfiles sin conexión:** la app guarda lo último que viste de cada jugador y lo abre aunque no haya internet.
@@ -207,7 +215,7 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
 | Animación | Reanimated 4 · Skia (`@shopify/react-native-skia`, banner líquido) · SVG (`react-native-svg`) · `expo-haptics` |
 | Diseño | Sistema propio de *tokens* (`src/theme`) · Sora + Inter (`@expo-google-fonts`) |
 | Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · OpenDota · Fortnite-API · Apex Legends Status · API de PUBG · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) · LoL Esports (lolesports.com y su feed de estadísticas) |
-| Notificaciones | `expo-notifications` + Expo Push (FCM en Android) · vigilante de partidas en el backend · Postgres (Neon) para los dispositivos |
+| Notificaciones | `expo-notifications` + Expo Push (FCM en Android) · vigilante de partidas en el backend · Postgres (Neon) para los dispositivos, el historial de LP y las builds de Challenger |
 | Almacenamiento | AsyncStorage (favoritos, recientes, preferencias) |
 
 ## 🏗️ Arquitectura
@@ -268,7 +276,7 @@ EXPO_PUBLIC_API_URL=http://192.168.1.8:3000 npx expo start
 
 ## ☁️ Desplegar en la nube
 
-Para que la app funcione **sin tu PC encendida**, el backend tiene que estar en internet. No necesitas base de datos: los favoritos y preferencias se guardan en el propio celular.
+Para que la app funcione **sin tu PC encendida**, el backend tiene que estar en internet. Los favoritos y preferencias se guardan en el propio celular; la base de datos solo hace falta para las notificaciones, el historial de LP y las builds de Challenger (`DATABASE_URL`, por ejemplo Neon). Sin ella el servidor usa un archivo local, que Render gratis borra al reiniciar.
 
 El repo incluye [`render.yaml`](render.yaml) y un [`Dockerfile`](server/Dockerfile) (Render, Railway, Fly.io…). Resumen con Render:
 
@@ -299,6 +307,13 @@ Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad
 | `FORTNITE_API_KEY` · `APEX_API_KEY` · `PUBG_API_KEY` | Keys gratuitas de Fortnite-API, Apex Legends Status y PUBG (opcionales: cada juego se activa al ponerla) |
 | `OPENDOTA_API_KEY` | Opcional: Dota 2 funciona sin key; con ella suben los límites de OpenDota |
 | `LOLESPORTS_API_KEY` | Opcional: key de la API de lolesports.com (por defecto la pública que usa su web) |
+| `DATABASE_URL` | Postgres para dispositivos, historial de LP y builds (sin ella, un archivo JSON local) |
+| `WATCHER_ENABLED` · `WATCH_INTERVAL_MS` · `WATCH_MAX_PER_TICK` | Vigilante de partidas en vivo: encendido (por defecto sí), cada cuánto revisa (`120000` ms) y cuántos jugadores por vuelta (`40`) |
+| `BUILDS_ENABLED` | `false` apaga la recolección de builds y enfrentamientos de Challenger (útil en local para no gastar cupo de Riot) |
+| `MAX_DEVICES` | Tope de dispositivos registrados para notificaciones (por defecto `5000`) |
+| `EXPO_ACCESS_TOKEN` | Opcional: token de Expo si activas la seguridad de envío de notificaciones |
+| `WEBPUSH_PUBLIC_KEY` · `WEBPUSH_PRIVATE_KEY` · `WEBPUSH_SUBJECT` | Opcionales: avisos web de Kairo Web (`npx web-push generate-vapid-keys`) |
+| `ART_SECRET` · `PUBLIC_BASE_URL` | Opcionales: firma y URL pública de las imágenes de las notificaciones (en Render la URL se detecta sola) |
 
 App
 
@@ -322,6 +337,11 @@ Todas las rutas aceptan `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1
 | `GET /lol/rotation` | Rotación semanal gratuita (IDs de campeón) |
 | `GET /lol/status` | Mantenimientos e incidencias del servidor de la región |
 | `GET /lol/live/:puuid` | Partida en curso con el rango Solo/Dúo de cada jugador (`{ inGame: false }` si no está jugando) |
+| `GET /lol/live/:puuid/insights` | Etiquetas de la partida en vivo: la maestría de cada jugador con el campeón que juega |
+| `GET /lol/match/:matchId/timeline` | Oro, experiencia y farmeo por minuto, objetivos y orden de compra de una partida terminada |
+| `GET /lol/history/:puuid` · `POST /lol/history/touch` | Historial diario de rango (30 días) y aviso de qué favoritos seguir guardando |
+| `GET /lol/builds` · `GET /lol/builds/:championId` | Builds de Challenger: campeones del parche y build de uno (objetos, runas, hechizos) |
+| `GET /lol/builds/matchups?position=` · `GET /lol/builds/:championId/opponents` · `GET /lol/builds/:championId/vs/:enemyId` | Enfrentamientos: cruces más vistos por línea, rivales frecuentes y el resumen de un cruce (build, runas, orden de habilidades, counters y tipo de daño del rival) |
 | `GET /lol/leaderboard?region=&tier=&queue=&start=&limit=` | Clasificación Challenger, Gran Maestro o Maestro (Solo/Dúo o Flex): los N mejores por LP con su Riot ID, paginada (máx. 50; liga 10 min y cuentas 24 h en caché; `X-Total-Count` = jugadores de la liga). La usan la pestaña Explorar de la app y [Kairo Web](https://github.com/0scar07/kairo-web) |
 
 Esports de LoL (datos de lolesports.com; todas aceptan `?hl=es|en|pt|fr|de`):
@@ -332,6 +352,7 @@ Esports de LoL (datos de lolesports.com; todas aceptan `?hl=es|en|pt|fr|de`):
 | `GET /esports/leagues/:slug?tournamentId=` | Torneos de la liga y la clasificación del elegido (el más reciente por defecto); en formato suizo o eliminatorias se arma con las series terminadas (`fromResults`) |
 | `GET /esports/teams/:slug` | Equipo con su plantilla (foto, nombre y rol) |
 | `GET /esports/teams/:slug/stats?tournamentId=` | Estadísticas de cada jugador en el torneo a partir del feed de cada partida (partidas terminadas en caché 7 días; el resultado, 1 h) |
+| `GET /esports/teams/:slug/next` | Próxima partida oficial del equipo (para seguir a un pro) |
 
 Supercell (sin región; el tag se acepta con o sin `#`):
 
@@ -340,15 +361,25 @@ Supercell (sin región; el tag se acepta con o sin `#`):
 | `GET /{brawlstars, clashroyale, clashofclans}/player/:tag` | Perfil del jugador |
 | `GET /{brawlstars, clashroyale}/battles/:tag` | Últimas batallas (`{ items }`) |
 | `GET /{brawlstars, clashroyale, clashofclans}/top?limit=10` | Mejores jugadores del mundo (sirve para descubrir tags) |
+| `GET /brawlstars/club/:tag` · `/brawlers` · `/events` | Club, lista de brawlers y eventos activos de Brawl Stars |
 
 Otros juegos (por nombre; la plataforma va en `?platform=`):
 
 | Ruta | Descripción |
 |------|-------------|
 | `GET /dota2/search?q=` · `GET /dota2/player/:id` · `GET /dota2/heroes` | Búsqueda por nombre, perfil (ID de cuenta o Steam64) y héroes |
+| `GET /dota2/match/:id` · `/items` · `/herostats` | Detalle de una partida, objetos y estadísticas de héroes |
 | `GET /fortnite/player/:name?platform=epic\|psn\|xbl` | Estadísticas de batalla campal por modo |
 | `GET /apex/player/:name?platform=PC\|PS4\|X1` | Rango, leyenda seleccionada, totales y estado |
 | `GET /pubg/player/:name?platform=steam\|psn\|xbox\|kakao` | Temporada, clasificatoria y últimas partidas |
+
+Notificaciones y sincronización (sin cuentas: cada celular se registra con su token y un secreto propio):
+
+| Ruta | Descripción |
+|------|-------------|
+| `POST /devices` · `GET /devices/me` · `PUT /devices/me/{favorites, settings, token, webpush}` · `POST /devices/me/test` · `DELETE /devices/me` | Registro del dispositivo, favoritos vigilados, ajustes de avisos, prueba y baja |
+| `POST /sync` · `GET /sync/:code` · `PUT /sync/:code` | Favoritos sincronizados de Kairo Web con un código privado |
+| `GET /art/banner.png` | Imagen de las notificaciones (solo URLs firmadas por el servidor) |
 
 Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, `/match`) siguen funcionando como alias de `/lol/…`.
 
@@ -357,7 +388,7 @@ Las rutas antiguas sin prefijo (`/account`, `/summoner`, `/ranked`, `/matches`, 
 ```
 server/                  backend Express (proxy a Riot, Supercell y las APIs de los demás juegos) + Dockerfile + pruebas
   lib/                   clientes de Riot y Supercell, caché, cola de salida, regiones, errores y middlewares
-  routes/                /lol y /tft (fábrica compartida) y /brawlstars, /clashroyale, /clashofclans
+  routes/                /lol y /tft (fábrica compartida), builds y enfrentamientos, Supercell, demás juegos, esports, dispositivos y sync
 src/
   api/                   cliente del backend y Data Dragon
   boot/                  tareas de arranque y progreso de la pantalla de carga
@@ -397,9 +428,12 @@ Tipografía: **Sora** para títulos (con `letter-spacing` amplio) e **Inter** pa
 | Comando | Qué hace |
 |---------|----------|
 | `npx expo start` | Levanta la app (Expo Go / emulador) |
-| `npm run verify` | Comprueba imports locales y tokens del tema |
+| `npm run phone` | Igual, sin pedir sesión de Expo (para Expo Go en el celular) |
+| `npm run web` | La app en el navegador |
+| `npm run verify` | Comprueba imports locales, tokens del tema y que los cinco idiomas tengan las mismas claves |
 | `npm run icons` | Regenera `icon`, `adaptive-icon`, `splash-icon` y `favicon` desde el SVG |
 | `cd server && npm start` | Levanta el backend |
+| `cd server && npm test` | Pruebas del backend |
 
 `splash-icon.png` se muestra a 260 dp: si cambias `imageWidth` en `app.json`, cambia también `sizes.splashLogo` en `src/theme/spacing.js`.
 
@@ -431,6 +465,9 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 - [x] Brawl Stars, Clash Royale y Clash of Clans (API de Supercell)
 - [x] Dota 2, Fortnite, Apex Legends y PUBG (búsqueda por nombre y plataforma)
 - [x] Comparar dos jugadores
+- [x] Ranking, jugadores profesionales y seguir a un pro
+- [x] Progreso de LP y detalle de partida minuto a minuto
+- [x] Enfrentamientos: build, runas, orden de habilidades y counters por cruce de campeones
 
 La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
 

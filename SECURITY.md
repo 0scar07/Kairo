@@ -14,7 +14,7 @@ Si ves una key en el código o en el historial:
 
 ## Reportar una vulnerabilidad
 
-No abras un *issue* público. Escribe al mantenedor por mensaje privado en GitHub con una descripción y pasos para reproducirla.
+No abras un *issue* público. Repórtala en privado desde la pestaña **Security** del repositorio → [**Report a vulnerability**](https://github.com/0scar07/Kairo/security/advisories/new), con una descripción y pasos para reproducirla. Solo el mantenedor la ve.
 
 ## Backend
 
