@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+# Solo lee el repositorio: el token de GitHub del flujo no puede escribir nada
+permissions:
+  contents: read
+
 jobs:
   app:
     name: App (verificación y bundle)
