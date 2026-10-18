@@ -6,6 +6,8 @@
 
 **Cada partida cuenta.**
 
+**Español** · [English](README.en.md)
+
 Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale**, **Clash of Clans**, **Dota 2**, **Fortnite**, **Apex Legends** y **PUBG** en una app móvil premium, hecha con React Native y Expo.
 
 [![Versión](https://img.shields.io/github/v/release/0scar07/Kairo?label=versi%C3%B3n&color=35E0A1&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases/latest)

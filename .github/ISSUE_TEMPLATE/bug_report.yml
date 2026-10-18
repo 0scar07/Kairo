@@ -1,0 +1,75 @@
+name: Reportar un error
+description: Algo no funciona como debería
+title: "[Error] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisar. Antes de enviar, revisa [Problemas frecuentes](https://github.com/0scar07/Kairo#-problemas-frecuentes): muchas veces la solución ya está ahí.
+        **Nunca pegues una API key** en un issue. Si se te escapó una, mira [SECURITY.md](https://github.com/0scar07/Kairo/blob/main/SECURITY.md).
+  - type: dropdown
+    id: juego
+    attributes:
+      label: Juego
+      options:
+        - League of Legends
+        - Teamfight Tactics
+        - Brawl Stars
+        - Clash Royale
+        - Clash of Clans
+        - Dota 2
+        - Fortnite
+        - Apex Legends
+        - PUBG
+        - Toda la app / no depende del juego
+    validations:
+      required: true
+  - type: input
+    id: region
+    attributes:
+      label: Región o plataforma
+      placeholder: "LAN, EUW, KR… o PC, PlayStation, Xbox"
+  - type: textarea
+    id: que-paso
+    attributes:
+      label: ¿Qué pasó?
+      description: Qué buscaste o tocaste, qué esperabas y qué pasó en realidad.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Cómo reproducirlo
+      placeholder: |
+        1. Abrí…
+        2. Toqué…
+        3. Apareció…
+  - type: textarea
+    id: capturas
+    attributes:
+      label: Capturas o mensaje de error
+      description: Arrastra aquí capturas o pega el mensaje que mostró la app (sin tu API key).
+  - type: dropdown
+    id: instalacion
+    attributes:
+      label: Cómo la instalaste
+      options:
+        - APK de GitHub
+        - Obtainium
+        - Web en iPhone (pantalla de inicio)
+        - Expo Go
+        - Build propio
+    validations:
+      required: true
+  - type: input
+    id: dispositivo
+    attributes:
+      label: Dispositivo
+      placeholder: "Samsung A54 · Android 14"
+  - type: input
+    id: version
+    attributes:
+      label: Versión de la app
+      description: Está en Ajustes, al final.
+      placeholder: "1.5.0"

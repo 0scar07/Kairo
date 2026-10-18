@@ -1,0 +1,41 @@
+name: Proponer una mejora
+description: Una idea para Kairo
+title: "[Idea] "
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: juego
+    attributes:
+      label: ¿Para qué juego?
+      options:
+        - Toda la app
+        - League of Legends
+        - Teamfight Tactics
+        - Brawl Stars
+        - Clash Royale
+        - Clash of Clans
+        - Dota 2
+        - Fortnite
+        - Apex Legends
+        - PUBG
+        - Un juego nuevo
+    validations:
+      required: true
+  - type: textarea
+    id: problema
+    attributes:
+      label: ¿Qué problema resuelve?
+      description: Qué te falta hoy o qué te cuesta hacer.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: ¿Cómo lo imaginas?
+      description: Si tienes un boceto o una captura de otra app, arrástrala aquí.
+    validations:
+      required: true
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas que consideraste
