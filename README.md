@@ -47,7 +47,7 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 <a href="https://github.com/0scar07/Kairo/releases/latest/download/Kairo.apk"><img src="https://img.shields.io/badge/Descargar-APK-3DDC84?logo=android&logoColor=white&style=for-the-badge" alt="Descargar APK" height="54" align="middle" /></a>
 &nbsp;
-<a href="https://apps.obtainium.imranr.dev/redirect.html?r=obtainium%3A%2F%2Fadd%2Fhttps%3A%2F%2Fgithub.com%2F0scar07%2FKairo"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Obtainium" height="54" align="middle" /></a>
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.camavingaaa.kairo%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2F0scar07%2FKairo%22%2C%22author%22%3A%220scar07%22%2C%22name%22%3A%22Kairo%22%7D"><img src="docs/badges/obtainium.png" alt="Consíguelo en Obtainium" height="54" align="middle" /></a>
 
 </div>
 
