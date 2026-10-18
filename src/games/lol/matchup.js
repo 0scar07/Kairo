@@ -88,6 +88,14 @@ export function loadRuneNames() {
   return runesPromise;
 }
 
+// Quita las etiquetas repitiendo hasta que no quede ninguna (una etiqueta puede esconder otra) y los < o > sueltos
+function plainText(html) {
+  let text = String(html || "").replace(/<br\s*\/?>/gi, " ");
+  let prev;
+  do { prev = text; text = text.replace(/<[^<>]*>/g, ""); } while (text !== prev);
+  return text.replace(/[<>]/g, "").replace(/\s+/g, " ").trim();
+}
+
 const spellCache = {};
 // Habilidades de un campeón (por ID numérico): [{ key: "Q", name, text, cooldown, icon }] en el idioma activo
 export function loadAbilities(championKey) {
@@ -100,8 +108,8 @@ export function loadAbilities(championKey) {
       .then(({ data }) => (data.data?.[champ.id]?.spells || []).map((s, i) => ({
         key: "QWER"[i],
         name: s.name,
-        // La descripción trae etiquetas propias del juego (<br>, <magicDamage>…): se dejan solo las palabras (y ningún < o > suelto)
-        text: String(s.description || "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]*>/g, "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim(),
+        // La descripción trae etiquetas propias del juego (<br>, <magicDamage>…): se dejan solo las palabras
+        text: plainText(s.description),
         cooldown: s.cooldownBurn || null,
         icon: `${ddBase()}/img/spell/${s.image.full}`,
       })))
