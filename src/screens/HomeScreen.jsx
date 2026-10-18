@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useT } from "../i18n/I18nProvider";
 import { View, Text, TextInput, ScrollView, StyleSheet, Alert, TouchableOpacity, Platform, RefreshControl, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -13,6 +13,7 @@ import { select, warning, tap, success } from "../utils/haptics";
 import { Card, SectionLabel, PressableScale, EmptyState, showHud, Sheet, SheetAction } from "../components/ui";
 import { RegionButton } from "../components/RegionPicker";
 import FavoriteCard from "../components/FavoriteCard";
+import SuggestedPlayers from "../components/SuggestedPlayers";
 import Icon from "../components/Icon";
 import Reveal from "../components/Reveal";
 import Animated, { FadeIn, FadeOut, ReduceMotion, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
@@ -39,6 +40,7 @@ export default function HomeScreen({ navigation }) {
   } = useBootData();
   const [input,     setInput]     = useState("");
   const [favorites, setFavorites] = useState(bootFavorites);
+  const inputRef = useRef(null);
   const [recents,   setRecents]   = useState(bootRecents);
   const [platforms, setPlatforms] = useState({});   // plataforma elegida por juego (Fortnite, Apex, PUBG…)
   const [error,     setError]     = useState(null); // formato incorrecto: se muestra bajo el buscador, sin alertas
@@ -197,6 +199,7 @@ export default function HomeScreen({ navigation }) {
               <View style={[styles.field, focused && { borderColor: withAlpha(accent, 0.7) }]}>
               <Icon name="search" size={fontSizes.lg} color={colors.textMuted} />
               <TextInput
+                ref={inputRef}
                 value={input}
                 onChangeText={v => { setInput(v); if (error) setError(null); }}
                 onSubmitEditing={handleSearch}
@@ -337,12 +340,18 @@ export default function HomeScreen({ navigation }) {
               ))}
             </View>
           ) : (
-            <EmptyState
-              compact
-              icon="star"
-              title={t("home.noFavorites")}
-              text={t("home.noFavoritesText")}
-            />
+            <>
+              {/* Lo de siempre, más un atajo al buscador de arriba y, en LoL, jugadores del ranking para seguir */}
+              <EmptyState
+                compact
+                icon="star"
+                title={t("home.noFavorites")}
+                text={t("home.noFavoritesText")}
+                actionLabel={t("favorites.search")}
+                onAction={() => inputRef.current?.focus()}
+              />
+              {game.id === "lol" ? <SuggestedPlayers region={region} favorites={favorites} onChanged={setFavorites} onOpen={openProfile} /> : null}
+            </>
           )}
         </Reveal>
 

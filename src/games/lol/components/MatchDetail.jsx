@@ -4,6 +4,7 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { championIcon, itemIcon } from "../../../api/ddragon";
 import { spellIcon, perkIcon, perksOf } from "../assets";
 import Mini from "./Mini";
+import MatchTimeline from "./MatchTimeline";
 import { csOf, playerName } from "../utils";
 import Icon from "../../../components/Icon";
 import { formatDuration } from "../../../utils/format";
@@ -91,6 +92,8 @@ export default function MatchDetail({ match, myPuuid }) {
           <Text style={styles.teamStatLabel}>kills</Text>
         </View>
       </View>
+
+      <MatchTimeline match={match} myPuuid={myPuuid} />
 
       {[{ team: team1, win: team1Win }, { team: team2, win: !team1Win }].map(({ team, win }, ti) => (
         <View key={ti} style={[styles.teamBlock, ti === 0 && styles.teamBorder]}>

@@ -14,6 +14,7 @@ const es = require("../lib/esports");
  *   GET /leagues/:slug?tournamentId=     torneos de la liga y la clasificación del elegido (el más reciente por defecto)
  *   GET /teams/:slug                     equipo con su roster (foto, nombre y rol)
  *   GET /teams/:slug/stats?tournamentId= estadísticas de cada jugador del roster en ese torneo (y por campeón)
+ *   GET /teams/:slug/next                próxima partida oficial del equipo en cualquiera de esas ligas (o null)
  * Todas aceptan ?hl=es|en|pt|fr|de para los nombres de fases y grupos.
  */
 const PUBLIC_KEY = "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z";   // la que publica lolesports.com en su propia web
@@ -144,6 +145,22 @@ router.get("/teams/:slug/stats", handle(async (req, res) => {
       games: reduced.filter(Boolean).length,
       players: es.rosterStats(seriesList, String(t.id)),
     };
+  });
+  res.json(body);
+}));
+
+// Próxima partida del equipo: se miran los calendarios de todas las ligas de la app (un torneo internacional como el
+// Mundial también cuenta). Cada calendario se guarda 15 minutos y la respuesta por equipo 10.
+const nextCache = new TtlCache({ max: 300 });
+
+router.get("/teams/:slug/next", handle(async (req, res) => {
+  const hl = hlOf(req);
+  const slug = slugOf(req.params.slug);
+  const body = await nextCache.wrap(`${slug}:${hl}`, 10 * MIN, async () => {
+    const [t, list] = await Promise.all([team(slug, hl), leagues(hl)]);
+    const schedules = await Promise.all(list.map(l =>
+      gw.get("/getSchedule", { ttl: 15 * MIN, query: { hl, leagueId: l.id } }).then(r => data(r).schedule?.events || []).catch(() => [])));
+    return { team: { slug: t.slug, code: t.code, name: t.name, image: t.image }, next: es.nextMatch(schedules.flat(), t) };
   });
   res.json(body);
 }));

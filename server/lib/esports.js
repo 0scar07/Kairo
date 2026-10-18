@@ -258,4 +258,28 @@ function endTimestamp(startIso, minutes = 90) {
   return t.toISOString();
 }
 
-module.exports = { LEAGUES, pickLeagues, pickTournaments, pickStandings, pickTeam, teamSeries, reduceGame, seriesResults, rosterStats, teamIndex, standingsFromEvents, endTimestamp };
+/**
+ * Próxima partida oficial de un equipo en los calendarios (getSchedule) de las ligas: la primera que aún no termina,
+ * reconociendo al equipo por su código o su nombre. Las que siguen "en curso" cuentan (se están jugando ahora).
+ * -> { startTime, state, league: { slug, name }, block, bestOf, opponent: { code, name, image } } o null
+ */
+function nextMatch(events, team, now = Date.now()) {
+  const same = t => t && ((team.code && t.code === team.code) || (team.name && t.name === team.name));
+  const list = (events || [])
+    .filter(e => e && e.type !== "show" && e.state !== "completed" && e.match && (e.match.teams || []).some(same))
+    .filter(e => e.state === "inProgress" || Date.parse(e.startTime) >= now - 3_600_000)
+    .sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime));
+  const e = list[0];
+  if (!e) return null;
+  const rival = (e.match.teams || []).find(t => !same(t)) || {};
+  return {
+    startTime: e.startTime,
+    state: e.state,
+    league: { slug: e.league?.slug || null, name: e.league?.name || null },
+    block: e.blockName || null,
+    bestOf: e.match.strategy?.type === "bestOf" ? e.match.strategy.count : null,
+    opponent: { code: rival.code || null, name: rival.name || null, image: rival.image ? https(rival.image) : null },
+  };
+}
+
+module.exports = { nextMatch, LEAGUES, pickLeagues, pickTournaments, pickStandings, pickTeam, teamSeries, reduceGame, seriesResults, rosterStats, teamIndex, standingsFromEvents, endTimestamp };

@@ -1,5 +1,6 @@
-// Línea de tiempo de una partida (match-v5 /timeline) reducida a lo que dibuja la web: el oro, la experiencia y el
-// farmeo de cada jugador minuto a minuto y los objetivos grandes. La respuesta de Riot pesa cientos de KB; esta, pocos.
+// Línea de tiempo de una partida (match-v5 /timeline) reducida a lo que dibujan la web y la app: el oro, la experiencia y
+// el farmeo de cada jugador minuto a minuto, los objetivos grandes y las compras de objetos de cada uno (para el orden de
+// compra). La respuesta de Riot pesa cientos de KB; esta, pocos.
 
 // Objetivos que se marcan en el gráfico
 const MONSTERS = { DRAGON: "dragon", BARON_NASHOR: "baron", RIFTHERALD: "herald", HORDE: "grubs", ATAKHAN: "atakhan" };
@@ -27,9 +28,18 @@ function reduceTimeline(raw) {
   });
 
   const events = [];
+  // Compras por jugador, en orden: [[minuto, idObjeto], ...]. Un "deshacer" en la tienda borra la última compra de ese
+  // objeto (Riot lo manda como ITEM_UNDO con el objeto anterior en beforeId)
+  const buys = ids.map(() => []);
   for (const f of info.frames || []) {
     for (const e of f.events || []) {
-      if (e.type === "ELITE_MONSTER_KILL" && MONSTERS[e.monsterType]) {
+      const who = (e.participantId || 0) - 1;
+      if (e.type === "ITEM_PURCHASED" && buys[who] && e.itemId) {
+        buys[who].push([Math.floor((e.timestamp || 0) / 60_000), e.itemId]);
+      } else if (e.type === "ITEM_UNDO" && buys[who] && e.beforeId) {
+        const list = buys[who];
+        for (let i = list.length - 1; i >= 0; i--) if (list[i][1] === e.beforeId) { list.splice(i, 1); break; }
+      } else if (e.type === "ELITE_MONSTER_KILL" && MONSTERS[e.monsterType]) {
         events.push({ t: e.timestamp, type: MONSTERS[e.monsterType], team: e.killerTeamId ?? null, sub: e.monsterSubType || null });
       } else if (e.type === "BUILDING_KILL" && BUILDINGS[e.buildingType]) {
         // teamId es el dueño de la estructura: el objetivo se lo lleva el otro equipo
@@ -38,7 +48,7 @@ function reduceTimeline(raw) {
     }
   }
 
-  return { puuids, interval: info.frameInterval || 60_000, frames, events };
+  return { puuids, interval: info.frameInterval || 60_000, frames, events, buys };
 }
 
 module.exports = { reduceTimeline };

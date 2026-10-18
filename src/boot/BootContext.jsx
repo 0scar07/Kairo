@@ -4,6 +4,7 @@ import { DEFAULT_REGION } from "../constants/regions";
 import { saveRegion, saveHaptics } from "../utils/prefs";
 import { setHapticsEnabled } from "../utils/haptics";
 import { touchFavoritesHistory } from "../utils/historyTouch";
+import { syncProAlerts } from "../notifications/proAlerts";
 
 const BootContext = createContext({
   favorites: [], recents: [], region: DEFAULT_REGION, setRegion: () => {},
@@ -21,6 +22,8 @@ export function BootProvider({ boot, children }) {
 
   useEffect(() => { setHapticsEnabled(haptics); }, []);
   useEffect(() => { touchFavoritesHistory().catch(e => console.warn("Historial de favoritos:", e.message)); }, []);
+  // Reprograma los avisos de las partidas de los pros seguidos (por si cambió el horario o ya pasaron)
+  useEffect(() => { syncProAlerts().catch(e => console.warn("Avisos de pros:", e.message)); }, []);
 
   const retryServer = useCallback(async () => {
     try {

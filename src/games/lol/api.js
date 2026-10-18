@@ -36,6 +36,9 @@ export const getLive = (puuid, region) => client.get(`/live/${puuid}`, region);
 
 // Ranking de una región: { players: [{ puuid, gameName, tagLine, leaguePoints, wins, losses }], total }
 // tier: challenger | grandmaster | master; queue: RANKED_SOLO_5x5 | RANKED_FLEX_SR; limit hasta 50 por página
+// Línea de tiempo de una partida terminada (oro por minuto y compras de objetos; ver server/lib/timeline.js)
+export const getTimeline = async matchId => (await api.get(`/lol/match/${matchId}/timeline`)).data;
+
 export async function getLeaderboard(region, { tier = "challenger", queue = "RANKED_SOLO_5x5", start = 0, limit = 10 } = {}) {
   const r = await api.get("/lol/leaderboard", { params: { region, tier, queue, start, limit } });
   return { players: r.data || [], total: Number(r.headers?.["x-total-count"]) || null };

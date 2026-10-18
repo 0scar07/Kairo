@@ -32,7 +32,7 @@ export default function Skeleton({ width = "100%", height, radius = radii.md, st
             <Defs>
               <LinearGradient id="kairoSheen" x1="0" y1="0" x2="1" y2="0">
                 <Stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
-                <Stop offset="0.5" stopColor="#FFFFFF" stopOpacity="0.08" />
+                <Stop offset="0.5" stopColor="#FFFFFF" stopOpacity="0.13" />
                 <Stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
               </LinearGradient>
             </Defs>

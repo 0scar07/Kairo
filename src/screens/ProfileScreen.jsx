@@ -51,7 +51,7 @@ export default function ProfileScreen({ route }) {
   if (state.status === "error") {
     return <View style={styles.center}><ErrorState message={state.message} onRetry={retry} /></View>;
   }
-  return <ProfileSkeleton />;
+  return <ProfileSkeleton gameId={gameId} />;
 }
 
 const styles = StyleSheet.create({

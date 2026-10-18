@@ -12,14 +12,14 @@ import { colors, radii, sizes, spacing, type, useAccent, withAlpha } from "../th
 const VERSION = Constants.expoConfig?.version || "";
 // Revisión de las novedades dentro de la misma versión: las actualizaciones por aire no cambian la versión de la app,
 // así que al cambiar las novedades se sube este número para que vuelvan a mostrarse una vez
-const REVISION = 3;
+const REVISION = 4;
 const SEEN_ID = `${VERSION}#${REVISION}`;
 const ITEMS = [
-  { icon: "home",     title: "whatsNew.home.title",      text: "whatsNew.home.text" },
-  { icon: "user",     title: "whatsNew.splash.title",    text: "whatsNew.splash.text" },
-  { icon: "barChart", title: "whatsNew.recent.title",    text: "whatsNew.recent.text" },
-  { icon: "compare",  title: "whatsNew.teammates.title", text: "whatsNew.teammates.text" },
-  { icon: "zap",      title: "whatsNew.motion.title",    text: "whatsNew.motion.text" },
+  { icon: "trending", title: "whatsNew.lp.title",        text: "whatsNew.lp.text" },
+  { icon: "barChart", title: "whatsNew.match.title",     text: "whatsNew.match.text" },
+  { icon: "crown",    title: "whatsNew.pros.title",      text: "whatsNew.pros.text" },
+  { icon: "star",     title: "whatsNew.suggested.title", text: "whatsNew.suggested.text" },
+  { icon: "zap",      title: "whatsNew.loading.title",   text: "whatsNew.loading.text" },
 ];
 
 // Abrir la hoja desde otra pantalla (Ajustes › Novedades)

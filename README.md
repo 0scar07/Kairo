@@ -28,6 +28,15 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 <sub>Capturas renderizadas en un navegador móvil contra el backend real. En un celular los brillos y la háptica se ven distintos.</sub>
 
+<br />
+<br />
+
+### 🎬 Demostración de la app
+
+<a href="https://0scar07.github.io/Kairo/demo/kairo-demo.mp4"><img src="docs/demo/kairo-demo-poster.jpg" alt="Ver la demostración de Kairo (1:30)" width="100%" /></a>
+
+<sub>Un recorrido de 90 segundos por Kairo: los juegos, el perfil, el detalle de partida, Explorar y los pros. Toca la imagen para verlo o <a href="docs/demo/kairo-demo.mp4">descárgalo</a>.</sub>
+
 </div>
 
 ---

@@ -145,7 +145,7 @@ export default function MyProfileScreen() {
     );
   }
 
-  if (state.status === "loading") return <ProfileSkeleton />;
+  if (state.status === "loading") return <ProfileSkeleton gameId={gameId} />;
 
   return (
     <View style={styles.center}>

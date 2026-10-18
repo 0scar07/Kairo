@@ -16,6 +16,9 @@ export const getProTeam = slug => get(`/teams/${slug}`);
 // { tournamentId, series, games, players: { [playerId]: { games, wins, kda, killParticipation, ... champions } } }
 export const getProTeamStats = (slug, tournamentId) => get(`/teams/${slug}/stats`, { tournamentId });
 
+// Próxima partida oficial del equipo en cualquiera de las ligas de la app: { team, next } (next = null si no hay)
+export const getProNext = slug => get(`/teams/${slug}/next`);
+
 // "lck_split_3_2026" -> "Split 3 2026"; "msi_2026" -> "2026"; el nombre de la liga va aparte
 export function tournamentLabel(slug, leagueSlug) {
   const rest = String(slug || "").replace(new RegExp(`^${leagueSlug}_?`), "").replace(/_/g, " ").trim();

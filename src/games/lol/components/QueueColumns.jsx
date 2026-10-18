@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import Icon from "../../../components/Icon";
 import { useT } from "../../../i18n/I18nProvider";
 import { CountUp } from "../../../components/ui";
 import RankEmblem from "../../../components/RankEmblem";
@@ -11,26 +12,43 @@ import { colors, radii, sizes, spacing, fontSizes, type, tracking, winrateColor,
  * Solo/Dúo y Flex en dos columnas separadas por una línea (sin tarjetas): rango, LP, récord y, debajo,
  * los campeones con mejor winrate de esa cola en las partidas cargadas.
  *  - queues: [{ key, label, entry, best: [champStats], games }]
+ *  - onOpen(key): opcional; tocar una columna abre su progreso de LP (la columna lleva una flechita)
  */
-export default function QueueColumns({ queues }) {
+export default function QueueColumns({ queues, onOpen }) {
+  const t = useT();
   return (
     <View style={styles.wrap}>
       {queues.map(({ key, ...q }, i) => (
-        <View key={key} style={[styles.col, i > 0 && styles.colRight]}>
-          <Queue {...q} />
-        </View>
+        onOpen ? (
+          <Pressable
+            key={key}
+            onPress={() => onOpen(key)}
+            style={({ pressed }) => [styles.col, i > 0 && styles.colRight, pressed && styles.pressed]}
+            accessibilityRole="button"
+            accessibilityHint={t("lpHistory.open")}
+          >
+            <Queue {...q} openable />
+          </Pressable>
+        ) : (
+          <View key={key} style={[styles.col, i > 0 && styles.colRight]}>
+            <Queue {...q} />
+          </View>
+        )
       ))}
     </View>
   );
 }
 
-function Queue({ label, entry, best, games }) {
+function Queue({ label, entry, best, games, openable }) {
   const t = useT();
   const accent = useAccent("lol");
 
   return (
     <>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.labelRow}>
+        <Text style={styles.label}>{label}</Text>
+        {openable ? <Icon name="chevron" size={fontSizes.sm} color={colors.textMuted} /> : null}
+      </View>
       {entry ? (
         <>
           <View style={styles.tierRow}>
@@ -78,6 +96,8 @@ const styles = StyleSheet.create({
   col:       { flex: 1, paddingVertical: spacing.md, paddingRight: spacing.sm },
   colRight:  { borderLeftWidth: sizes.hairline, borderLeftColor: colors.border, paddingLeft: spacing.lg },
   label:     { ...type.label, color: colors.textMuted, letterSpacing: tracking.wide, textTransform: "uppercase" },
+  labelRow:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: spacing.xs },
+  pressed:   { opacity: 0.7 },
   tierRow:   { flexDirection: "row", alignItems: "center", gap: spacing.xs, marginTop: spacing.sm },
   tier:      { ...type.heading, fontSize: fontSizes.base, flexShrink: 1 },
   lpRow:     { flexDirection: "row", alignItems: "baseline", gap: spacing.xxs },

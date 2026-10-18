@@ -3,6 +3,7 @@ import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import { useT } from "../../i18n/I18nProvider";
 import { Chip, CountUp, ErrorState, RowSkeleton, SegmentedTabs } from "../../components/ui";
 import ChampionTable from "./components/ChampionTable";
+import ProFollow from "./components/ProFollow";
 import { Group, Ring, RING_SIZE } from "./components/SummaryRings";
 import { ROLE_KEYS, getProLeague, getProTeam, getProTeamStats, tournamentLabel } from "./esports";
 import { errorMessage, formatNumber, winrate } from "../../utils/format";
@@ -67,6 +68,8 @@ export default function ProPlayerScreen({ route, navigation }) {
           {player.image ? <Image source={{ uri: player.image }} style={styles.photo} resizeMode="cover" accessibilityIgnoresInvertColors /> : null}
         </View>
       ) : <RowSkeleton />}
+
+      {player ? <ProFollow player={player} team={team} slug={slug} leagueSlug={leagueSlug} /> : null}
 
       <SegmentedTabs tabs={[{ key: "summary", label: t("pros.tabSummary") }, { key: "champions", label: t("lol.tabChampions") }]} value={tab} onChange={setTab} game="lol" />
 

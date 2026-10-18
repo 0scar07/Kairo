@@ -3,6 +3,8 @@ import { useT } from "../i18n/I18nProvider";
 import { View, Text, ScrollView, StyleSheet, Alert, RefreshControl } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import FavoriteCard from "../components/FavoriteCard";
+import SuggestedPlayers from "../components/SuggestedPlayers";
+import FollowedPros from "../components/FollowedPros";
 import Reveal from "../components/Reveal";
 import Animated from "react-native-reanimated";
 import { LargeTitle, CompactTitleBar, useLargeTitle } from "../components/LargeTitle";
@@ -30,7 +32,7 @@ export default function FavoritesScreen({ navigation }) {
     catch (e) { setError(t("favorites.readError", { error: errorMessage(e) })); }
     setRefreshing(false);
   }
-  const { favorites: bootFavorites, gameEnabled } = useBootData();
+  const { favorites: bootFavorites, gameEnabled, region } = useBootData();
   const availableGames = GAMES.filter(g => gameEnabled(g.id));
   const [favorites, setFavorites] = useState(bootFavorites);
   const [filter, setFilter] = useState("all");
@@ -77,6 +79,8 @@ export default function FavoritesScreen({ navigation }) {
 
       <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
+      <FollowedPros navigation={navigation} />
+
       {known.length > 0 && (
         <Reveal order={1}>
           <View style={styles.filters}>
@@ -97,6 +101,7 @@ export default function FavoritesScreen({ navigation }) {
             actionLabel={t("favorites.search")}
             onAction={() => navigation.navigate("Inicio")}
           />
+          {availableGames.some(g => g.id === "lol") ? <SuggestedPlayers region={region} favorites={favorites} onChanged={setFavorites} onOpen={target => navigation.navigate("Profile", target)} /> : null}
         </Reveal>
       ) : visible.length === 0 ? (
         <EmptyState compact icon="search" title={t("favorites.emptyGame")} />

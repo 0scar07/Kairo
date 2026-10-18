@@ -37,3 +37,19 @@ test("reduceTimeline marca objetivos y da la torre al equipo que la destruyó", 
     { t: 700_000, type: "tower", team: 200 },
   ]);
 });
+
+test("reduceTimeline guarda las compras de cada jugador y descarta las deshechas", () => {
+  const out = reduceTimeline({
+    info: {
+      participants: [{ participantId: 1, puuid: "a" }, { participantId: 2, puuid: "b" }],
+      frames: [frame(0, 0, [
+        { type: "ITEM_PURCHASED", participantId: 1, itemId: 1055, timestamp: 1_000 },
+        { type: "ITEM_PURCHASED", participantId: 2, itemId: 1056, timestamp: 2_000 },
+        { type: "ITEM_PURCHASED", participantId: 1, itemId: 2003, timestamp: 3_000 },
+        { type: "ITEM_UNDO", participantId: 1, beforeId: 2003, afterId: 0, timestamp: 4_000 },
+        { type: "ITEM_PURCHASED", participantId: 1, itemId: 3006, timestamp: 485_000 },
+      ])],
+    },
+  });
+  assert.deepStrictEqual(out.buys, [[[0, 1055], [8, 3006]], [[0, 1056]]]);
+});

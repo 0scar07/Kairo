@@ -10,12 +10,17 @@ function splitRiotId(riotId) {
  * Abre la pantalla que corresponde al tocar una notificación (o su banner):
  *  - resumen semanal y cambios de rango -> el perfil del jugador
  *  - inicio y resultado de partida -> la partida en vivo
+ *  - partida oficial de un pro seguido -> la pantalla del pro
  */
 export function openFromNotification(data) {
   if (!data || data.demo) return;
   if (data.type === "weekly" || data.type === "rank_change") {
     const id = splitRiotId(data.riotId);
     if (id && data.region) navigateWhenReady("Profile", { gameId: "lol", gameName: id.gameName, tagLine: id.tagLine, region: data.region });
+    return;
+  }
+  if (data.type === "pro_match") {
+    if (data.slug && data.playerId) navigateWhenReady("ProPlayer", { slug: data.slug, playerId: data.playerId, leagueSlug: data.leagueSlug });
     return;
   }
   if (data.type === "trophy_record") {

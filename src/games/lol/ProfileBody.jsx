@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useT } from "../../i18n/I18nProvider";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Reveal from "../../components/Reveal";
 import {
   SectionLabel, SegmentedTabs, Chip, LoadMoreButton, Notice,
@@ -20,7 +21,6 @@ import { QUEUE_FLEX, QUEUE_SOLO, findMe, getBestChampions, getChampionStats, get
 import { championIcon, championLabel } from "../../api/ddragon";
 import Icon from "../../components/Icon";
 import LiveBanner from "./components/LiveBanner";
-import RankHistoryCard from "./components/RankHistoryCard";
 import { errorMessage } from "../../utils/format";
 import { colors, radii, sizes, spacing, fontSizes, type } from "../../theme";
 
@@ -30,6 +30,7 @@ const STRIP_MAX = 20;
 // Contenido del perfil de League of Legends (la cabecera, favoritos y refresco los pone el perfil genérico)
 export default function LolProfileBody({ data, setData, setError, mine }) {
   const t = useT();
+  const navigation = useNavigation();
   const tabs = [
     { key: "partidas",  label: t("lol.tabMatches"), icon: "gamepad" },
     { key: "campeones", label: t("lol.tabChampions"), icon: "trophy" },
@@ -119,11 +120,10 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
       <Reveal order={1}>
         {rankedError
           ? <Notice tone="warn">{t("ranked.error", { error: rankedError })}</Notice>
-          : <QueueColumns queues={queues} />}
-      </Reveal>
-
-      <Reveal order={2}>
-        <RankHistoryCard puuid={account.puuid} region={region} />
+          : <QueueColumns
+              queues={queues}
+              onOpen={queue => navigation.navigate("RankHistory", { puuid: account.puuid, region, queue, name: `${account.gameName} #${account.tagLine}` })}
+            />}
       </Reveal>
 
       {mastery && (

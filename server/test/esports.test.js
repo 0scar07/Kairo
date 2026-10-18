@@ -132,3 +132,20 @@ test("standingsFromEvents arma la tabla con las series terminadas cuando el torn
   assert.deepStrictEqual(out[0].rows.map(r => [r.position, r.slug, r.wins, r.losses]), [[1, "geng", 1, 1], [2, "g2", 1, 1], [3, "t1", 1, 1]]);
   assert.deepStrictEqual(es.standingsFromEvents([], index), []);
 });
+
+test("nextMatch da la primera partida sin terminar del equipo, con su rival", () => {
+  const { nextMatch } = require("../lib/esports");
+  const t1 = { code: "T1", name: "T1" };
+  const ev = (startTime, state, teams, extra = {}) => ({ startTime, state, type: "match", blockName: "Sistema Suizo", league: { slug: "worlds", name: "Worlds" }, match: { teams, strategy: { type: "bestOf", count: 1 } }, ...extra });
+  const now = Date.parse("2026-10-20T00:00:00Z");
+  const out = nextMatch([
+    ev("2026-10-19T10:00:00Z", "completed", [{ code: "T1" }, { code: "G2" }]),
+    ev("2026-10-24T10:00:00Z", "unstarted", [{ code: "GEN", name: "Gen.G", image: "http://x/gen.png" }, { code: "T1" }]),
+    ev("2026-10-22T10:00:00Z", "unstarted", [{ code: "BLG", name: "Bilibili" }, { code: "T1" }]),
+    ev("2026-10-21T10:00:00Z", "unstarted", [{ code: "HLE" }, { code: "KT" }]),
+  ], t1, now);
+  assert.strictEqual(out.startTime, "2026-10-22T10:00:00Z");
+  assert.deepStrictEqual(out.opponent, { code: "BLG", name: "Bilibili", image: null });
+  assert.strictEqual(out.bestOf, 1);
+  assert.strictEqual(nextMatch([], t1, now), null);
+});

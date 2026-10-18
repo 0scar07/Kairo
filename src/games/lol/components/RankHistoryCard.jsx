@@ -11,11 +11,11 @@ import { colors, fonts, radii, sizes, spacing, type, useAccent, withAlpha } from
 const H = 168;
 const PAD = { l: 8, r: 64, t: 12, b: 24 };   // el margen derecho lleva los nombres de los niveles
 
-const fmtDay = day => new Date(`${day}T12:00:00Z`).toLocaleDateString(activeLanguage(), { day: "numeric", month: "short", timeZone: "UTC" });
-const signed = n => `${n > 0 ? "+" : n < 0 ? "−" : ""}${Math.abs(n)}`;
+export const fmtDay = day => new Date(`${day}T12:00:00Z`).toLocaleDateString(activeLanguage(), { day: "numeric", month: "short", timeZone: "UTC" });
+export const signed = n => `${n > 0 ? "+" : n < 0 ? "−" : ""}${Math.abs(n)}`;
 
 // Gráfico de puntos de liga a lo largo del tiempo (línea con área, ejes por división y nombre del nivel al lado)
-function Chart({ series, color, width }) {
+export function Chart({ series, color, width }) {
   const scale = scaleFor(series);
   const w = Math.max(width, 120);
   const plotW = w - PAD.l - PAD.r, plotH = H - PAD.t - PAD.b;

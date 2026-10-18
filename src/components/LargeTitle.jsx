@@ -4,6 +4,7 @@ import Animated, {
   Extrapolation, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import Glass from "./ui/Glass";
 import { colors, sizes, spacing, type } from "../theme";
 
@@ -51,6 +52,19 @@ export function CompactTitleBar({ y, title, threshold = 56 }) {
     >
       {/* Barra pegada al borde: sin cantos iluminados, solo la línea inferior que la separa del contenido */}
       <Glass style={StyleSheet.absoluteFill} intensity={70} rim={false} />
+      {/* Borde de desplazamiento, como el de la barra inferior: el contenido se funde antes de pasar bajo la barra en vez
+          de cortarse en seco. Aparece con ella (vive dentro de la barra) y es un degradado, sin desenfoque */}
+      <Animated.View style={styles.edge}>
+        <Svg style={StyleSheet.absoluteFill} width="100%" height="100%">
+          <Defs>
+            <LinearGradient id="titleEdge" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor={colors.bg} stopOpacity="0.85" />
+              <Stop offset="1" stopColor={colors.bg} stopOpacity="0" />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#titleEdge)" />
+        </Svg>
+      </Animated.View>
       <Animated.Text style={[styles.compact, text]} numberOfLines={1}>{title}</Animated.Text>
     </Animated.View>
   );
@@ -64,4 +78,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: sizes.hairline, borderBottomColor: colors.border,
   },
   compact: { ...type.heading, color: colors.text, paddingHorizontal: spacing.xxxl },
+  edge:    { position: "absolute", top: "100%", left: 0, right: 0, height: spacing.xl + spacing.sm },
 });
