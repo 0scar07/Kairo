@@ -34,8 +34,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     backgroundColor: "rgba(14, 23, 30, 0.82)",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.14)",
+    borderColor: "rgba(230, 237, 246, 0.06)",
     backdropFilter: "blur(18px) saturate(1.3)",
-    boxShadow: "0 12px 30px rgba(0, 0, 0, 0.55)",
+    // Mismo acabado que el resto del cristal (ver GLASS_RIM y GLASS_LIFT en ui/Glass.jsx)
+    boxShadow: "inset 1px 1px 0 rgba(230, 237, 246, 0.2), inset -1px -1px 0 rgba(230, 237, 246, 0.08), inset 0 18px 22px -20px rgba(230, 237, 246, 0.1), 0 8px 24px rgba(0, 0, 0, 0.32), 0 1px 3px rgba(0, 0, 0, 0.25)",
   },
 });

@@ -7,6 +7,7 @@ import { CHIP_H, CHIP_W, chipScale, chipTop, neckWidth } from "./geometry";
 // Convierte el alfa suavizado por el desenfoque en un borde nítido: donde dos formas se acercan se funden como líquido
 // (metaballs). Es el truco clásico "gooey": Blur + ColorMatrix con la fila de alfa multiplicada y desplazada.
 const GOO = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 22, -9];
+const RIM = ["rgba(230, 237, 246, 0.2)", "rgba(230, 237, 246, 0.03)", "rgba(230, 237, 246, 0.08)"];
 
 /**
  * Fondo del banner en móvil, dibujado con Skia: la cápsula, el chip y el hilo entre ambos son formas que se funden.
@@ -34,6 +35,16 @@ export default function GlassBackdrop({ geo, width, height }) {
   const neckR = useDerivedValue(() => neckWidth(chip.value) / 2);
   const chipVisible = useDerivedValue(() => (chip.value > 0.01 ? 1 : 0));
 
+  // Canto iluminado de la cápsula, el mismo acabado que ui/Glass: un trazo de 1 px medio píxel hacia dentro, con la
+  // luz arriba que se apaga hacia abajo y un rebote tenue en el borde inferior
+  const rimX = useDerivedValue(() => (width - pw.value) / 2 + 0.5);
+  const rimY = useDerivedValue(() => py.value + 0.5);
+  const rimW = useDerivedValue(() => Math.max(0, pw.value - 1));
+  const rimH = useDerivedValue(() => Math.max(0, ph.value - 1));
+  const rimR = useDerivedValue(() => Math.max(0, ph.value / 2 - 0.5));
+  const rimStart = useDerivedValue(() => vec(0, py.value));
+  const rimEnd = useDerivedValue(() => vec(0, py.value + ph.value));
+
   return (
     <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
       {/* Sombra suave bajo la cápsula (aparte del efecto líquido, para no mezclar filtros de imagen) */}
@@ -60,6 +71,11 @@ export default function GlassBackdrop({ geo, width, height }) {
             <LinearGradient start={vec(0, 0)} end={vec(0, height)} colors={["#26343F", "#0E171E"]} />
           </RoundedRect>
         </Group>
+      </Group>
+      <Group opacity={alpha}>
+        <RoundedRect x={rimX} y={rimY} width={rimW} height={rimH} r={rimR} style="stroke" strokeWidth={1}>
+          <LinearGradient start={rimStart} end={rimEnd} positions={[0, 0.55, 1]} colors={RIM} />
+        </RoundedRect>
       </Group>
     </Canvas>
   );
