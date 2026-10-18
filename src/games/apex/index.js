@@ -42,5 +42,8 @@ export default {
 
   favoriteStat: fav => rankLabel(fav.apexRank),
 
+  // Banner de la leyenda seleccionada: es el fondo de Inicio
+  backdropKey: data => data.player?.legend?.banner || null,
+
   ProfileBody,
 };

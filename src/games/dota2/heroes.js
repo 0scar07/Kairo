@@ -33,3 +33,4 @@ export const heroById = id => byId[id] || null;
 export const heroName = id => byId[id]?.label || `#${id}`;
 const CDN = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes";
 export const heroIcon = id => (byId[id] ? `${CDN}/icons/${byId[id].name}.png` : null);
+export const heroImage = id => (byId[id] ? `${CDN.replace("/images/", "/videos/")}/renders/${byId[id].name}.png` : null);   // cuerpo entero, sin fondo
