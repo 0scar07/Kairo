@@ -220,6 +220,8 @@ export default {
   "settings.version": "{app} · version {version}",
   "whatsNew.title": "What's new in Kairo {version}",
   "whatsNew.continue": "Continue",
+  "whatsNew.matchups.title": "Matchups",
+  "whatsNew.matchups.text": "In the search: pick your champion and your opponent, and see the Challenger build, runes, skill order and counters.",
   "whatsNew.lp.title": "LP progress",
   "whatsNew.lp.text": "Tap Solo/Duo or Flex on a profile to see how that queue climbs over 7 days, 30 days or the season.",
   "whatsNew.match.title": "Every match, minute by minute",

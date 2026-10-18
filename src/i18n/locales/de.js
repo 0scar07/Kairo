@@ -222,6 +222,8 @@ export default {
   "settings.version": "{app} · Version {version}",
   "whatsNew.title": "Neu in Kairo {version}",
   "whatsNew.continue": "Weiter",
+  "whatsNew.matchups.title": "Matchups",
+  "whatsNew.matchups.text": "In der Lupe: Wähle deinen Champion und deinen Gegner und sieh Build, Runen, Fähigkeitenreihenfolge und Counter aus Challenger-Spielen.",
   "whatsNew.lp.title": "LP-Verlauf",
   "whatsNew.lp.text": "Tippe im Profil auf Solo/Duo oder Flex und sieh, wie die Warteschlange in 7 Tagen, 30 Tagen oder der Saison steigt.",
   "whatsNew.match.title": "Jedes Spiel, Minute für Minute",

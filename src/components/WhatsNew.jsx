@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Sheet, PressableScale } from "./ui";
@@ -12,9 +12,10 @@ import { colors, radii, sizes, spacing, type, useAccent, withAlpha } from "../th
 const VERSION = Constants.expoConfig?.version || "";
 // Revisión de las novedades dentro de la misma versión: las actualizaciones por aire no cambian la versión de la app,
 // así que al cambiar las novedades se sube este número para que vuelvan a mostrarse una vez
-const REVISION = 4;
+const REVISION = 5;
 const SEEN_ID = `${VERSION}#${REVISION}`;
 const ITEMS = [
+  { icon: "target",   title: "whatsNew.matchups.title",  text: "whatsNew.matchups.text" },
   { icon: "trending", title: "whatsNew.lp.title",        text: "whatsNew.lp.text" },
   { icon: "barChart", title: "whatsNew.match.title",     text: "whatsNew.match.text" },
   { icon: "crown",    title: "whatsNew.pros.title",      text: "whatsNew.pros.text" },
@@ -53,7 +54,8 @@ export default function WhatsNew() {
   return (
     <Sheet visible={open} onClose={() => setOpen(false)}>
       <Text style={styles.title} accessibilityRole="header">{t("whatsNew.title", { version: VERSION })}</Text>
-      <View style={styles.list}>
+      {/* En pantallas bajas la lista se desplaza y el botón queda siempre a la vista */}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
         {ITEMS.map(it => (
           <View key={it.title} style={styles.item}>
             <View style={[styles.icon, { backgroundColor: withAlpha(accent, 0.14) }]}>
@@ -65,7 +67,7 @@ export default function WhatsNew() {
             </View>
           </View>
         ))}
-      </View>
+      </ScrollView>
       <PressableScale haptic onPress={() => setOpen(false)} style={[styles.button, { backgroundColor: accent }]}>
         <Text style={styles.buttonText}>{t("whatsNew.continue")}</Text>
       </PressableScale>
@@ -77,6 +79,7 @@ const styles = StyleSheet.create({
   title:      { ...type.largeTitle, fontSize: type.title.fontSize + spacing.sm, color: colors.text, marginBottom: spacing.xl },
   list:       { gap: spacing.lg, marginBottom: spacing.xl },
   item:       { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
+  scroll:     { flexShrink: 1 },
   icon:       { width: sizes.avatarLg, height: sizes.avatarLg, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
   copy:       { flex: 1 },
   itemTitle:  { ...type.bodyStrong, fontSize: type.body.fontSize, color: colors.text },

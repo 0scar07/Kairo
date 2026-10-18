@@ -222,6 +222,8 @@ export default {
   "settings.version": "{app} · versão {version}",
   "whatsNew.title": "Novidades do Kairo {version}",
   "whatsNew.continue": "Continuar",
+  "whatsNew.matchups.title": "Confrontos",
+  "whatsNew.matchups.text": "Na lupa: escolha seu campeão e seu rival e veja a build, as runas, a ordem de habilidades e os counters do Desafiante.",
   "whatsNew.lp.title": "Progresso de PDL",
   "whatsNew.lp.text": "Toque em Solo/Duo ou Flex no perfil e veja a fila subir em 7 dias, 30 dias ou na temporada.",
   "whatsNew.match.title": "Cada partida, minuto a minuto",
