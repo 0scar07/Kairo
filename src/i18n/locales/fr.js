@@ -222,6 +222,8 @@ export default {
   "settings.version": "{app} · version {version}",
   "whatsNew.title": "Nouveautés de Kairo {version}",
   "whatsNew.continue": "Continuer",
+  "whatsNew.matchups.title": "Affrontements",
+  "whatsNew.matchups.text": "Dans la loupe : choisis ton champion et ton adversaire, et vois le build, les runes, l'ordre des compétences et les counters des Challenger.",
   "whatsNew.lp.title": "Progression des LP",
   "whatsNew.lp.text": "Touche Solo/Duo ou Flex sur le profil pour voir la file monter sur 7 jours, 30 jours ou la saison.",
   "whatsNew.match.title": "Chaque partie, minute par minute",
