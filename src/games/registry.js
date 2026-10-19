@@ -9,7 +9,8 @@ import fortnite from "./fortnite/meta";
 import apex from "./apex/meta";
 import pubg from "./pubg/meta";
 import valorant from "./valorant/meta";
+import wildrift from "./wildrift/meta";
 
-export const GAME_META = [lol, tft, brawlstars, clashroyale, clashofclans, dota2, fortnite, apex, pubg, valorant];
+export const GAME_META = [lol, tft, brawlstars, clashroyale, clashofclans, dota2, fortnite, apex, pubg, valorant, wildrift];
 
 export const getGameMeta = id => GAME_META.find(g => g.id === id);

@@ -7,6 +7,19 @@ Las descargas están en [GitHub Releases](https://github.com/0scar07/Kairo/relea
 
 ## v1.5.0 · por aire
 
+### 2026-10-19
+- **Wild Rift:** nuevo juego, sin buscador (Wild Rift no publica perfiles). Tier list S+ a D por carril y rango que
+  se ordena por victorias, elección o baneo y se comparte como imagen; ficha de cada campeón con su winrate por
+  rango; buscador A-Z y comparador de dos campeones; **Mis mains**; los que suben y bajan hoy y las últimas notas
+  del parche. Datos públicos del servidor de China; los esports solo aparecen si hubo partidos en los últimos 30 días.
+- **Valorant:** deja de estar «Próximamente» con su apartado de **esports**: el último campeón (o el partido en vivo),
+  la cuenta atrás del próximo partido, calendario por día, resultados, torneos con su premio y el detalle de cada
+  partido. Los perfiles de jugador siguen esperando la aprobación de Riot.
+- Íconos del selector de juego con el degradado de marca de cada juego (también los no elegidos) y emblema propio
+  de Wild Rift. Fondo de Inicio con el arte oficial del último parche en Wild Rift y un agente distinto cada día en
+  Valorant.
+- Servidor: rutas de Wild Rift y Valorant, y PandaScore para sus esports (`PANDASCORE_TOKEN`).
+
 ### 2026-10-18
 - **Enfrentamientos (LoL):** nueva pestaña en la lupa. Eliges tu campeón y tu rival, y ves la build que más gana
   contra él, la runa principal y los hechizos, el orden de habilidades, sus counters en la línea y las habilidades

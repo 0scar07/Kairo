@@ -35,6 +35,9 @@ export const colors = {
   placement: { first: "#FFD700", second: "#C0C0C0", third: "#CD7F32" },
   rank:      ["#FFD700", "#C0C0C0", "#CD7F32"],
 
+  // Tiers del meta de Wild Rift (de S+, el más fuerte, a D)
+  wrTier: { "S+": "#FF5D6C", S: "#FFAA2E", A: "#E6CF35", B: "#5CCB7A", C: "#7F92A8", D: "#5B6878" },
+
   tier: {
     IRON: "#8A8A8A", BRONZE: "#CD7F32", SILVER: "#A8A9AD",
     GOLD: "#FFD700", PLATINUM: "#00D4AA", EMERALD: "#50C878",
