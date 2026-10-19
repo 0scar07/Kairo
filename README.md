@@ -12,7 +12,10 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 [![Versión](https://img.shields.io/github/v/release/0scar07/Kairo?label=versi%C3%B3n&color=35E0A1&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases/latest)
 [![CI](https://github.com/0scar07/Kairo/actions/workflows/ci.yml/badge.svg)](https://github.com/0scar07/Kairo/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/0scar07/Kairo/badge)](https://scorecard.dev/viewer/?uri=github.com/0scar07/Kairo)
 ![Android](https://img.shields.io/badge/Android-APK-3DDC84?logo=android&logoColor=white)
+[![Descargas](https://img.shields.io/github/downloads/0scar07/Kairo/total?label=descargas&color=3DDC84&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases)
+[![Último cambio](https://img.shields.io/github/last-commit/0scar07/Kairo?label=%C3%BAltimo%20cambio&color=35E0A1)](https://github.com/0scar07/Kairo/commits/main)
 ![Juegos](https://img.shields.io/badge/juegos-9-C89B3C)
 ![Idiomas](https://img.shields.io/badge/idiomas-5-0BC4E3)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
@@ -475,7 +478,7 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 - [x] Progreso de LP y detalle de partida minuto a minuto
 - [x] Enfrentamientos: build, runas, orden de habilidades y counters por cruce de campeones
 
-La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md).
+La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md), y todo lo que ya salió, versión por versión, en [CHANGELOG.md](CHANGELOG.md).
 
 ## 🌐 Página pública y key de Riot
 
@@ -496,6 +499,12 @@ El repo incluye una [página del producto](docs/index.html) y una [política de 
 | Un perfil de Dota 2 casi vacío | El jugador no tiene activado "Exponer datos públicos de partidas" en Dota 2 |
 | Un juego de Supercell aparece como "PRONTO" o no aparece | El servidor no tiene su key configurada (`/health` → `games`). Ponla en las variables de entorno |
 | Íconos de TFT con iniciales | Data Dragon solo trae los sets vigentes; las partidas de sets antiguos usan un placeholder |
+
+## ⭐ Estrellas
+
+Si Kairo te sirve, una estrella ayuda a que más gente lo encuentre (y a que entre al catálogo de Obtainium).
+
+<a href="https://star-history.com/#0scar07/Kairo&Date"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=0scar07/kairo&type=Date&theme=dark" /><img src="https://api.star-history.com/svg?repos=0scar07/kairo&type=Date" alt="Estrellas de Kairo a lo largo del tiempo" width="600" /></picture></a>
 
 ## 🤝 Contribuir
 

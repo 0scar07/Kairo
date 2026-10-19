@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#070C0F" />
   <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://0scar07.github.io/Kairo/" />
+  <link rel="alternate" hreflang="es" href="https://0scar07.github.io/Kairo/" />
+  <link rel="alternate" hreflang="en" href="https://0scar07.github.io/Kairo/en.html" />
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
@@ -36,7 +38,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Sora:wght@800&display=swap" />
 
   <link rel="preload" as="image" href="landing/img/profile-lol.webp" fetchpriority="high" />
-  <link rel="stylesheet" href="landing/styles.css?v=20261011d" />
+  <link rel="stylesheet" href="landing/styles.css?v=20261018a" />
 
   <script>document.documentElement.classList.add("js");</script>
 
@@ -57,10 +59,10 @@
   }
   </script>
 
-  <script defer src="landing/lib/gsap.min.js?v=20261011d"></script>
-  <script defer src="landing/lib/ScrollTrigger.min.js?v=20261011d"></script>
-  <script defer src="landing/lib/manifest.js?v=20261011d"></script>
-  <script defer src="landing/main.js?v=20261011d"></script>
+  <script defer src="landing/lib/gsap.min.js?v=20261018a"></script>
+  <script defer src="landing/lib/ScrollTrigger.min.js?v=20261018a"></script>
+  <script defer src="landing/lib/manifest.js?v=20261018a"></script>
+  <script defer src="landing/main.js?v=20261018a"></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -361,7 +363,7 @@
               <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-chart" /></svg></span>
               <h3>Historial de rango</h3>
             </div>
-            <p>Una foto diaria de tu rango, convertida en la curva de LP de Solo/Dúo y Flex. Mira de un vistazo cuánto subiste esta semana y este mes.</p>
+            <p>Una foto diaria de tu rango, convertida en la curva de LP de Solo/Dúo y Flex. Toca la cola en el perfil y mira cuánto subiste en 7 días, 30 días o la temporada.</p>
             <div class="rankup" data-rankup role="img" aria-label="Ejemplo: ascenso de Platinum I a Emerald IV">
               <span class="rankup-emblem" aria-hidden="true">
                 <img class="re-from" src="landing/img/ranks/platinum.webp" alt="" width="200" height="171" loading="lazy" decoding="async" />
@@ -486,6 +488,26 @@
             <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-globe" /></svg></span>
             <h3>5 idiomas</h3>
             <p>Español, English, Português, Français y Deutsch.</p>
+          </article>
+          <article class="card card-mini" data-reveal data-glow>
+            <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-shield" /></svg></span>
+            <h3>Enfrentamientos</h3>
+            <p>Tu campeón contra el rival: build, runas, orden de habilidades y counters de Challenger.</p>
+          </article>
+          <article class="card card-mini" data-reveal data-glow>
+            <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-trend-up" /></svg></span>
+            <h3>Minuto a minuto</h3>
+            <p>La diferencia de oro de cada partida y el orden en que se compró cada objeto.</p>
+          </article>
+          <article class="card card-mini" data-reveal data-glow>
+            <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-trophy" /></svg></span>
+            <h3>Sigue a un pro</h3>
+            <p>Su próxima partida oficial y un aviso 15 minutos antes de que empiece.</p>
+          </article>
+          <article class="card card-mini" data-reveal data-glow>
+            <span class="card-icon"><svg class="ic" aria-hidden="true"><use href="#i-compass" /></svg></span>
+            <h3>Sugeridos</h3>
+            <p>¿Sin favoritos aún? Te proponemos jugadores Challenger de tu región.</p>
           </article>
         </div>
 
@@ -632,6 +654,20 @@
               <figure class="step-shot"><img src="landing/img/live-red-lol.webp" alt="" width="600" height="1298" loading="lazy" decoding="async" /></figure>
             </li>
           </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIDEO ============ -->
+    <section class="section demo" id="demo" aria-labelledby="demo-title">
+      <div class="container">
+        <header class="section-head" data-reveal>
+          <p class="kicker">Demostración</p>
+          <h2 id="demo-title" data-lines>Kairo en 90 segundos.</h2>
+          <p class="section-lead">Los juegos, el perfil, cada partida minuto a minuto, Explorar y los pros. Empieza sin sonido; actívalo en el reproductor.</p>
+        </header>
+        <div class="demo-frame" data-reveal>
+          <video class="demo-video" data-demo-video src="demo/kairo-demo.mp4" poster="demo/kairo-demo-poster.jpg" controls muted loop playsinline preload="none" aria-label="Video de demostración de Kairo"></video>
         </div>
       </div>
     </section>
@@ -859,6 +895,7 @@
           <a href="privacy.html"><svg class="ic" aria-hidden="true"><use href="#i-shield" /></svg>Política de privacidad</a>
           <a href="https://github.com/0scar07/Kairo/blob/main/LICENSE"><svg class="ic" aria-hidden="true"><use href="#i-scale" /></svg>Licencia MIT</a>
           <a href="https://0scar07.github.io/Kairo/app/"><svg class="ic" aria-hidden="true"><use href="#i-globe" /></svg>Versión web</a>
+          <a href="en.html" hreflang="en" lang="en"><svg class="ic" aria-hidden="true"><use href="#i-globe" /></svg>English</a>
         </nav>
       </div>
       <p class="legal">Kairo no está respaldada por Riot Games, Supercell, Valve, Epic Games, Electronic Arts ni KRAFTON. Todas las marcas pertenecen a sus dueños.</p>

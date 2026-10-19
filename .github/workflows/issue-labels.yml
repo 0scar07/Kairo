@@ -1,0 +1,45 @@
+name: Etiqueta del juego
+
+# Cuando alguien abre (o edita) un issue con los formularios, lee el juego que eligió y le pone su etiqueta
+# (lol, brawl-stars…). El texto del issue solo se lee como datos dentro del script, nunca se ejecuta.
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const LABELS = {
+              "League of Legends": "lol",
+              "Teamfight Tactics": "tft",
+              "Brawl Stars": "brawl-stars",
+              "Clash Royale": "clash-royale",
+              "Clash of Clans": "clash-of-clans",
+              "Dota 2": "dota-2",
+              "Fortnite": "fortnite",
+              "Apex Legends": "apex-legends",
+              "PUBG": "pubg",
+              "Toda la app": "toda-la-app",
+              "Toda la app / no depende del juego": "toda-la-app",
+              "Un juego nuevo": "juego-nuevo",
+            };
+            const body = context.payload.issue.body || "";
+            // Los formularios guardan cada respuesta como "### Pregunta" y, debajo, la opción elegida
+            const match = body.match(/^###\s*(?:Juego|¿Para qué juego\?)\s*\n+([^\n]+)/m);
+            const label = match && LABELS[match[1].trim()];
+            if (!label) return;
+            const current = (context.payload.issue.labels || []).map(l => l.name);
+            if (current.includes(label)) return;
+            // Al editar, se quita la etiqueta de juego anterior para que no queden dos
+            const stale = current.filter(name => Object.values(LABELS).includes(name));
+            for (const name of stale) {
+              await github.rest.issues.removeLabel({ ...context.repo, issue_number: context.issue.number, name }).catch(() => {});
+            }
+            await github.rest.issues.addLabels({ ...context.repo, issue_number: context.issue.number, labels: [label] });

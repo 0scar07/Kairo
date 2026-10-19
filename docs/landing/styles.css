@@ -1250,3 +1250,7 @@ html:not(.js) .live-step { min-height: 0; padding: 1.8rem; border: 1px solid var
   }
   .float-card, .live-timer, .nav.is-scrolled { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+
+/* Video de demostración */
+.demo-frame { margin-top: 2.4rem; border-radius: 24px; overflow: hidden; border: 1px solid var(--hairline-strong); background: var(--bg); box-shadow: 0 30px 80px -40px rgba(0, 0, 0, .8); }
+.demo-video { display: block; width: 100%; aspect-ratio: 16 / 9; background: var(--bg); }
