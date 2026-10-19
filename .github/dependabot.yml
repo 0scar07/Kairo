@@ -1,0 +1,15 @@
+# Dependabot solo revisa las acciones de GitHub de los flujos (están fijadas por commit) y propone un PR al mes
+# si hay una versión nueva. Las dependencias de la app y del servidor NO van aquí: se actualizan a mano y probando
+# antes, porque Expo y React Native se mueven juntos.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      acciones:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(ci)"
