@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 
 // Logos de los juegos como SVG (LoL, Valorant, Dota 2, Fortnite y PUBG: Simple Icons, CC0; TFT: ícono del selector de juego del cliente
 // vía Community Dragon). Son de una sola tinta, así que toman el color que se les pase.
@@ -45,6 +45,25 @@ const LOGOS = {
   }
 };
 
+// Wild Rift: emblema propio (escudo con una W calada), para no confundirlo con el de LoL
+LOGOS.wildrift = {
+  viewBox: "0 0 24 24",
+  fillRule: "evenodd",
+  paths: ["M12 1.2 21.4 6.1v11.8L12 22.8 2.6 17.9V6.1z M6.3 7.4h2.2l1.4 5.7 1.3-3.9h1.6l1.3 3.9 1.4-5.7h2.2l-2.5 9.1h-2L12 12.8l-1.2 3.7h-2z"],
+};
+
+// Degradado de marca de cada logo de una tinta (de arriba a abajo), para el selector de juego
+const BRAND = {
+  lol:      ["#F3D58A", "#B8862B"],
+  tft:      ["#6FF0FF", "#0A8FB0"],
+  dota2:    ["#FF6A50", "#B3261E"],
+  fortnite: ["#D19BFF", "#7C3AED"],
+  pubg:     ["#FFD27A", "#D9861A"],
+  wildrift: ["#6FE6FF", "#7B6CFF"],
+  valorant: ["#FF7A86", "#E0283F"],
+};
+let gradientId = 0;
+
 // Juegos de Supercell: el ícono de la app del juego (a color, así que no toman `color`; `muted` los atenúa)
 const IMAGE_LOGOS = {
   brawlstars:   require("../../assets/games/brawlstars.png"),
@@ -53,21 +72,36 @@ const IMAGE_LOGOS = {
   apex:         { source: require("../../assets/games/apex.png"), tint: true },   // la "A" del logo, de una sola tinta
 };
 
-export default function GameLogo({ game, size, color, style, muted }) {
+/**
+ * Logo de un juego. `color` pinta los de una tinta; `brand` los pinta con el degradado de su juego (y la "A" de Apex
+ * con `color`); `dim` los atenúa sin quitarles el color (juego disponible pero no elegido); `muted`, para "pronto".
+ */
+export default function GameLogo({ game, size, color, style, muted, brand, dim }) {
+  const [gid] = useState(() => `gameLogo${++gradientId}`);
+  const fade = dim ? { opacity: 0.75 } : null;
   if (IMAGE_LOGOS[game]) {
     const { source, tint } = IMAGE_LOGOS[game].source ? IMAGE_LOGOS[game] : { source: IMAGE_LOGOS[game], tint: false };
     return (
       <Image
         source={source}
-        style={[{ width: size, height: size, borderRadius: tint ? 0 : size * 0.22, opacity: muted ? 0.45 : 1 }, tint && { tintColor: color }, style]}
+        style={[{ width: size, height: size, borderRadius: tint ? 0 : size * 0.22, opacity: muted ? 0.45 : 1 }, tint && { tintColor: color }, fade, style]}
       />
     );
   }
   const logo = LOGOS[game];
   if (!logo) return null;
+  const stops = brand && !muted ? BRAND[game] : null;
   return (
-    <Svg width={size} height={size} viewBox={logo.viewBox} style={style}>
-      {logo.paths.map((d, i) => <Path key={i} d={d} fill={color} />)}
+    <Svg width={size} height={size} viewBox={logo.viewBox} style={[fade, style]}>
+      {stops ? (
+        <Defs>
+          <LinearGradient id={gid} x1="0" y1="0" x2="0.6" y2="1">
+            <Stop offset="0" stopColor={stops[0]} />
+            <Stop offset="1" stopColor={stops[1]} />
+          </LinearGradient>
+        </Defs>
+      ) : null}
+      {logo.paths.map((d, i) => <Path key={i} d={d} fill={stops ? `url(#${gid})` : color} fillRule={logo.fillRule} />)}
     </Svg>
   );
 }

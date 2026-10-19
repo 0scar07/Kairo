@@ -25,7 +25,9 @@ export default function SearchScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { gameId, accent, setGameId } = useActiveGame();
   const { region, setRegion, gameEnabled } = useBootData();
-  const game = getGame(gameId) || GAMES[0];
+  // Los juegos sin perfiles de jugador (Wild Rift) no se buscan: se usa el primero que sí
+  const active = getGame(gameId);
+  const game = active && !active.browseOnly ? active : GAMES[0];
   const [input, setInput] = useState("");
   const [error, setError] = useState(null);
   const [platforms, setPlatforms] = useState({});
@@ -74,13 +76,13 @@ export default function SearchScreen({ navigation }) {
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]}>
         {/* Juego en el que se busca (es el mismo juego activo de Inicio) */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={styles.games} contentContainerStyle={styles.gamesRow}>
-          {GAMES.filter(g => gameEnabled(g.id)).map(g => (
+          {GAMES.filter(g => gameEnabled(g.id) && !g.browseOnly).map(g => (
             <Chip
               key={g.id}
               label={g.short}
               game={g.id}
               active={g.id === game.id}
-              icon={<GameLogo game={g.id} size={sizes.avatarXs} color={g.id === game.id ? g.accent : colors.textMuted} muted={g.id !== game.id} />}
+              icon={<GameLogo game={g.id} size={sizes.avatarXs} color={g.accent} brand dim={g.id !== game.id} />}
               onPress={() => { if (g.id !== game.id) setGameId(g.id); }}
             />
           ))}

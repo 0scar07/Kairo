@@ -8,7 +8,7 @@
 
 **Español** · [English](README.en.md)
 
-Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale**, **Clash of Clans**, **Dota 2**, **Fortnite**, **Apex Legends** y **PUBG** en una app móvil premium, hecha con React Native y Expo.
+Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Tactics**, **Brawl Stars**, **Clash Royale**, **Clash of Clans**, **Dota 2**, **Fortnite**, **Apex Legends**, **PUBG**, **Wild Rift** (meta de campeones) y **Valorant** (esports) en una app móvil premium, hecha con React Native y Expo.
 
 [![Versión](https://img.shields.io/github/v/release/0scar07/Kairo?label=versi%C3%B3n&color=35E0A1&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases/latest)
 [![CI](https://github.com/0scar07/Kairo/actions/workflows/ci.yml/badge.svg)](https://github.com/0scar07/Kairo/actions/workflows/ci.yml)
@@ -17,7 +17,7 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 ![Android](https://img.shields.io/badge/Android-APK-3DDC84?logo=android&logoColor=white)
 [![Descargas](https://img.shields.io/github/downloads/0scar07/Kairo/total?label=descargas&color=3DDC84&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases)
 [![Último cambio](https://img.shields.io/github/last-commit/0scar07/Kairo?label=%C3%BAltimo%20cambio&color=35E0A1)](https://github.com/0scar07/Kairo/commits/main)
-![Juegos](https://img.shields.io/badge/juegos-9-C89B3C)
+![Juegos](https://img.shields.io/badge/juegos-11-C89B3C)
 ![Idiomas](https://img.shields.io/badge/idiomas-5-0BC4E3)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
 
@@ -104,7 +104,7 @@ https://github.com/user-attachments/assets/d742c1f1-c26e-4f44-955c-a063e2840adc
 - **Perfiles sin conexión:** la app guarda lo último que viste de cada jugador y lo abre aunque no haya internet.
 - **Actualizaciones sin reinstalar:** los cambios de pantallas y textos llegan al abrir la app (ver [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)); solo los cambios nativos piden un APK nuevo.
 
-TFT y LoL comparten la búsqueda por **Riot ID** con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada. **Valorant** llegará cuando Riot apruebe una *production key* (su API de partidas la exige).
+TFT y LoL comparten la búsqueda por **Riot ID** con selector de **región** (LAN, LAS, NA, BR, EUW, EUNE, TR, KR, JP, OCE) que recuerda la última usada. Los **perfiles de Valorant** llegarán cuando Riot apruebe una *production key* (su API de partidas la exige); mientras tanto Valorant ya tiene su apartado de **esports** (ver abajo).
 
 ### Supercell
 
@@ -127,12 +127,26 @@ Se buscan por **`#TAG`** y no tienen regiones.
 
 Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita. Todas se buscan por nombre y cada una recuerda su plataforma.
 
+### Wild Rift y Valorant
+
+Ninguno de los dos publica perfiles de jugador (Wild Rift no tiene API pública y la de Valorant pide aprobación de Riot), así que no tienen buscador: su Inicio va directo a lo que sí hay.
+
+| | Wild Rift | Valorant |
+|---|---|---|
+| **Inicio** | Arte oficial del último parche, tier list, atajos al buscador y al comparador, **Mis mains**, top del parche, **los que suben y bajan hoy** y las últimas notas del parche | Un agente distinto cada día, el **último campeón** (o el partido en vivo), la **cuenta atrás** del próximo partido y los torneos que vienen con su premio |
+| **Tier list / Calendario** | Tiers S+ a D por carril (Barón, Jungla, Medio, Dragón, Soporte) y rango (Diamante, Maestro, Retador, Leyenda); se ordena por tier, victorias, elección o baneo y **se comparte como imagen** | Próximos por día, resultados y torneos, agrupados por torneo |
+| **Detalle** | Ficha del campeón con anillos de victorias, elección y baneo y su winrate en cada rango; estrella para guardarlo en **Mis mains** | Partido con los dos equipos, marcador, quién ganó cada mapa, fase del torneo y enlace a la transmisión |
+| **Extra** | Buscador de campeones A-Z por carril y **comparador** de dos campeones lado a lado | Esports de VCT, Champions, Masters, Game Changers y torneos de tercer nivel |
+| **Datos** | Estadísticas públicas del servidor de China (una vez al día) y noticias de la web oficial | PandaScore (`PANDASCORE_TOKEN`, gratis) |
+
+Wild Rift no publica builds ni counters en ninguna fuente pública, así que la app no los inventa. Los esports de Wild Rift también salen de PandaScore y su tarjeta solo aparece si hubo partidos en los últimos 30 días.
+
 ### En toda la app
 
 - **Cinco idiomas:** español, English, Português, Français y Deutsch. Se elige solo según el idioma del dispositivo o a mano en Ajustes, se recuerda, y cambia los textos, los nombres de los campeones de LoL (Data Dragon), los mensajes de error del servidor y el formato de los números.
-- **Multijuego:** nueve juegos con un módulo cada uno; las pantallas genéricas no conocen ninguno. Cada juego se activa solo si el servidor tiene su key, y lo que no esté disponible aparece como "PRONTO" en vez de dar errores.
+- **Multijuego:** once juegos con un módulo cada uno; las pantallas genéricas no conocen ninguno. Cada juego se activa solo si el servidor tiene su key, y lo que no esté disponible aparece como "PRONTO" en vez de dar errores.
 - **Favoritos** con tarjetas (ícono, rango o trofeos con el color del juego) y **búsquedas recientes**; funcionan igual en los cinco juegos.
-- **Identidad visual:** acento propio por juego con transición suave, logos e íconos oficiales de cada juego y **cero emojis** (íconos vectoriales propios en SVG que toman el color del juego).
+- **Identidad visual:** acento propio por juego con transición suave, logos oficiales de cada juego con su **degradado de marca** en el selector (Wild Rift con emblema propio) y **cero emojis** (íconos vectoriales propios en SVG que toman el color del juego).
 - **Pantalla de carga animada** con progreso real de arranque, aparición escalonada de las secciones, skeletons, estados vacíos amables y errores con botón de reintentar.
 - **Háptica** y escala sutil al presionar; barra de navegación flotante tipo *pill*, neutra, con el botón de la lupa al lado; pestañas subrayadas.
 
@@ -224,7 +238,7 @@ Dota 2 usa OpenDota (sin key); Fortnite, Apex y PUBG necesitan una key gratuita.
 | App | React Native 0.86 · Expo SDK 57 · React Navigation 7 |
 | Animación | Reanimated 4 · Skia (`@shopify/react-native-skia`, banner líquido) · SVG (`react-native-svg`) · `expo-haptics` |
 | Diseño | Sistema propio de *tokens* (`src/theme`) · Sora + Inter (`@expo-google-fonts`) |
-| Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · OpenDota · Fortnite-API · Apex Legends Status · API de PUBG · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) · LoL Esports (lolesports.com y su feed de estadísticas) |
+| Datos | Backend Express 5 · API de Riot · API de Supercell (vía proxy de IP fija) · OpenDota · Fortnite-API · Apex Legends Status · API de PUBG · Data Dragon (íconos, campeones, runas, TFT) · Brawlify (íconos de Brawl Stars) · LoL Esports (lolesports.com y su feed de estadísticas) · estadísticas públicas de Wild Rift (servidor de China) y su web oficial · PandaScore (esports de Wild Rift y Valorant) · valorant-api.com (arte de agentes) |
 | Notificaciones | `expo-notifications` + Expo Push (FCM en Android) · vigilante de partidas en el backend · Postgres (Neon) para los dispositivos, el historial de LP y las builds de Challenger |
 | Almacenamiento | AsyncStorage (favoritos, recientes, preferencias) |
 
@@ -316,6 +330,7 @@ Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad
 | `*_API_BASE` | Otra URL base para esos juegos (por defecto los proxies de RoyaleAPI, que dan una IP fija) |
 | `FORTNITE_API_KEY` · `APEX_API_KEY` · `PUBG_API_KEY` | Keys gratuitas de Fortnite-API, Apex Legends Status y PUBG (opcionales: cada juego se activa al ponerla) |
 | `OPENDOTA_API_KEY` | Opcional: Dota 2 funciona sin key; con ella suben los límites de OpenDota |
+| `PANDASCORE_TOKEN` | Token gratuito de [PandaScore](https://pandascore.co) para los esports de Wild Rift y Valorant (sin él, Valorant aparece como "PRONTO" y Wild Rift funciona sin esports) |
 | `LOLESPORTS_API_KEY` | Opcional: key de la API de lolesports.com (por defecto la pública que usa su web) |
 | `DATABASE_URL` | Postgres para dispositivos, historial de LP y builds (sin ella, un archivo JSON local) |
 | `WATCHER_ENABLED` · `WATCH_INTERVAL_MS` · `WATCH_MAX_PER_TICK` | Vigilante de partidas en vivo: encendido (por defecto sí), cada cuánto revisa (`120000` ms) y cuántos jugadores por vuelta (`40`) |
@@ -383,6 +398,16 @@ Otros juegos (por nombre; la plataforma va en `?platform=`):
 | `GET /apex/player/:name?platform=PC\|PS4\|X1` | Rango, leyenda seleccionada, totales y estado |
 | `GET /pubg/player/:name?platform=steam\|psn\|xbox\|kakao` | Temporada, clasificatoria y últimas partidas |
 
+Wild Rift y Valorant (sin perfiles de jugador):
+
+| Ruta | Descripción |
+|------|-------------|
+| `GET /wildrift/meta?rank=diamond\|master\|challenger\|legend` | Tier list por carril del rango elegido, ordenada por fuerza |
+| `GET /wildrift/champion/:heroId` | Un campeón en cada rango y carril donde aparece |
+| `GET /wildrift/news?lang=es\|en\|pt\|fr\|de` | Últimas actualizaciones del juego de la web oficial (las notas del parche llevan `patch: true`) |
+| `GET /wildrift/esports` · `GET /valorant/esports` | En vivo, próximos, resultados y torneos (Valorant suma los próximos torneos y el último campeón) |
+| `GET /valorant/match/:id` | Detalle de un partido de Valorant |
+
 Notificaciones y sincronización (sin cuentas: cada celular se registra con su token y un secreto propio):
 
 | Ruta | Descripción |
@@ -428,6 +453,8 @@ Base casi negra con un toque verdoso, superficies en capas y bordes sutiles. Cad
 | Fortnite | ![#A855F7](https://img.shields.io/badge/-%23A855F7-A855F7) | Acento de Fortnite |
 | Apex Legends | ![#E23E57](https://img.shields.io/badge/-%23E23E57-E23E57) | Acento de Apex Legends |
 | PUBG | ![#F5A623](https://img.shields.io/badge/-%23F5A623-F5A623) | Acento de PUBG |
+| Wild Rift | ![#4FC3F7](https://img.shields.io/badge/-%234FC3F7-4FC3F7) | Acento de Wild Rift |
+| Valorant | ![#FF4655](https://img.shields.io/badge/-%23FF4655-FF4655) | Acento de Valorant |
 | Victoria | ![#4FC97A](https://img.shields.io/badge/-%234FC97A-4FC97A) | Resultado positivo |
 | Derrota | ![#E05555](https://img.shields.io/badge/-%23E05555-E05555) | Resultado negativo |
 
@@ -457,7 +484,7 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 
 1. Crea `src/games/<id>/` con `meta.js` (id, nombre, acento…; los textos van en `src/i18n/locales/`) e `index.js` (`api.search`, `getProfile`, `toFavorite`, `ProfileBody`). Si el juego se busca solo por tag y no tiene regiones, añade `tagSearch: true` y `hasRegion: false` al `meta.js`.
 2. Regístralo en `src/games/registry.js` (metadatos) y `src/games/index.js` (módulo completo).
-3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`. Si es de Supercell, añádelo a `GAMES` en `server/lib/supercell.js` y móntalo con `createSupercellRouter`. Para otras APIs de terceros usa `createUpstream` (`server/lib/upstream.js`) como en `server/routes/dota2.js`, y regístrala en `server/lib/extra.js`. Los juegos que se buscan por nombre declaran `search: "name"` (y `platforms`, o `searchResults` si el nombre se repite) en su `meta.js`.
+3. Si su API de Riot tiene la misma forma, añade `server/routes/<id>.js` con `createGameRouter` y móntalo en `server/index.js`. Si es de Supercell, añádelo a `GAMES` en `server/lib/supercell.js` y móntalo con `createSupercellRouter`. Para otras APIs de terceros usa `createUpstream` (`server/lib/upstream.js`) como en `server/routes/dota2.js`, y regístrala en `server/lib/extra.js`. Los juegos que se buscan por nombre declaran `search: "name"` (y `platforms`, o `searchResults` si el nombre se repite) en su `meta.js`. Los que no tienen perfiles de jugador (Wild Rift, Valorant) declaran `browseOnly: true`: Inicio oculta el buscador y los favoritos y muestra solo sus `HomeExtras`.
 
 ## 🗺️ Roadmap
 
@@ -467,7 +494,7 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 - [x] Backend listo para la nube (límite de peticiones, CORS, Docker, `render.yaml`)
 - [x] Backend desplegado en la nube (Render) y APK de prueba con EAS
 - [ ] Publicar con una *Production API Key* de Riot
-- [ ] Valorant (requiere aprobación de Riot)
+- [ ] Perfiles de Valorant (requiere aprobación de Riot)
 - [x] Modo sin conexión con el último perfil visto
 - [x] Notificaciones cuando un favorito cambia de rango
 - [x] Cola de salida hacia Riot que respeta el cupo, y juegos no habilitados como "PRONTO"
@@ -478,6 +505,8 @@ Los textos viven en `src/i18n/locales/` (un archivo por idioma, con `es.js` como
 - [x] Ranking, jugadores profesionales y seguir a un pro
 - [x] Progreso de LP y detalle de partida minuto a minuto
 - [x] Enfrentamientos: build, runas, orden de habilidades y counters por cruce de campeones
+- [x] Wild Rift: tier list, ficha y comparador de campeones, Mis mains, los que suben y bajan y notas del parche
+- [x] Valorant: esports (campeón, calendario, resultados, torneos y detalle de partido)
 
 La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md), y todo lo que ya salió, versión por versión, en [CHANGELOG.md](CHANGELOG.md).
 

@@ -25,7 +25,7 @@ import { useBootData } from "../boot/BootContext";
 import { homeArtFor } from "../utils/homeArt";
 import { getRotation } from "../games/lol/api";
 import {
-  colors, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, textGlow, withAlpha, useActiveGame,
+  colors, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, textGlow, glow, withAlpha, useActiveGame,
 } from "../theme";
 
 // Espera a que la pantalla de carga se desvanezca antes de empezar la aparición escalonada
@@ -183,8 +183,8 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.logoSub}>{t("app.tagline").toUpperCase()}</Text>
         </Reveal>
 
-        {/* Buscador destacado */}
-        <Reveal order={1} baseDelay={HANDOFF_MS}>
+        {/* Buscador destacado (no en los juegos sin perfiles de jugador, como Wild Rift) */}
+        {!game.browseOnly && <Reveal order={1} baseDelay={HANDOFF_MS}>
           <Card style={[styles.searchCard, { borderColor: withAlpha(accent, error ? 0 : 0.35) }, error && styles.searchCardError]}>
             <SectionLabel>{t("home.searchIn", { game: game.name })}</SectionLabel>
             <View style={styles.searchRow}>
@@ -241,7 +241,7 @@ export default function HomeScreen({ navigation }) {
               </View>
             ) : null}
           </Card>
-        </Reveal>
+        </Reveal>}
 
         {/* Selector de juego */}
         <Reveal order={2} baseDelay={HANDOFF_MS}>
@@ -265,10 +265,11 @@ export default function HomeScreen({ navigation }) {
                   onPress={() => { if (!active) { select(); setGameId(g.id); } }}
                   accessibilityLabel={g.name}
                   accessibilityState={{ selected: active }}
-                  style={[styles.gameBtn, active && { backgroundColor: withAlpha(g.accent, 0.14), borderColor: g.accent }]}
+                  style={[styles.gameBtn, { backgroundColor: withAlpha(g.accent, 0.06) }, active && { backgroundColor: withAlpha(g.accent, 0.18), borderColor: g.accent, ...glow(g.accent) }]}
                 >
-                  <GamePop active={active}><GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={active ? g.accent : colors.textMuted} muted={!active} /></GamePop>
-                  <Text style={[styles.gameShort, active && { color: g.accent }]}>{g.short}</Text>
+                  {/* Cada juego con su color de marca; el elegido, con borde y brillo */}
+                  <GamePop active={active}><GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={g.accent} brand dim={!active} /></GamePop>
+                  <Text style={[styles.gameShort, styles.gameShortOn, active && { color: g.accent }]}>{g.short}</Text>
                 </PressableScale>
               );
             })}
@@ -290,7 +291,7 @@ export default function HomeScreen({ navigation }) {
         )}
 
         {/* Búsquedas recientes */}
-        {recents.length > 0 && (
+        {recents.length > 0 && !game.browseOnly && (
           <Reveal order={4} baseDelay={HANDOFF_MS}>
             <View style={styles.sectionHeader}>
               <SectionLabel style={styles.sectionLabel}>{t("home.recents")}</SectionLabel>
@@ -318,7 +319,7 @@ export default function HomeScreen({ navigation }) {
         )}
 
         {/* Favoritos */}
-        <Reveal order={5} baseDelay={HANDOFF_MS}>
+        {!game.browseOnly && <Reveal order={5} baseDelay={HANDOFF_MS}>
           <View style={styles.sectionHeader}>
             <SectionLabel style={styles.sectionLabel} icon="star" iconColor={colors.gold}>{t("home.favoritesOf", { game: game.short })}</SectionLabel>
             {gameFavs.length > 0 && (
@@ -353,7 +354,7 @@ export default function HomeScreen({ navigation }) {
               {game.id === "lol" ? <SuggestedPlayers region={region} favorites={favorites} onChanged={setFavorites} onOpen={openProfile} /> : null}
             </>
           )}
-        </Reveal>
+        </Reveal>}
 
       </Animated.ScrollView>
       <Sheet visible={!!recentMenu} onClose={() => setRecentMenu(null)} title={recentMenu ? `${recentMenu.gameName}${recentMenu.tagLine ? ` #${recentMenu.tagLine}` : ""}` : ""}>
@@ -385,11 +386,23 @@ function HomeArt({ art }) {
   return (
     <Animated.View pointerEvents="none" style={[styles.art, fade]}>
       {/* Igual en todos los juegos: la ilustración a lo ancho, o el personaje grande a la derecha; encima, el mismo
-          degradado que la funde con el fondo */}
+          degradado que la funde con el fondo. Los "vivos" (Wild Rift y Valorant) se ven más; el agente de Valorant
+          lleva detrás un brillo con el color del juego. */}
+      {art.glow ? (
+        <Svg style={StyleSheet.absoluteFill} width="100%" height="100%">
+          <Defs>
+            <RadialGradient id="homeGlow" cx="78%" cy="30%" r="55%">
+              <Stop offset="0" stopColor={art.glow} stopOpacity="0.5" />
+              <Stop offset="1" stopColor={art.glow} stopOpacity="0" />
+            </RadialGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#homeGlow)" />
+        </Svg>
+      ) : null}
       <Image
         source={source}
-        style={art.fit === "hero" ? styles.artHero : [StyleSheet.absoluteFill, styles.artImage]}
-        resizeMode={art.fit === "hero" ? "contain" : "cover"}
+        style={art.fit === "agent" ? styles.artAgent : art.fit === "hero" ? styles.artHero : [StyleSheet.absoluteFill, styles.artImage, art.vivid && styles.artVivid]}
+        resizeMode={art.fit === "hero" || art.fit === "agent" ? "contain" : "cover"}
         onLoad={onLoad}
         onError={() => { if (art.fallback && uri !== art.fallback) setUri(art.fallback); }}
         accessibilityIgnoresInvertColors
@@ -397,8 +410,8 @@ function HomeArt({ art }) {
       <Svg style={StyleSheet.absoluteFill} width="100%" height="100%">
         <Defs>
           <LinearGradient id="homeShade" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={colors.bg} stopOpacity="0.45" />
-            <Stop offset="0.5" stopColor={colors.bg} stopOpacity="0.75" />
+            <Stop offset="0" stopColor={colors.bg} stopOpacity={art.vivid ? "0.2" : "0.45"} />
+            <Stop offset="0.5" stopColor={colors.bg} stopOpacity={art.vivid ? "0.62" : "0.75"} />
             <Stop offset="1" stopColor={colors.bg} stopOpacity="1" />
           </LinearGradient>
         </Defs>
@@ -434,6 +447,8 @@ const styles = StyleSheet.create({
   // overflow: el fondo desenfocado va ampliado y no debe salirse por debajo del degradado que lo funde con el fondo
   art:           { position: "absolute", top: 0, left: 0, right: 0, height: sizes.iconHero * 4 + spacing.xxxl, overflow: "hidden" },
   artImage:      { opacity: 0.6 },
+  artVivid:      { opacity: 0.8 },
+  artAgent:      { position: "absolute", top: spacing.xl, bottom: 0, right: -spacing.xxxl, width: "88%" },
   artHero:       { position: "absolute", top: 0, bottom: 0, right: -spacing.xl, width: "70%", opacity: 0.75 },
   logoMark:      { position: "absolute", top: spacing.xxxl, right: -spacing.xxl, opacity: 0.08, transform: [{ rotate: "-12deg" }] },
   inner:         { padding: spacing.xl, paddingTop: spacing.hero, paddingBottom: sizes.tabBarSpace },
@@ -475,6 +490,7 @@ const styles = StyleSheet.create({
   gameBtnSoon:   { opacity: 0.45 },
   gameIcon:      { marginBottom: spacing.xs },
   gameShort:     { ...type.label, color: colors.textMuted },
+  gameShortOn:   { color: colors.textSecondary },
   soon:          { ...type.micro, color: colors.textMuted, marginTop: spacing.xxs },
   sectionHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.sm },
   sectionLabel:  { marginBottom: 0 },

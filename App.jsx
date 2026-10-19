@@ -20,6 +20,13 @@ import ProTeamScreen from "./src/games/lol/ProTeamScreen";
 import ProPlayerScreen from "./src/games/lol/ProPlayerScreen";
 import RankHistoryScreen from "./src/games/lol/RankHistoryScreen";
 import MatchupScreen from "./src/games/lol/MatchupScreen";
+import WRTierListScreen from "./src/games/wildrift/TierListScreen";
+import WRChampionScreen from "./src/games/wildrift/ChampionScreen";
+import WREsportsScreen from "./src/games/wildrift/EsportsScreen";
+import WRChampionsScreen from "./src/games/wildrift/ChampionsScreen";
+import WRCompareScreen from "./src/games/wildrift/CompareScreen";
+import VALEsportsScreen from "./src/games/valorant/EsportsScreen";
+import VALMatchScreen from "./src/games/valorant/MatchScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
 import LoadingScreen from "./src/screens/LoadingScreen";
 import FloatingTabBar from "./src/components/FloatingTabBar";
@@ -96,6 +103,13 @@ function RootStack() {
       <Stack.Screen name="ProPlayer" component={ProPlayerScreen} options={{ title: t("explore.tabPros") }} />
       <Stack.Screen name="RankHistory" component={RankHistoryScreen} options={{ title: t("lpHistory.title") }} />
       <Stack.Screen name="Matchup" component={MatchupScreen} options={{ title: t("matchup.title") }} />
+      <Stack.Screen name="WRTierList" component={WRTierListScreen} options={{ title: t("wr.tierList") }} />
+      <Stack.Screen name="WRChampion" component={WRChampionScreen} options={{ title: "Wild Rift" }} />
+      <Stack.Screen name="WREsports" component={WREsportsScreen} options={{ title: t("wr.esports") }} />
+      <Stack.Screen name="WRChampions" component={WRChampionsScreen} options={{ title: t("wr.champions") }} />
+      <Stack.Screen name="WRCompare" component={WRCompareScreen} options={{ title: t("wr.compare") }} />
+      <Stack.Screen name="VALEsports" component={VALEsportsScreen} options={{ title: t("wr.esports") }} />
+      <Stack.Screen name="VALMatch" component={VALMatchScreen} options={{ title: "Valorant" }} />
       {/* Buscar desde cualquier pestaña: hoja en iOS (se cierra deslizando), pantalla que sube en Android */}
       <Stack.Screen name="Search" component={SearchScreen} options={{ presentation: "modal", headerShown: false, title: t("tabs.search") }} />
     </Stack.Navigator>

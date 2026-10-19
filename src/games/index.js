@@ -7,7 +7,8 @@ import dota2 from "./dota2";
 import fortnite from "./fortnite";
 import apex from "./apex";
 import pubg from "./pubg";
-import valorant from "./valorant/meta";
+import valorant from "./valorant";
+import wildrift from "./wildrift";
 
 /**
  * Registro de juegos. Para añadir uno: crear src/games/<id>/ con meta.js e index.js,
@@ -24,10 +25,11 @@ import valorant from "./valorant/meta";
  *  - getProfile(...).badgeIcon / favoriteStat(fav): icono de la insignia y texto de la tarjeta de favorito (opcionales)
  *  - ProfileBody({ data, setData, setError, mine })         contenido propio del juego
  *  - HomeExtras({ region })                                 (opcional) extras de Inicio propios del juego
+ *  - meta.browseOnly: juegos sin perfiles de jugador (Wild Rift): sin buscador ni favoritos, solo sus extras
  */
-export const GAMES = [lol, tft, brawlstars, clashroyale, clashofclans, dota2, fortnite, apex, pubg];
+export const GAMES = [lol, tft, brawlstars, clashroyale, clashofclans, dota2, fortnite, apex, pubg, wildrift, valorant];
 
 // Juegos anunciados que aún no están disponibles (se muestran como "Próximamente")
-export const UPCOMING_GAMES = [valorant];
+export const UPCOMING_GAMES = [];
 
 export const getGame = id => GAMES.find(g => g.id === id);

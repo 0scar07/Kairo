@@ -33,7 +33,7 @@ export default function FavoritesScreen({ navigation }) {
     setRefreshing(false);
   }
   const { favorites: bootFavorites, gameEnabled, region } = useBootData();
-  const availableGames = GAMES.filter(g => gameEnabled(g.id));
+  const availableGames = GAMES.filter(g => gameEnabled(g.id) && !g.browseOnly);
   const [favorites, setFavorites] = useState(bootFavorites);
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState(null);
@@ -86,7 +86,7 @@ export default function FavoritesScreen({ navigation }) {
           <View style={styles.filters}>
             <Chip label={t("filters.allPlayers")} active={filter === "all"} onPress={() => setFilter("all")} />
             {availableGames.map(g => (
-              <Chip key={g.id} label={g.short} icon={<GameLogo game={g.id} size={sizes.avatarXs} color={filter === g.id ? g.accent : colors.textMuted} muted={filter !== g.id} />} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
+              <Chip key={g.id} label={g.short} icon={<GameLogo game={g.id} size={sizes.avatarXs} color={g.accent} brand dim={filter !== g.id} />} active={filter === g.id} game={g.id} onPress={() => setFilter(g.id)} />
             ))}
           </View>
         </Reveal>
