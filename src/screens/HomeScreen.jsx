@@ -25,7 +25,7 @@ import { useBootData } from "../boot/BootContext";
 import { homeArtFor } from "../utils/homeArt";
 import { getRotation } from "../games/lol/api";
 import {
-  colors, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, textGlow, glow, withAlpha, useActiveGame,
+  colors, radii, sizes, spacing, fontSizes, lineHeights, type, tracking, textGlow, withAlpha, useActiveGame,
 } from "../theme";
 
 // Espera a que la pantalla de carga se desvanezca antes de empezar la aparición escalonada
@@ -265,9 +265,10 @@ export default function HomeScreen({ navigation }) {
                   onPress={() => { if (!active) { select(); setGameId(g.id); } }}
                   accessibilityLabel={g.name}
                   accessibilityState={{ selected: active }}
-                  style={[styles.gameBtn, { backgroundColor: withAlpha(g.accent, 0.06) }, active && { backgroundColor: withAlpha(g.accent, 0.18), borderColor: g.accent, ...glow(g.accent) }]}
+                  style={[styles.gameBtn, { backgroundColor: withAlpha(g.accent, 0.06) }, active && { backgroundColor: withAlpha(g.accent, 0.18), borderColor: g.accent, boxShadow: `0 0 14px ${withAlpha(g.accent, 0.5)}` }]}
                 >
-                  {/* Cada juego con su color de marca; el elegido, con borde y brillo */}
+                  {/* Cada juego con su color de marca; el elegido, con borde y brillo. El brillo va con boxShadow y no con
+                      elevation: en Android la sombra de elevation se ve a través del fondo translúcido como una mancha negra */}
                   <GamePop active={active}><GameLogo game={g.id} style={styles.gameIcon} size={sizes.avatarSm} color={g.accent} brand dim={!active} /></GamePop>
                   <Text style={[styles.gameShort, styles.gameShortOn, active && { color: g.accent }]}>{g.short}</Text>
                 </PressableScale>
