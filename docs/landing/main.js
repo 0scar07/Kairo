@@ -4,6 +4,22 @@
   var data = window.__BRAND__ || {};
   var root = document.documentElement;
   var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Idioma de la página: los textos que arma este script se traducen con L() si la página está en inglés
+  var LANG = document.documentElement.lang === "en" ? "en" : "es";
+  var EN = {
+    " días": " days", "Nuevo": "New", "Versión": "Version", "Sin clasificar": "Unranked", "Nivel ": "Level ",
+    "Datos en vivo de Riot Games": "Live data from Riot Games",
+    "Historial y partida en vivo en la app →": "Match history and live game in the app →",
+    "Escribe tu Riot ID completo, con el #TAG. Ejemplo: Nombre#LAN": "Type your full Riot ID, with the #TAG. Example: Name#NA1",
+    "Buscando…": "Searching…",
+    "Despertando el servidor, puede tardar hasta un minuto…": "Waking up the server, this can take up to a minute…",
+    "El servidor no respondió. Inténtalo de nuevo en un momento.": "The server didn't respond. Try again in a moment.",
+    "No encontramos ese Riot ID. Revisa el nombre, el #TAG y la región.": "We couldn't find that Riot ID. Check the name, the #TAG and the region.",
+    "Demasiadas búsquedas seguidas. Espera unos segundos.": "Too many searches in a row. Wait a few seconds.",
+    "No pudimos buscar ahora mismo. Inténtalo de nuevo en un momento.": "We couldn't search right now. Try again in a moment.",
+    "Ampliar: ": "Enlarge: ", "Solo/Dúo": "Solo/Duo"
+  };
+  function L(text) { return LANG === "en" && EN[text] || text; }
   var fineHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   function $(sel, scope) { return (scope || document).querySelector(sel); }
@@ -391,8 +407,8 @@
 
   function relativeDays(iso) {
     var days = Math.round((Date.now() - new Date(iso).getTime()) / 86400000);
-    var rtf = window.Intl && Intl.RelativeTimeFormat ? new Intl.RelativeTimeFormat("es", { numeric: "auto" }) : null;
-    if (!rtf) return days + " días";
+    var rtf = window.Intl && Intl.RelativeTimeFormat ? new Intl.RelativeTimeFormat(LANG, { numeric: "auto" }) : null;
+    if (!rtf) return days + L(" días");
     if (days < 30) return rtf.format(-days, "day");
     if (days < 365) return rtf.format(-Math.round(days / 30), "month");
     return rtf.format(-Math.round(days / 365), "year");
@@ -405,7 +421,7 @@
       cachedJSON("kairo:release", "https://api.github.com/repos/" + REPO + "/releases/latest").then(function (rel) {
         if (!rel || !rel.tag_name) return;
         var days = (Date.now() - new Date(rel.published_at).getTime()) / 86400000;
-        $("[data-release-tag]", pill).textContent = days <= 30 ? "Nuevo" : "Versión";
+        $("[data-release-tag]", pill).textContent = days <= 30 ? L("Nuevo") : L("Versión");
         $("[data-release-text]", pill).textContent = rel.tag_name + " · " + relativeDays(rel.published_at);
         if (rel.html_url) pill.href = rel.html_url;
         pill.hidden = false;
@@ -416,7 +432,7 @@
       cachedJSON("kairo:repo", "https://api.github.com/repos/" + REPO).then(function (repo) {
         var n = repo && repo.stargazers_count;
         if (typeof n !== "number" || n < MIN_STARS_TO_SHOW) return;
-        count.textContent = "★ " + n.toLocaleString("es");
+        count.textContent = "★ " + n.toLocaleString(LANG);
         count.hidden = false;
       }).catch(function () {});
     }
@@ -456,7 +472,9 @@
 
   /* ---------- Pruébalo: rango real desde la API de Kairo ---------- */
   var API = "https://kairo-api-nqts.onrender.com";
-  var TIER_NAMES = { IRON: "Hierro", BRONZE: "Bronce", SILVER: "Plata", GOLD: "Oro", PLATINUM: "Platino", EMERALD: "Esmeralda", DIAMOND: "Diamante", MASTER: "Maestro", GRANDMASTER: "Gran Maestro", CHALLENGER: "Retador" };
+  var TIER_NAMES = LANG === "en"
+    ? { IRON: "Iron", BRONZE: "Bronze", SILVER: "Silver", GOLD: "Gold", PLATINUM: "Platinum", EMERALD: "Emerald", DIAMOND: "Diamond", MASTER: "Master", GRANDMASTER: "Grandmaster", CHALLENGER: "Challenger" }
+    : { IRON: "Hierro", BRONZE: "Bronce", SILVER: "Plata", GOLD: "Oro", PLATINUM: "Platino", EMERALD: "Esmeralda", DIAMOND: "Diamante", MASTER: "Maestro", GRANDMASTER: "Gran Maestro", CHALLENGER: "Retador" };
   var APEX = { MASTER: 1, GRANDMASTER: 1, CHALLENGER: 1 };
 
   function el(tag, cls, text) {
@@ -498,7 +516,7 @@
       if (!q) {
         var img0 = el("img"); img0.src = "landing/img/ranks/iron.webp"; img0.alt = ""; img0.style.opacity = ".25"; img0.style.filter = "grayscale(1)";
         box.appendChild(img0);
-        info.appendChild(el("b", "tr-unranked", "Sin clasificar"));
+        info.appendChild(el("b", "tr-unranked", L("Sin clasificar")));
       } else {
         var img = el("img"); img.src = "landing/img/ranks/" + q.tier.toLowerCase() + ".webp"; img.alt = ""; img.width = 64; img.height = 52;
         box.appendChild(img);
@@ -506,7 +524,7 @@
         info.appendChild(el("b", null, name + " · " + q.leaguePoints + " LP"));
         var games = q.wins + q.losses, wr = games ? Math.round(q.wins / games * 100) : 0;
         var line = el("span");
-        line.appendChild(document.createTextNode(q.wins + "V " + q.losses + "D · "));
+        line.appendChild(document.createTextNode(q.wins + (LANG === "en" ? "W " : "V ") + q.losses + (LANG === "en" ? "L · " : "D · ")));
         line.appendChild(el("span", wr >= 50 ? "wr-up" : null, wr + "% winrate"));
         info.appendChild(line);
       }
@@ -527,7 +545,7 @@
       var b = el("b", null, acc.gameName);
       b.appendChild(el("span", null, " #" + acc.tagLine));
       nm.appendChild(b);
-      nm.appendChild(el("small", null, "Nivel " + (sum.summonerLevel || "—") + " · " + regionLabel));
+      nm.appendChild(el("small", null, L("Nivel ") + (sum.summonerLevel || "—") + " · " + regionLabel));
       head.appendChild(nm);
       card.appendChild(head);
 
@@ -535,13 +553,13 @@
       var solo = list.filter(function (q) { return q.queueType === "RANKED_SOLO_5x5"; })[0];
       var flex = list.filter(function (q) { return q.queueType === "RANKED_FLEX_SR"; })[0];
       var qs = el("div", "tr-queues");
-      qs.appendChild(queueCard(solo, "Solo/Dúo"));
+      qs.appendChild(queueCard(solo, L("Solo/Dúo")));
       qs.appendChild(queueCard(flex, "Flex 5v5"));
       card.appendChild(qs);
 
       var foot = el("div", "tr-foot");
-      foot.appendChild(el("span", null, "Datos en vivo de Riot Games"));
-      var a = el("a", null, "Historial y partida en vivo en la app →");
+      foot.appendChild(el("span", null, L("Datos en vivo de Riot Games")));
+      var a = el("a", null, L("Historial y partida en vivo en la app →"));
       a.href = "#descargar";
       foot.appendChild(a);
       card.appendChild(foot);
@@ -552,7 +570,7 @@
       var cut = raw.lastIndexOf("#");
       var name = cut > 0 ? raw.slice(0, cut).trim() : "";
       var tag = cut > 0 ? raw.slice(cut + 1).trim() : "";
-      if (!name || !tag) { status("Escribe tu Riot ID completo, con el #TAG. Ejemplo: Nombre#LAN", true); input.focus(); return; }
+      if (!name || !tag) { status(L("Escribe tu Riot ID completo, con el #TAG. Ejemplo: Nombre#LAN"), true); input.focus(); return; }
 
       if (current) current.abort();
       var ctrl = window.AbortController ? new AbortController() : null;
@@ -562,9 +580,9 @@
       var regionLabel = region.options[region.selectedIndex].text;
 
       btn.disabled = true;
-      status("Buscando…", false, true);
+      status(L("Buscando…"), false, true);
       // El servidor gratuito se duerme: si tarda, avisar en vez de parecer roto
-      var slow = setTimeout(function () { status("Despertando el servidor, puede tardar hasta un minuto…", false, true); }, 4000);
+      var slow = setTimeout(function () { status(L("Despertando el servidor, puede tardar hasta un minuto…"), false, true); }, 4000);
       var hardStop = setTimeout(function () { if (ctrl) ctrl.abort(); }, 75000);
 
       get("/lol/account/" + encodeURIComponent(name) + "/" + encodeURIComponent(tag) + q, signal)
@@ -576,10 +594,10 @@
         })
         .catch(function (e) {
           if (e.name === "AbortError" && current !== ctrl) return; // reemplazada por otra búsqueda
-          var msg = e.name === "AbortError" ? "El servidor no respondió. Inténtalo de nuevo en un momento."
+          var msg = L(e.name === "AbortError" ? "El servidor no respondió. Inténtalo de nuevo en un momento."
             : e.status === 404 || e.code === "PLAYER_NOT_FOUND" ? "No encontramos ese Riot ID. Revisa el nombre, el #TAG y la región."
             : e.status === 429 ? "Demasiadas búsquedas seguidas. Espera unos segundos."
-            : "No pudimos buscar ahora mismo. Inténtalo de nuevo en un momento.";
+            : "No pudimos buscar ahora mismo. Inténtalo de nuevo en un momento.");
           status(msg, true);
         })
         .then(function () { clearTimeout(slow); clearTimeout(hardStop); if (current === ctrl) btn.disabled = false; });
@@ -655,7 +673,7 @@
       var label = ($("figcaption", fig) || {}).textContent || "captura";
       var b = el("button", "shot-open");
       b.type = "button";
-      b.setAttribute("aria-label", "Ampliar: " + label);
+      b.setAttribute("aria-label", L("Ampliar: ") + label);
       phone.parentNode.insertBefore(b, phone);
       b.appendChild(phone);
       b.addEventListener("click", function () { opener = b; open(i); });
@@ -903,6 +921,22 @@
       safe(initScrollScenes, "initScrollScenes");
     }
   }
+
+  // Video de demostración: se reproduce sin sonido al verse y se pausa al salir; con "Reducir movimiento", solo con play
+  function demoVideo() {
+    var v = document.querySelector("[data-demo-video]");
+    if (!v || reduced || !("IntersectionObserver" in window)) return;
+    var touched = false;
+    v.addEventListener("pause", function () { if (!v.dataset.auto) touched = true; delete v.dataset.auto; });
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && !touched) { v.preload = "auto"; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+        else if (!e.isIntersecting && !v.paused) { v.dataset.auto = "1"; v.pause(); }
+      });
+    }, { threshold: 0.5 }).observe(v);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", demoVideo);
+  else demoVideo();
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

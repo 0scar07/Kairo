@@ -12,7 +12,10 @@ Stats for **League of Legends** (with **live game**), **Teamfight Tactics**, **B
 
 [![Version](https://img.shields.io/github/v/release/0scar07/Kairo?label=version&color=35E0A1&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases/latest)
 [![CI](https://github.com/0scar07/Kairo/actions/workflows/ci.yml/badge.svg)](https://github.com/0scar07/Kairo/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/0scar07/Kairo/badge)](https://scorecard.dev/viewer/?uri=github.com/0scar07/Kairo)
 ![Android](https://img.shields.io/badge/Android-APK-3DDC84?logo=android&logoColor=white)
+[![Downloads](https://img.shields.io/github/downloads/0scar07/Kairo/total?label=downloads&color=3DDC84&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases)
+[![Last commit](https://img.shields.io/github/last-commit/0scar07/Kairo?label=last%20commit&color=35E0A1)](https://github.com/0scar07/Kairo/commits/main)
 ![Games](https://img.shields.io/badge/games-9-C89B3C)
 ![Languages](https://img.shields.io/badge/languages-5-0BC4E3)
 ![License](https://img.shields.io/badge/license-MIT-35E0A1)
@@ -241,6 +244,14 @@ All the server variables, every backend route and the troubleshooting table are 
 - [x] Ladder, pro players and following a pro
 - [x] LP progress and match details minute by minute
 - [x] Matchups: build, runes, skill order and counters per champion matchup
+
+Everything already released, version by version, is in [CHANGELOG.md](CHANGELOG.md) (in Spanish).
+
+## ⭐ Stars
+
+If Kairo is useful to you, a star helps more people find it (and gets it into the Obtainium catalog).
+
+<a href="https://star-history.com/#0scar07/Kairo&Date"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=0scar07/kairo&type=Date&theme=dark" /><img src="https://api.star-history.com/svg?repos=0scar07/kairo&type=Date" alt="Kairo stars over time" width="600" /></picture></a>
 
 ## 🤝 Contributing
 

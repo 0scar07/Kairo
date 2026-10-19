@@ -3,6 +3,9 @@ contact_links:
   - name: Reportar una vulnerabilidad o una key expuesta
     url: https://github.com/0scar07/Kairo/security/advisories/new
     about: En privado; no lo publiques en un issue.
+  - name: Preguntas e ideas
+    url: https://github.com/0scar07/Kairo/discussions
+    about: Para dudas, sugerencias o mostrar cómo usas Kairo.
   - name: Descargar la última versión
     url: https://github.com/0scar07/Kairo/releases/latest
     about: APK, notas de la versión y el enlace para Obtainium.
