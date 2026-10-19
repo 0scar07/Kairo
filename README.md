@@ -12,6 +12,7 @@ Estadísticas de **League of Legends** (con **partida en vivo**), **Teamfight Ta
 
 [![Versión](https://img.shields.io/github/v/release/0scar07/Kairo?label=versi%C3%B3n&color=35E0A1&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases/latest)
 [![CI](https://github.com/0scar07/Kairo/actions/workflows/ci.yml/badge.svg)](https://github.com/0scar07/Kairo/actions/workflows/ci.yml)
+[![Estado de la API](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fstats.uptimerobot.com%2Fapi%2FgetMonitorList%2F3pSwWADClB&query=%24.data%5B0%5D%5B%2730dRatio%27%5D.ratio&suffix=%25&label=API%20%C2%B7%2030%20d%C3%ADas&color=35E0A1&cacheSeconds=3600)](https://stats.uptimerobot.com/3pSwWADClB)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/0scar07/Kairo/badge)](https://scorecard.dev/viewer/?uri=github.com/0scar07/Kairo)
 ![Android](https://img.shields.io/badge/Android-APK-3DDC84?logo=android&logoColor=white)
 [![Descargas](https://img.shields.io/github/downloads/0scar07/Kairo/total?label=descargas&color=3DDC84&cacheSeconds=3600)](https://github.com/0scar07/Kairo/releases)
