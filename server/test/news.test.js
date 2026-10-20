@@ -56,11 +56,12 @@ test("parseArticle lee los cambios estructurados de Wild Rift", () => {
 });
 
 test("riotNews y articlePath: solo artículos de la propia web", () => {
-  const item = (title, date, url) => ({ title, publishedAt: date, action: { payload: { url } }, media: { url: "https://img" }, category: { machineName: "game-updates" } });
+  const item = (title, date, url) => ({ title, publishedAt: date, action: { payload: { url } }, media: { url: "https://img", colors: { primary: "#2B4457" } }, category: { machineName: "game-updates" } });
   const list = news.riotNews({ a: [item("26.20", "2026-10-06", "/es-mx/news/game-updates/league-of-legends-patch-26-20-notes"), item("Video", "2026-10-07", "https://youtube.com/x")] }, "https://www.leagueoflegends.com");
   assert.strictEqual(list.length, 1);
   assert.strictEqual(list[0].patch, true);
   assert.strictEqual(list[0].category, "game_updates");
+  assert.strictEqual(list[0].color, "#2B4457");
   assert.strictEqual(news.articlePath("/es-mx/news/game-updates/league-of-legends-patch-26-20-notes"), true);
   assert.strictEqual(news.articlePath("//evil.com/x"), false);
   assert.strictEqual(news.articlePath("/es-mx/news/../../etc"), false);

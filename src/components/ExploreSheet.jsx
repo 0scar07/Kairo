@@ -11,6 +11,7 @@ import { getProLeague, getProLeagues, tournamentLabel } from "../games/lol/espor
 import ProStandings from "../games/lol/components/ProStandings";
 import MatchupsTab from "../games/lol/components/MatchupsTab";
 import NewsTab from "../news/NewsTab";
+import ClipsTab from "../clips/ClipsTab";
 import { queueLabel } from "../games/lol/utils";
 import { championByKey, championIcon, profileIconUrl } from "../api/ddragon";
 import { getRegion } from "../constants/regions";
@@ -28,6 +29,7 @@ const QUEUES = ["RANKED_SOLO_5x5", "RANKED_FLEX_SR"];
 /**
  * Hoja "Explorar" del botón de la lupa: descubrir jugadores de League of Legends sin escribir su nombre.
  *  - Noticias: lo último de todos los juegos (carrusel, parches para leer en la app y esports; ver src/news/).
+ *  - Clips: los Shorts oficiales de cada juego en un visor a pantalla completa tipo TikTok (ver src/clips/).
  *  - Ranking: el top de la región (Challenger, Gran Maestro o Maestro; Solo/Dúo o Flex) como tabla.
  *  - En vivo: los favoritos de LoL que están en partida ahora.
  *  - Enfrentamientos: tu campeón contra un rival (build, habilidades y counters; ver games/lol/MatchupScreen.jsx).
@@ -95,6 +97,7 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
 
   const tabs = [
     { key: "news", label: t("explore.tabNews") },
+    { key: "clips", label: t("explore.tabClips") },
     { key: "ranking", label: t("explore.tabRanking") },
     { key: "live", label: live.list.length ? `${t("explore.tabLive")} · ${live.list.length}` : t("explore.tabLive") },
     { key: "pros", label: t("explore.tabPros") },
@@ -126,7 +129,9 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
         <View style={styles.tabs}><SegmentedTabs tabs={tabs} value={tab} onChange={setTab} game="lol" scroll /></View>
 
         {tab === "news" ? (
-          <NewsTab visible={visible && tab === "news"} onArticle={a => go("NewsArticle", a)} onMatch={id => go("VALMatch", { id })} />
+          <NewsTab visible={visible && tab === "news"} onArticle={a => go("NewsArticle", a)} onMatch={id => go("VALMatch", { id })} onClip={p => go("Clips", p)} />
+        ) : tab === "clips" ? (
+          <ClipsTab visible={visible && tab === "clips"} onOpen={p => go("Clips", p)} />
         ) : tab === "ranking" ? (
           <>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chips}>
