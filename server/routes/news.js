@@ -41,6 +41,7 @@ async function riotGame(game, locale) {
     summary: null,
     date: n.date,
     image: news.sized(n.image, 900),
+    color: /^#[0-9a-f]{6}$/i.test(n.color || "") ? n.color : null,
     url: n.url,
     article: { game, path: n.path },
   }));

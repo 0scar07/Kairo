@@ -9,6 +9,7 @@ const lolRouter = require("./routes/lol");
 const tftRouter = require("./routes/tft");
 const esportsRouter = require("./routes/esports");
 const newsRouter = require("./routes/news");
+const clipsRouter = require("./routes/clips");
 const { createSupercellRouter } = require("./routes/supercell");
 const extra = require("./lib/extra");
 const { createStore } = require("./lib/store");
@@ -89,6 +90,8 @@ for (const [id, module] of Object.entries(extra.ROUTES)) app.use(`/${id}`, modul
 app.use("/esports", esportsRouter);
 // Noticias de todos los juegos y lector de las notas del parche de Riot (ver routes/news.js)
 app.use("/news", newsRouter);
+// Clips: Shorts oficiales de YouTube de cada juego (ver routes/clips.js)
+app.use("/clips", clipsRouter);
 
 // Dispositivos para las notificaciones (Postgres si hay DATABASE_URL; si no, un archivo JSON local).
 // Si el almacén no arranca, el resto de la API sigue funcionando y solo /devices responde 503.

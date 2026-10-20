@@ -32,5 +32,8 @@ export function featured(items) {
   return out.slice(0, 5);
 }
 
+/** Número de versión del título de un parche: "Notas de la versión 26.20 de League of Legends" → "26.20" */
+export const patchVersion = title => /\d+\.\d+[a-z]?/i.exec(title || "")?.[0] || title || "";
+
 /** Póster de un campeón cambiado: el retrato de pantalla de carga en LoL; el banner oficial en Wild Rift */
 export const posterOf = entry => (entry?.key ? `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${entry.key}_0.jpg` : entry?.banner || null);

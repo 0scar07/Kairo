@@ -8,6 +8,15 @@ Las descargas están en [GitHub Releases](https://github.com/0scar07/Kairo/relea
 ## v1.5.0 · por aire
 
 ### 2026-10-19
+- **Clips** en Explorar, tipo TikTok: los Shorts oficiales de YouTube de 9 juegos en un visor a pantalla completa;
+  deslizas hacia abajo y el siguiente arranca solo. Para ti / Esports, filtro por juego, sonido que se recuerda, tocar
+  para pausar, doble toque para guardar en Mi lista, compartir y lo más visto de la semana. Para verlos dentro de
+  Kairo hace falta el próximo APK (trae `react-native-webview`); hasta entonces cada clip se abre en YouTube.
+- **Noticias PRO:** carrusel con zoom lento sobre el arte, parallax en capas y luz ambiental del color de cada
+  noticia; chips con pastilla deslizante, Top 5 del parche al estilo Netflix, Seguir leyendo, Mi lista, vista previa
+  al mantener presionado y carga con el logo de Kairo. El lector suma cabecera que se vuelve barra de vidrio con las
+  pestañas, barra de lectura, contadores, «Lo esencial en 10 segundos», tamaño de letra, cada campeón apareciendo al
+  llegar a él y compartir el Top 5 como historia.
 - **Noticias** en Explorar, al estilo Netflix: un carrusel que pasa solo con lo más importante de todos los juegos
   (parches, el último campeón de esports y eventos), filas por tipo y, al elegir un juego, el arte de sus campeones y
   los que cambiaron en su último parche. Las **notas del parche se leen dentro de la app**: cada campeón con su

@@ -44,7 +44,7 @@ function sized(url, width) {
 }
 
 /**
- * Noticias de una web de Riot a partir de __NEXT_DATA__: [{ title, date, url, path, image, category, patch }] de la
+ * Noticias de una web de Riot a partir de __NEXT_DATA__: [{ title, date, url, path, image, color, category, patch }] de la
  * más nueva a la más vieja. Solo los enlaces a la propia web (los videos de YouTube y demás se descartan).
  */
 function riotNews(data, site, limit = 8) {
@@ -60,6 +60,7 @@ function riotNews(data, site, limit = 8) {
           url: site + path,
           path,
           image: o.media?.url || o.imageMedia?.url || null,
+          color: o.media?.colors?.primary || o.imageMedia?.colors?.primary || null,   // color dominante de la imagen
           category: String(o.category?.machineName || "").replace(/-/g, "_") || null,
           patch: PATCH_URL.test(path),
         });
