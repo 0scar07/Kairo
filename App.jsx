@@ -27,6 +27,7 @@ import WRChampionsScreen from "./src/games/wildrift/ChampionsScreen";
 import WRCompareScreen from "./src/games/wildrift/CompareScreen";
 import VALEsportsScreen from "./src/games/valorant/EsportsScreen";
 import VALMatchScreen from "./src/games/valorant/MatchScreen";
+import NewsArticleScreen from "./src/news/ArticleScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
 import LoadingScreen from "./src/screens/LoadingScreen";
 import FloatingTabBar from "./src/components/FloatingTabBar";
@@ -110,6 +111,7 @@ function RootStack() {
       <Stack.Screen name="WRCompare" component={WRCompareScreen} options={{ title: t("wr.compare") }} />
       <Stack.Screen name="VALEsports" component={VALEsportsScreen} options={{ title: t("wr.esports") }} />
       <Stack.Screen name="VALMatch" component={VALMatchScreen} options={{ title: "Valorant" }} />
+      <Stack.Screen name="NewsArticle" component={NewsArticleScreen} options={{ headerShown: false, title: t("explore.tabNews") }} />
       {/* Buscar desde cualquier pestaña: hoja en iOS (se cierra deslizando), pantalla que sube en Android */}
       <Stack.Screen name="Search" component={SearchScreen} options={{ presentation: "modal", headerShown: false, title: t("tabs.search") }} />
     </Stack.Navigator>

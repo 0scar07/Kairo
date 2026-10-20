@@ -98,7 +98,7 @@ https://github.com/user-attachments/assets/d742c1f1-c26e-4f44-955c-a063e2840adc
 - **Resumen semanal:** el domingo por la tarde (hora de tu celular) una notificación con tus partidas, victorias y LP de la semana.
 - **Avisos de progreso:** cuando un favorito de LoL sube o baja de rango o entra en promoción, y cuando un favorito de **Brawl Stars** o **Clash Royale** bate su récord de trofeos.
 - **Comparar dos jugadores** de LoL cara a cara (rango, winrate, KDA, nivel, maestría, campeón más jugado).
-- **Explorar (la lupa de la barra):** el **ranking** Challenger, Gran Maestro o Maestro de tu región (Solo/Dúo o Flex) con su tabla completa, tus **favoritos en partida ahora** con cronómetro, los **pros**, los **enfrentamientos**, la búsqueda por Riot ID y atajos a Mi perfil y Comparar.
+- **Explorar (la lupa de la barra):** **Noticias** de todos los juegos al estilo Netflix (un carrusel que pasa solo con los parches, el último campeón de esports y los eventos; filas por tipo y, al elegir un juego, el arte de sus campeones y los que cambiaron en su último parche), las **notas del parche para leer dentro de la app** (cada campeón con su splash, el porqué de Riot y cada cambio antes → ahora con sube / baja), el **ranking** Challenger, Gran Maestro o Maestro de tu región (Solo/Dúo o Flex) con su tabla completa, tus **favoritos en partida ahora** con cronómetro, los **pros**, los **enfrentamientos**, la búsqueda por Riot ID y atajos a Mi perfil y Comparar.
 - **Jugadores profesionales:** LCK, LPL, LEC, LCS, LTA Norte y Sur, LLA, Mundial y MSI con la **clasificación** de cada torneo, la **plantilla** de cada equipo y el perfil de cada pro (winrate, KDA, participación en kills, oro y CS por minuto, % del daño y campeones) por split. Datos de lolesports.com.
 - **Compartir el perfil como imagen** lista para redes (Android e iPhone nativo).
 - **Perfiles sin conexión:** la app guarda lo último que viste de cada jugador y lo abre aunque no haya internet.
@@ -407,6 +407,13 @@ Wild Rift y Valorant (sin perfiles de jugador):
 | `GET /wildrift/news?lang=es\|en\|pt\|fr\|de` | Últimas actualizaciones del juego de la web oficial (las notas del parche llevan `patch: true`) |
 | `GET /wildrift/esports` · `GET /valorant/esports` | En vivo, próximos, resultados y torneos (Valorant suma los próximos torneos y el último campeón) |
 | `GET /valorant/match/:id` | Detalle de un partido de Valorant |
+
+Noticias (webs oficiales de Riot, Steam, Fortnite-API y PandaScore; sin key):
+
+| Ruta | Descripción |
+|------|-------------|
+| `GET /news?lang=es\|en\|pt\|fr\|de` | Lo último de LoL, TFT, Valorant, Wild Rift, Dota 2, Apex, PUBG y Fortnite, y el último campeón de Valorant |
+| `GET /news/article?game=lol\|tft\|valorant\|wildrift&path=` | Un artículo de Riot (notas del parche) en secciones, campeones y cambios en texto plano |
 
 Notificaciones y sincronización (sin cuentas: cada celular se registra con su token y un secreto propio):
 
