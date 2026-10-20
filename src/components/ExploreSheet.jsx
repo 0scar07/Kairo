@@ -10,6 +10,7 @@ import { getLeaderboard, getLive } from "../games/lol/api";
 import { getProLeague, getProLeagues, tournamentLabel } from "../games/lol/esports";
 import ProStandings from "../games/lol/components/ProStandings";
 import MatchupsTab from "../games/lol/components/MatchupsTab";
+import NewsTab from "../news/NewsTab";
 import { queueLabel } from "../games/lol/utils";
 import { championByKey, championIcon, profileIconUrl } from "../api/ddragon";
 import { getRegion } from "../constants/regions";
@@ -26,6 +27,7 @@ const QUEUES = ["RANKED_SOLO_5x5", "RANKED_FLEX_SR"];
 
 /**
  * Hoja "Explorar" del botón de la lupa: descubrir jugadores de League of Legends sin escribir su nombre.
+ *  - Noticias: lo último de todos los juegos (carrusel, parches para leer en la app y esports; ver src/news/).
  *  - Ranking: el top de la región (Challenger, Gran Maestro o Maestro; Solo/Dúo o Flex) como tabla.
  *  - En vivo: los favoritos de LoL que están en partida ahora.
  *  - Enfrentamientos: tu campeón contra un rival (build, habilidades y counters; ver games/lol/MatchupScreen.jsx).
@@ -35,7 +37,7 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
   const t = useT();
   const { region } = useBootData();
   const { setGameId } = useActiveGame();
-  const [tab, setTab] = useState("ranking");
+  const [tab, setTab] = useState("news");
   const [tier, setTier] = useState("challenger");
   const [queue, setQueue] = useState("RANKED_SOLO_5x5");
   const [ranking, setRanking] = useState({ status: "loading" });   // loading | ready | error
@@ -92,6 +94,7 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
   }
 
   const tabs = [
+    { key: "news", label: t("explore.tabNews") },
     { key: "ranking", label: t("explore.tabRanking") },
     { key: "live", label: live.list.length ? `${t("explore.tabLive")} · ${live.list.length}` : t("explore.tabLive") },
     { key: "pros", label: t("explore.tabPros") },
@@ -122,7 +125,9 @@ export default function ExploreSheet({ visible, onClose, navigation }) {
 
         <View style={styles.tabs}><SegmentedTabs tabs={tabs} value={tab} onChange={setTab} game="lol" scroll /></View>
 
-        {tab === "ranking" ? (
+        {tab === "news" ? (
+          <NewsTab visible={visible && tab === "news"} onArticle={a => go("NewsArticle", a)} onMatch={id => go("VALMatch", { id })} />
+        ) : tab === "ranking" ? (
           <>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chips}>
               {QUEUES.map(q => <Chip key={q} label={q === "RANKED_SOLO_5x5" ? t("ranked.solo") : t("ranked.flex")} active={queue === q} game="lol" onPress={() => setQueue(q)} />)}

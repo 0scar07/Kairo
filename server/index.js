@@ -8,6 +8,7 @@ const { securityHeaders, requestLogger, corsMiddleware, limiter } = require("./l
 const lolRouter = require("./routes/lol");
 const tftRouter = require("./routes/tft");
 const esportsRouter = require("./routes/esports");
+const newsRouter = require("./routes/news");
 const { createSupercellRouter } = require("./routes/supercell");
 const extra = require("./lib/extra");
 const { createStore } = require("./lib/store");
@@ -86,6 +87,8 @@ app.use("/clashofclans", createSupercellRouter("clashofclans"));
 for (const [id, module] of Object.entries(extra.ROUTES)) app.use(`/${id}`, module.router);
 // Esports de LoL (ligas profesionales, rosters y estadísticas por torneo; ver routes/esports.js)
 app.use("/esports", esportsRouter);
+// Noticias de todos los juegos y lector de las notas del parche de Riot (ver routes/news.js)
+app.use("/news", newsRouter);
 
 // Dispositivos para las notificaciones (Postgres si hay DATABASE_URL; si no, un archivo JSON local).
 // Si el almacén no arranca, el resto de la API sigue funcionando y solo /devices responde 503.

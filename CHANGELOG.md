@@ -8,6 +8,11 @@ Las descargas están en [GitHub Releases](https://github.com/0scar07/Kairo/relea
 ## v1.5.0 · por aire
 
 ### 2026-10-19
+- **Noticias** en Explorar, al estilo Netflix: un carrusel que pasa solo con lo más importante de todos los juegos
+  (parches, el último campeón de esports y eventos), filas por tipo y, al elegir un juego, el arte de sus campeones y
+  los que cambiaron en su último parche. Las **notas del parche se leen dentro de la app**: cada campeón con su
+  splash, el porqué de Riot y cada cambio antes → ahora con sube / baja (LoL, TFT, Valorant y Wild Rift).
+- Arreglo: el brillo del juego elegido ya no deja una mancha negra en Android.
 - **Wild Rift:** nuevo juego, sin buscador (Wild Rift no publica perfiles). Tier list S+ a D por carril y rango que
   se ordena por victorias, elección o baneo y se comparte como imagen; ficha de cada campeón con su winrate por
   rango; buscador A-Z y comparador de dos campeones; **Mis mains**; los que suben y bajan hoy y las últimas notas
