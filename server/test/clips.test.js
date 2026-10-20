@@ -21,3 +21,20 @@ test("mix turna los juegos para que un canal que publica mucho no tape a los dem
   assert.deepStrictEqual(out.map(x => x.game), ["lol", "valorant", "lol", "lol", "lol"]);
   assert.deepStrictEqual(out.filter(x => x.game === "lol").map(x => x.date), ["2026-10-19", "2026-10-18", "2026-10-17", "2026-10-16"]);
 });
+
+test("parseApi toma los videos de hasta 3 minutos de la API oficial con sus estadísticas", () => {
+  const v = (id, duration, views) => ({ id, contentDetails: { duration }, snippet: { title: `Clip ${id}`, publishedAt: "2026-10-19T00:00:00Z" }, statistics: { viewCount: String(views), likeCount: "10" } });
+  const list = clips.parseApi({ items: [v("aaaaaaaaaaa", "PT45S", 1000), v("bbbbbbbbbbb", "PT12M3S", 5), v("ccccccccccc", "PT2M59S", 7)] }, { game: "valorant", name: "VALORANT" });
+  assert.deepStrictEqual(list.map(c => c.id), ["aaaaaaaaaaa", "ccccccccccc"]);
+  assert.strictEqual(list[0].views, 1000);
+  assert.strictEqual(list[0].likes, 10);
+  assert.strictEqual(list[0].url, "https://www.youtube.com/shorts/aaaaaaaaaaa");
+});
+
+test("durationSeconds y uploadsOf", () => {
+  assert.strictEqual(clips.durationSeconds("PT1M5S"), 65);
+  assert.strictEqual(clips.durationSeconds("PT45S"), 45);
+  assert.strictEqual(clips.durationSeconds("P1DT1H"), 90000);
+  assert.strictEqual(clips.durationSeconds("x"), null);
+  assert.strictEqual(clips.uploadsOf("UC2t5bjwHdUX4vM2g8TRDq5g"), "UU2t5bjwHdUX4vM2g8TRDq5g");
+});
