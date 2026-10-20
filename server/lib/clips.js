@@ -52,6 +52,42 @@ function parseFeed(xml, source) {
     .filter(Boolean);
 }
 
+/** Duración ISO 8601 de la API de YouTube ("PT1M5S") → segundos */
+function durationSeconds(iso) {
+  const m = /^P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(String(iso || ""));
+  if (!m) return null;
+  const [, d, h, min, sec] = m.map(x => Number(x) || 0);
+  return d * 86400 + h * 3600 + min * 60 + sec;
+}
+
+// Los Shorts duran hasta 3 minutos; con la API (que no los marca) se reconocen por eso
+const SHORT_MAX = 180;
+
+/**
+ * Shorts con la API oficial de YouTube (con YOUTUBE_API_KEY): los videos de la lista de subidas del canal con su
+ * duración y estadísticas (videos.list). Mismo formato que parseFeed.
+ */
+function parseApi(videos, source) {
+  return (videos?.items || [])
+    .filter(v => VIDEO_ID.test(v.id || "") && (durationSeconds(v.contentDetails?.duration) ?? 999) <= SHORT_MAX)
+    .map(v => ({
+      id: v.id,
+      game: source.game,
+      channel: source.name,
+      esports: Boolean(source.esports),
+      title: decode(v.snippet?.title),
+      date: v.snippet?.publishedAt || null,
+      views: v.statistics?.viewCount != null ? Number(v.statistics.viewCount) : null,
+      likes: v.statistics?.likeCount != null ? Number(v.statistics.likeCount) : null,
+      image: `https://i.ytimg.com/vi/${v.id}/oar2.jpg`,
+      fallback: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+      url: `https://www.youtube.com/shorts/${v.id}`,
+    }));
+}
+
+/** Lista de subidas de un canal: "UC…" → "UU…" */
+const uploadsOf = channel => `UU${String(channel).slice(2)}`;
+
 /**
  * Mezcla los clips de todos los canales para "Para ti": van turnándose los juegos (primero el que publicó lo más nuevo)
  * y de cada juego sale su clip más nuevo que quede, así ningún canal que publica mucho tapa a los demás.
@@ -69,4 +105,4 @@ function mix(lists, limit = 90) {
   return out;
 }
 
-module.exports = { CHANNELS, parseFeed, mix };
+module.exports = { CHANNELS, parseFeed, parseApi, durationSeconds, uploadsOf, mix };

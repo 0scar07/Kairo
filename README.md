@@ -331,6 +331,7 @@ Guía completa (key de Riot, plan gratuito que se duerme, Railway/Fly, seguridad
 | `FORTNITE_API_KEY` · `APEX_API_KEY` · `PUBG_API_KEY` | Keys gratuitas de Fortnite-API, Apex Legends Status y PUBG (opcionales: cada juego se activa al ponerla) |
 | `OPENDOTA_API_KEY` | Opcional: Dota 2 funciona sin key; con ella suben los límites de OpenDota |
 | `PANDASCORE_TOKEN` | Token gratuito de [PandaScore](https://pandascore.co) para los esports de Wild Rift y Valorant (sin él, Valorant aparece como "PRONTO" y Wild Rift funciona sin esports) |
+| `YOUTUBE_API_KEY` | Opcional: key gratuita de la API de YouTube para los Clips (sin ella se usan los feeds públicos, que a veces fallan) |
 | `LOLESPORTS_API_KEY` | Opcional: key de la API de lolesports.com (por defecto la pública que usa su web) |
 | `DATABASE_URL` | Postgres para dispositivos, historial de LP y builds (sin ella, un archivo JSON local) |
 | `WATCHER_ENABLED` · `WATCH_INTERVAL_MS` · `WATCH_MAX_PER_TICK` | Vigilante de partidas en vivo: encendido (por defecto sí), cada cuánto revisa (`120000` ms) y cuántos jugadores por vuelta (`40`) |
