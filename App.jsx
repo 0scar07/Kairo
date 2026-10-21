@@ -51,10 +51,11 @@ SplashScreen.preventAutoHideAsync().catch(e => console.warn("No se pudo retener 
 const Stack = createNativeStackNavigator();
 const Tab   = createBottomTabNavigator();
 
-// Enlaces profundos (kairo://live/la1/<puuid>): abren la partida en vivo. En la web la URL ya es la del navegador.
+// Enlaces profundos: kairo://live/la1/<puuid> abre la partida en vivo; kairo://perfil, kairo://favoritos y
+// kairo://valorant/partido/<id> los usan los widgets de Android. En la web la URL ya es la del navegador.
 const linking = Platform.OS === "web" ? undefined : {
   prefixes: [Linking.createURL("/"), "kairo://"],
-  config: { screens: { LiveGame: "live/:region/:puuid", Tabs: { screens: { Inicio: "", Favoritos: "favoritos", Ajustes: "ajustes" } } } },
+  config: { screens: { LiveGame: "live/:region/:puuid", MyProfile: "perfil", VALMatch: "valorant/partido/:id", Tabs: { screens: { Inicio: "", Favoritos: "favoritos", Ajustes: "ajustes" } } } },
 };
 
 const navTheme = {

@@ -34,6 +34,54 @@
             "./assets/sounds/live_result.wav"
           ]
         }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "fonts": [
+            "./node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf",
+            "./node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf",
+            "./node_modules/@expo-google-fonts/sora/800ExtraBold/Sora_800ExtraBold.ttf"
+          ],
+          "widgets": [
+            {
+              "name": "KairoRank",
+              "label": "Kairo · Rango",
+              "description": "Tu rango Solo/Dúo, LP y últimas partidas",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000,
+              "previewImage": "./assets/widgets/rank.png"
+            },
+            {
+              "name": "KairoMatch",
+              "label": "Kairo · Próximo partido",
+              "description": "El próximo partido de Valorant de tu equipo",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000,
+              "previewImage": "./assets/widgets/match.png"
+            },
+            {
+              "name": "KairoFriends",
+              "label": "Kairo · Favoritos",
+              "description": "Quién de tus favoritos está en partida",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 1800000,
+              "previewImage": "./assets/widgets/friends.png"
+            }
+          ]
+        }
       ]
     ],
     "userInterfaceStyle": "dark",

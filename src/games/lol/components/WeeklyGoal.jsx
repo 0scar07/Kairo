@@ -9,6 +9,9 @@ import { Chip, Confetti, CountUp, PressableScale, Sheet, showHud } from "../../.
 import { useT } from "../../../i18n/I18nProvider";
 import { activeLanguage } from "../../../i18n";
 import { select, success } from "../../../utils/haptics";
+import { updateRankWidget } from "../../../widget";
+import { ddBase } from "../../../api/ddragon";
+import { findMe } from "../utils";
 import {
   GOAL_OPTIONS, gamesSince, goalProgress, loadWeekState, lpChange, markDone, rankScore, recordSnapshot, saveGoals, weekDays, weekStart,
 } from "../week";
@@ -108,7 +111,15 @@ export default function WeeklyGoal({ data }) {
 
   const refresh = useCallback(async () => {
     await recordSnapshot(account.puuid, solo).catch(() => {});
-    setState(await loadWeekState(account.puuid));
+    const next = await loadWeekState(account.puuid);
+    setState(next);
+    // El widget de rango de Android muestra lo mismo (solo si el APK lo trae)
+    updateRankWidget({
+      name: account.gameName, tag: account.tagLine, tier: solo?.tier || null, rank: solo?.rank || null, lp: solo?.leaguePoints ?? null,
+      weekLp: lpChange(next.snaps, weekStart(), rankScore(solo)),
+      last5: (matches || []).slice(0, 5).map(m => findMe(m, account.puuid)?.win).filter(w => w != null),
+      dd: ddBase(),
+    }).catch(() => {});
   }, [account.puuid, solo?.tier, solo?.rank, solo?.leaguePoints]);
   useEffect(() => { refresh(); }, [refresh]);
 

@@ -1,7 +1,7 @@
 {
   "name": "kairo",
   "version": "1.5.0",
-  "main": "expo/AppEntry.js",
+  "main": "index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -37,6 +37,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
+    "react-native-android-widget": "0.22.1",
     "react-native-chart-kit": "^6.12.1",
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",

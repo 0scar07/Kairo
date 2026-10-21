@@ -112,7 +112,6 @@ const SUGGESTED = {
   valorant: ["@TenZ", "@tarik", "@Sentinels"],
   fortnite: ["@Ninja"],
   apex: ["@iiTzTimmy"],
-  brawlstars: ["@KairosTime"],
 };
 
 const CHANNEL_ID = /^UC[A-Za-z0-9_-]{22}$/;
