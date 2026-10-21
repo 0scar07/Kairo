@@ -23,6 +23,7 @@ const { createBuildsRouter } = require("./routes/builds");
 const { createSyncRouter } = require("./routes/sync");
 const { RankTracker } = require("./lib/rankTracker");
 const { TrophyTracker } = require("./lib/trophyTracker");
+const { PatchTracker } = require("./lib/patchTracker");
 const storeRef = require("./lib/storeRef");
 let artRouter;
 try {
@@ -118,7 +119,8 @@ app.use("/sync", (_req, _res, next) => storeReady.then(() => next(), () => next(
   createSyncRouter(store));
 
 // Vigilante: revisa a los favoritos con alertas y manda las notificaciones (solo si el almacén arrancó)
-const watcher = new Watcher({ store, push, rank: new RankTracker({ store, push }), trophies: new TrophyTracker({ store, push }), maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
+const watcher = new Watcher({ store, push, rank: new RankTracker({ store, push }), trophies: new TrophyTracker({ store, push }),
+  patches: new PatchTracker({ store, push, loadNews: newsRouter.loadNews }), maxPerTick: config.watchMaxPerTick, canWatch: () => access.games().lol !== false });
 storeReady.then(() => { if (config.watcherEnabled) watcher.start(config.watchIntervalMs); }).catch(() => {});
 // BUILDS_ENABLED=false lo apaga (por ejemplo, para no gastar cupo de Riot en local)
 storeReady.then(() => { if (process.env.BUILDS_ENABLED !== "false") buildsJob.start(); }).catch(() => {});

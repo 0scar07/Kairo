@@ -105,4 +105,50 @@ function mix(lists, limit = 90) {
   return out;
 }
 
-module.exports = { CHANNELS, parseFeed, parseApi, durationSeconds, uploadsOf, mix };
+// Canales sugeridos para "Siguiendo" (pros y streamers), por juego. Se resuelven con la API de YouTube por su @: los
+// que no existan simplemente no aparecen.
+const SUGGESTED = {
+  lol: ["@Caedrel", "@T1", "@G2Esports"],
+  valorant: ["@TenZ", "@tarik", "@Sentinels"],
+  fortnite: ["@Ninja"],
+  apex: ["@iiTzTimmy"],
+  brawlstars: ["@KairosTime"],
+};
+
+const CHANNEL_ID = /^UC[A-Za-z0-9_-]{22}$/;
+const HANDLE = /^@?([A-Za-z0-9._-]{3,30})$/;
+
+/**
+ * Lo que alguien pega para seguir un canal → { id } o { handle }; null si no se entiende.
+ * Acepta "UC…", "@nombre", "nombre" y enlaces de YouTube (/@nombre, /channel/UC…, con o sin www/m.).
+ */
+function channelInput(raw) {
+  const text = String(raw || "").trim();
+  if (!text || text.length > 200) return null;
+  if (CHANNEL_ID.test(text)) return { id: text };
+  const url = /^(?:https?:\/\/)?(?:www\.|m\.)?youtube\.com\/(.+)$/i.exec(text);
+  const path = url ? url[1].split(/[?#]/)[0].replace(/\/+$/, "") : null;
+  if (path) {
+    const ch = /^channel\/(UC[A-Za-z0-9_-]{22})/.exec(path);
+    if (ch) return { id: ch[1] };
+    const at = /^@([A-Za-z0-9._-]{3,30})(?:\/.*)?$/.exec(path);
+    return at ? { handle: `@${at[1]}` } : null;
+  }
+  const h = HANDLE.exec(text);
+  return h ? { handle: `@${h[1]}` } : null;
+}
+
+/** Canal de la API de YouTube (channels.list) al formato de la app */
+function channelInfo(c) {
+  if (!c?.id) return null;
+  const thumbs = c.snippet?.thumbnails || {};
+  return {
+    id: c.id,
+    title: decode(c.snippet?.title) || c.id,
+    handle: c.snippet?.customUrl || null,
+    image: thumbs.medium?.url || thumbs.default?.url || null,
+    subs: c.statistics?.hiddenSubscriberCount ? null : (c.statistics?.subscriberCount != null ? Number(c.statistics.subscriberCount) : null),
+  };
+}
+
+module.exports = { CHANNELS, SUGGESTED, parseFeed, parseApi, durationSeconds, uploadsOf, mix, channelInput, channelInfo };

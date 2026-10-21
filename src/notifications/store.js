@@ -9,6 +9,9 @@ export const DEFAULT_PREFS = {
   weekly: true,         // resumen semanal (domingo por la tarde)
   rankAlerts: true,     // avisos de cambio de rango de los favoritos
   trophyAlerts: true,   // Brawl Stars y Clash Royale: récords de trofeos de los favoritos
+  patchAlerts: true,    // notas del parche nuevas de los juegos de patchGames (las manda el servidor)
+  patchGames: ["lol"],
+  valAlerts: true,      // 15 min antes de los partidos de los equipos de Valorant seguidos (en el celular)
   quiet: { enabled: false, from: "23:00", to: "07:00" },   // horario silencioso
 };
 

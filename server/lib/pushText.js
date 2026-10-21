@@ -126,6 +126,23 @@ const trophyText = (locale, { name, record, delta }) => {
   return { title: t.title(name), body: t.body(record, delta) };
 };
 
+const GAME_NAMES = { lol: "LoL", tft: "TFT", valorant: "Valorant", wildrift: "Wild Rift", dota2: "Dota 2", apex: "Apex Legends", pubg: "PUBG" };
+const PATCH = {
+  es: { version: (v, g) => `Salió el parche ${v} de ${g}`, plain: g => `Nuevo parche de ${g}` },
+  en: { version: (v, g) => `${g} patch ${v} is out`, plain: g => `New ${g} patch` },
+  pt: { version: (v, g) => `Saiu o patch ${v} de ${g}`, plain: g => `Novo patch de ${g}` },
+  fr: { version: (v, g) => `Le patch ${v} de ${g} est sorti`, plain: g => `Nouveau patch de ${g}` },
+  de: { version: (v, g) => `${g}-Patch ${v} ist da`, plain: g => `Neuer ${g}-Patch` },
+};
+// "Notas de la versión 26.21" -> "26.21"; sin número (Apex, PUBG…) queda el título genérico y el original va abajo
+const patchVersion = title => /(?<![\d.])\d{1,2}\.\d{1,2}[a-z]?(?![\d.])/i.exec(String(title || ""))?.[0] || null;
+function patchText(locale, { game, title }) {
+  const t = PATCH[locale] || PATCH.es;
+  const name = GAME_NAMES[game] || game;
+  const v = patchVersion(title);
+  return { title: v ? t.version(v, name) : t.plain(name), body: String(title || "").slice(0, 140) };
+}
+
 const testText = locale => ({ title: tr(locale).testTitle, body: tr(locale).testBody });
 
-module.exports = { LOCALES, queueName, startText, endText, testText, artText, weeklyText, rankChangeText, tierLabel, trophyText };
+module.exports = { LOCALES, queueName, startText, endText, testText, artText, weeklyText, rankChangeText, tierLabel, trophyText, patchText, patchVersion };

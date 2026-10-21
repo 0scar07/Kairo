@@ -15,6 +15,8 @@ import Teammates from "./components/Teammates";
 import RecentChampions from "./components/RecentChampions";
 import SummaryRings from "./components/SummaryRings";
 import MineExtras from "./MineExtras";
+import WeeklyGoal from "./components/WeeklyGoal";
+import WeekRecapCard from "./components/WeekRecapCard";
 import MasteryCard from "./components/MasteryCard";
 import { getMoreMatches, PROFILE_MATCHES } from "./api";
 import { QUEUE_FLEX, QUEUE_SOLO, findMe, getBestChampions, getChampionStats, getOverallStats, getPaceStats, getStreak, getTeammates } from "./utils";
@@ -125,6 +127,13 @@ export default function LolProfileBody({ data, setData, setError, mine }) {
               onOpen={queue => navigation.navigate("RankHistory", { puuid: account.puuid, region, queue, name: `${account.gameName} #${account.tagLine}` })}
             />}
       </Reveal>
+
+      {mine && (
+        <Reveal order={2}>
+          <WeeklyGoal data={data} />
+          <WeekRecapCard data={data} />
+        </Reveal>
+      )}
 
       {mastery && (
         <Reveal order={2}>

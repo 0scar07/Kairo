@@ -3,6 +3,7 @@ const { HttpError } = require("./errors");
 const { isRegion } = require("./regions");
 const { LOCALES } = require("./pushText");
 const { TAG_RE } = require("./supercell");
+const { PATCH_GAMES } = require("./patchTracker");
 
 // Un dispositivo = un celular con la app: su token de notificaciones, sus favoritos vigilados y sus ajustes.
 // Sin cuentas: al registrarse recibe un secreto propio (que el servidor guarda con hash) y con él se identifica.
@@ -25,6 +26,8 @@ const DEFAULT_SETTINGS = Object.freeze({
   weekly: true,         // resumen semanal (domingo por la tarde)
   trophyAlerts: true,   // Brawl Stars y Clash Royale: aviso cuando un favorito bate su récord de trofeos
   rankAlerts: true,     // avisar cuando un favorito sube o baja de rango, o entra en promoción
+  patchAlerts: true,    // avisar cuando salen notas del parche nuevas de los juegos de `patchGames`
+  patchGames: ["lol"],
   quiet: { enabled: false, from: "23:00", to: "07:00", utcOffsetMinutes: 0 },   // horario silencioso (hora local del celular)
 });
 
@@ -70,10 +73,15 @@ function parseFavorites(list) {
 function parseSettings(input, current = DEFAULT_SETTINGS) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw bad("Ajustes no válidos", "INVALID_SETTINGS");
   const next = { ...current, quiet: { ...current.quiet } };
-  for (const key of ["enabled", "notifyStart", "notifyEnd", "weekly", "rankAlerts", "trophyAlerts"]) {
+  for (const key of ["enabled", "notifyStart", "notifyEnd", "weekly", "rankAlerts", "trophyAlerts", "patchAlerts"]) {
     if (input[key] === undefined) continue;
     if (!isBool(input[key])) throw bad(`Ajuste no válido: ${key}`, "INVALID_SETTINGS");
     next[key] = input[key];
+  }
+  if (input.patchGames !== undefined) {
+    const list = input.patchGames;
+    if (!Array.isArray(list) || list.length > PATCH_GAMES.length || !list.every(g => PATCH_GAMES.includes(g))) throw bad("Juegos de parches no válidos", "INVALID_SETTINGS");
+    next.patchGames = [...new Set(list)];
   }
   if (input.locale !== undefined) {
     if (!LOCALES.includes(input.locale)) throw bad("Idioma no válido", "INVALID_SETTINGS");

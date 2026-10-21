@@ -5,7 +5,7 @@ import { ErrorState, PressableScale } from "../components/ui";
 import { getGameMeta } from "../games/registry";
 import { ChipLogo, GamePill, Rail, Shade } from "../news/components";
 import { GoldSkeleton, PillChips, PressCard, Shine } from "../news/fx";
-import { getClips, hasWebView } from "./api";
+import { getClips, hasWebView, loadFollowing, onFollowingChanged } from "./api";
 import { useT } from "../i18n/I18nProvider";
 import { errorMessage, formatCompact } from "../utils/format";
 import { accents, colors, radii, sizes, spacing, type, withAlpha } from "../theme";
@@ -42,6 +42,26 @@ function Stack({ clips, onOpen }) {
   );
 }
 
+/** Fila "Siguiendo": las caras de los canales que sigues (o la invitación a elegirlos) y el acceso a sus Shorts */
+function FollowingRow({ list, onOpen, t }) {
+  return (
+    <PressableScale onPress={onOpen} haptic scaleTo={0.97} style={styles.followRow} accessibilityRole="button">
+      <View style={styles.faces}>
+        {list.length ? list.slice(0, 5).map((c, i) => (
+          <Animated.View key={c.id} entering={FadeInRight.delay(i * 70).duration(320)} style={[styles.faceWrap, i > 0 && styles.faceOverlap, { zIndex: 10 - i }]}>
+            {c.image ? <Image source={{ uri: c.image }} style={styles.face} /> : <View style={[styles.face, styles.faceEmpty]} />}
+          </Animated.View>
+        )) : <View style={[styles.face, styles.faceAdd]}><Text style={styles.faceAddText}>+</Text></View>}
+      </View>
+      <View style={styles.followBody}>
+        <Text style={styles.followTitle}>{t("clips.following")}</Text>
+        <Text style={styles.followSub} numberOfLines={1}>{list.length ? list.map(c => c.title).join(", ") : t("clips.followingEmptyBody")}</Text>
+      </View>
+      <Text style={styles.followGo}>›</Text>
+    </PressableScale>
+  );
+}
+
 /**
  * Pestaña Clips de Explorar: portada con tres clips, el botón para abrir el visor a pantalla completa, filtro por juego
  * y lo más visto de la semana. Los clips son los Shorts oficiales de YouTube de cada juego.
@@ -52,6 +72,11 @@ export default function ClipsTab({ visible, onOpen }) {
   const [state, setState] = useState({ status: "loading" });
   const [game, setGame] = useState("all");
   const [attempt, setAttempt] = useState(0);
+  const [following, setFollowing] = useState([]);
+  useEffect(() => {
+    loadFollowing().then(setFollowing);
+    return onFollowingChanged(setFollowing);
+  }, []);
 
   useEffect(() => {
     if (!visible) return undefined;
@@ -68,7 +93,15 @@ export default function ClipsTab({ visible, onOpen }) {
   if (state.status === "loading") {
     return <View><GoldSkeleton height={sizes.chart * 2.7} radius={radii.xl} /><GoldSkeleton height={sizes.avatarLg + spacing.sm} style={styles.gap} /></View>;
   }
-  if (state.status === "error") return <ErrorState message={state.message} onRetry={() => setAttempt(n => n + 1)} />;
+  // Si fallan los clips oficiales, los de quien sigues siguen a mano
+  if (state.status === "error") {
+    return (
+      <View>
+        <ErrorState message={state.message} onRetry={() => setAttempt(n => n + 1)} />
+        <FollowingRow list={following} t={t} onOpen={() => onOpen({ feed: "following" })} />
+      </View>
+    );
+  }
 
   const open = clip => onOpen({ startId: clip?.id, game: game === "all" ? undefined : game });
   return (
@@ -79,6 +112,7 @@ export default function ClipsTab({ visible, onOpen }) {
         <Shine />
       </PressableScale>
       {!hasWebView() ? <Text style={styles.note}>{t("clips.needsUpdate")}</Text> : null}
+      <FollowingRow list={following} t={t} onOpen={() => onOpen({ feed: "following" })} />
 
       <PillChips
         style={styles.chips}
@@ -127,4 +161,16 @@ const styles = StyleSheet.create({
   miniPill:  { position: "absolute", top: spacing.xs, left: spacing.xs },
   miniViews: { ...type.micro, color: colors.text },
   source:    { ...type.micro, color: colors.textMuted, marginTop: spacing.lg },
+  followRow: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginTop: spacing.md, padding: spacing.md, borderRadius: radii.lg, backgroundColor: colors.surface, borderWidth: sizes.hairline, borderColor: withAlpha("#FF3D6E", 0.35) },
+  faces:     { flexDirection: "row" },
+  faceWrap:  { borderRadius: sizes.avatarMd, borderWidth: sizes.borderThick, borderColor: colors.surface },
+  faceOverlap: { marginLeft: -spacing.md },
+  face:      { width: sizes.avatarMd, height: sizes.avatarMd, borderRadius: sizes.avatarMd / 2, backgroundColor: colors.surfaceHigh },
+  faceEmpty: { backgroundColor: withAlpha(colors.text, 0.15) },
+  faceAdd:   { alignItems: "center", justifyContent: "center", borderWidth: sizes.hairline * 1.5, borderStyle: "dashed", borderColor: withAlpha("#FF3D6E", 0.8), backgroundColor: withAlpha("#FF3D6E", 0.1) },
+  faceAddText: { ...type.title, color: "#FF3D6E" },
+  followBody:{ flex: 1, minWidth: 0 },
+  followTitle: { ...type.bodyStrong, color: colors.text },
+  followSub: { ...type.caption, color: colors.textMuted, marginTop: spacing.xxs },
+  followGo:  { ...type.title, color: colors.textMuted },
 });

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Image, FlatList, Linking, Pressable, Share, StyleSheet, useWindowDimensions } from "react-native";
-import Animated, { FadeIn, FadeOut, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInRight, FadeOut, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import Svg, { Path } from "react-native-svg";
@@ -11,7 +11,8 @@ import { getGameMeta } from "../games/registry";
 import { GoldSkeleton } from "../news/fx";
 import { loadMyList, toggleMyList } from "../news/storage";
 import YouTubePlayer from "./YouTubePlayer";
-import { clipAsItem, getClips, hasWebView, loadSound, saveSound } from "./api";
+import { clipAsItem, getClips, getFollowingClips, hasWebView, loadFollowing, loadSound, onFollowingChanged, saveSound } from "./api";
+import FollowSheet from "./FollowSheet";
 import { useT } from "../i18n/I18nProvider";
 import { errorMessage, formatCompact, timeSince } from "../utils/format";
 import { select, success, tap } from "../utils/haptics";
@@ -140,8 +141,10 @@ function Clip({ clip, active, height, muted, saved, canPlay, onToggleSave, onTog
 
 /**
  * Visor de Clips a pantalla completa, tipo TikTok: un Short oficial por pantalla; deslizar hacia arriba pasa al
- * siguiente y arranca solo (el anterior se pausa). Arriba, "Para ti" / "Esports" y el filtro por juego.
- *  - params: { startId?, game? }
+ * siguiente y arranca solo (el anterior se pausa). Arriba, "Para ti" / "Esports" / "Siguiendo" y el filtro por juego.
+ * En "Siguiendo" salen los Shorts de los canales que elegiste (pros, streamers), con sus caras arriba y un "+" para
+ * sumar más.
+ *  - params: { startId?, game?, feed? }
  */
 export default function ClipsScreen({ route, navigation }) {
   const t = useT();
@@ -149,7 +152,10 @@ export default function ClipsScreen({ route, navigation }) {
   const { height } = useWindowDimensions();
   const [state, setState] = useState({ status: "loading" });
   const [game, setGame] = useState(route.params?.game || "all");
-  const [feed, setFeed] = useState("foryou");
+  const [feed, setFeed] = useState(route.params?.feed || "foryou");
+  const [following, setFollowing] = useState([]);
+  const [followState, setFollowState] = useState({ status: "idle", items: [] });
+  const [sheet, setSheet] = useState(false);
   const [index, setIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const [myList, setMyList] = useState([]);
@@ -163,9 +169,26 @@ export default function ClipsScreen({ route, navigation }) {
     return () => { alive = false; };
   }, [attempt]);
   useEffect(() => { loadSound().then(on => setMuted(!on)); loadMyList().then(setMyList); }, []);
+  useEffect(() => {
+    loadFollowing().then(setFollowing);
+    return onFollowingChanged(setFollowing);
+  }, []);
+  // Los Shorts de los canales seguidos (solo al entrar a "Siguiendo" o al cambiar la lista)
+  useEffect(() => {
+    if (feed !== "following") return undefined;
+    if (!following.length) { setFollowState({ status: "ready", items: [] }); return undefined; }
+    let alive = true;
+    setFollowState(s => ({ status: "loading", items: s.items }));
+    getFollowingClips(following)
+      .then(items => { if (alive) setFollowState({ status: "ready", items }); })
+      .catch(e => { if (alive) setFollowState({ status: "error", items: [], message: errorMessage(e) }); });
+    return () => { alive = false; };
+  }, [feed, following]);
 
   const all = state.items || [];
-  const list = useMemo(() => all.filter(c => (game === "all" || c.game === game) && (feed === "foryou" || c.esports)), [all, game, feed]);
+  const list = useMemo(() => (feed === "following"
+    ? followState.items.filter(c => game === "all" || c.game === game)
+    : all.filter(c => (game === "all" || c.game === game) && (feed === "foryou" || c.esports))), [all, game, feed, followState.items]);
   const games = useMemo(() => [...new Set(all.map(c => c.game))], [all]);
 
   // Al abrir desde una portada se empieza por ese clip
@@ -198,7 +221,7 @@ export default function ClipsScreen({ route, navigation }) {
     </PressableScale>
   );
 
-  if (state.status !== "ready") {
+  if (state.status !== "ready" && feed !== "following") {
     return (
       <View style={[styles.container, styles.middle]}>
         {state.status === "error" ? <ErrorState message={state.message} onRetry={() => setAttempt(n => n + 1)} /> : <GoldSkeleton height={height * 0.7} width="88%" radius={radii.xl} />}
@@ -233,14 +256,14 @@ export default function ClipsScreen({ route, navigation }) {
         initialNumToRender={2}
         maxToRenderPerBatch={2}
         removeClippedSubviews
-        ListEmptyComponent={<View style={[styles.middle, { height }]}><Text style={styles.empty}>{t("clips.empty")}</Text></View>}
+        ListEmptyComponent={feed === "following" ? null : <View style={[styles.middle, { height }]}><Text style={styles.empty}>{t("clips.empty")}</Text></View>}
       />
 
       {/* Barra de arriba: cerrar, Para ti / Esports y el filtro por juego */}
       <View style={[styles.top, { top: insets.top + spacing.sm }]} pointerEvents="box-none">
         {close}
         <View style={styles.seg}>
-          {[["foryou", t("clips.forYou")], ["esports", t("clips.esports")]].map(([k, label]) => (
+          {[["foryou", t("clips.forYou")], ["esports", t("clips.esports")], ["following", t("clips.following")]].map(([k, label]) => (
             <Pressable key={k} onPress={() => { select(); setFeed(k); }} accessibilityRole="tab" accessibilityState={{ selected: feed === k }}>
               <Text style={[styles.segText, feed === k && styles.segOn]}>{label}</Text>
             </Pressable>
@@ -248,6 +271,25 @@ export default function ClipsScreen({ route, navigation }) {
         </View>
         <View style={styles.roundSpacer} />
       </View>
+      {feed === "following" ? (
+        <View style={[styles.faces, { top: insets.top + spacing.sm + sizes.avatarLg + spacing.xs }]} pointerEvents="box-none">
+          {following.map((c, i) => {
+            const accent = getGameMeta(c.game)?.accent || "#FF3D6E";
+            return (
+              <Animated.View key={c.id} entering={FadeInRight.delay(i * 50).duration(320)} style={styles.face}>
+                <View style={[styles.faceRing, { borderColor: accent }]}>
+                  {c.image ? <Image source={{ uri: c.image }} style={styles.faceImg} /> : <View style={[styles.faceImg, styles.faceEmpty]} />}
+                </View>
+                <Text style={styles.faceName} numberOfLines={1}>{c.title}</Text>
+              </Animated.View>
+            );
+          })}
+          <Pressable onPress={() => { select(); setSheet(true); }} style={styles.face} accessibilityRole="button" accessibilityLabel={t("clips.addChannels")}>
+            <View style={[styles.faceRing, styles.faceAdd]}><Text style={styles.faceAddText}>+</Text></View>
+            <Text style={styles.faceName} numberOfLines={1}>{t("clips.add")}</Text>
+          </Pressable>
+        </View>
+      ) : (
       <View style={[styles.chips, { top: insets.top + spacing.sm + sizes.avatarLg + spacing.sm }]} pointerEvents="box-none">
         {["all", ...games].map(g => {
           const on = g === game;
@@ -259,6 +301,20 @@ export default function ClipsScreen({ route, navigation }) {
           );
         })}
       </View>
+      )}
+
+      {/* Siguiendo sin canales (o sin Shorts todavía): invitación a elegir */}
+      {feed === "following" && followState.status !== "loading" && !list.length ? (
+        <Animated.View entering={FadeIn.duration(260)} style={styles.followEmpty} pointerEvents="box-none">
+          <Text style={styles.followEmptyTitle}>{following.length ? t("clips.followingNone") : t("clips.followingEmpty")}</Text>
+          <Text style={styles.followEmptyBody}>{followState.status === "error" ? followState.message : t("clips.followingEmptyBody")}</Text>
+          <PressableScale onPress={() => setSheet(true)} haptic scaleTo={0.95} style={styles.followCta} accessibilityRole="button">
+            <Text style={styles.followCtaText}>{t("clips.addChannels")}</Text>
+          </PressableScale>
+        </Animated.View>
+      ) : null}
+      {feed === "following" && followState.status === "loading" && !list.length ? <View style={styles.followEmpty} pointerEvents="none"><GoldSkeleton height={height * 0.5} width="80%" radius={radii.xl} /></View> : null}
+      <FollowSheet visible={sheet} onClose={() => setSheet(false)} initialGame={game} />
 
       {/* Por cuál clip vas */}
       <View style={styles.dots} pointerEvents="none">
@@ -320,4 +376,17 @@ const styles = StyleSheet.create({
   dot:         { width: spacing.xs, height: spacing.md, borderRadius: radii.xs, backgroundColor: withAlpha(colors.text, 0.3) },
   dotOn:       { height: spacing.xl, backgroundColor: colors.text },
   hint:        { position: "absolute", alignSelf: "center", ...type.micro, color: withAlpha(colors.text, 0.75), letterSpacing: 1 },
+  faces:       { position: "absolute", left: spacing.md, right: spacing.md, flexDirection: "row", gap: spacing.sm },
+  face:        { width: sizes.avatarLg + spacing.md, alignItems: "center", gap: spacing.xxs },
+  faceRing:    { width: sizes.avatarLg + spacing.xs, height: sizes.avatarLg + spacing.xs, borderRadius: sizes.avatarLg, borderWidth: sizes.borderThick + 0.5, padding: 2, alignItems: "center", justifyContent: "center" },
+  faceImg:     { width: "100%", height: "100%", borderRadius: sizes.avatarLg },
+  faceEmpty:   { backgroundColor: withAlpha(colors.text, 0.2) },
+  faceAdd:     { borderStyle: "dashed", borderColor: withAlpha(colors.text, 0.6), ...glass },
+  faceAddText: { ...type.title, color: colors.text },
+  faceName:    { ...type.micro, color: colors.text, maxWidth: "100%", textShadowColor: "#000", textShadowRadius: 4 },
+  followEmpty: { ...StyleSheet.absoluteFillObject, alignItems: "center", justifyContent: "center", paddingHorizontal: spacing.xl, gap: spacing.sm },
+  followEmptyTitle: { ...type.title, color: colors.text, textAlign: "center" },
+  followEmptyBody:  { ...type.small, color: colors.textSecondary, textAlign: "center" },
+  followCta:   { marginTop: spacing.md, paddingHorizontal: spacing.xl, height: sizes.avatarLg + spacing.xs, borderRadius: radii.pill, alignItems: "center", justifyContent: "center", backgroundColor: "#FF3D6E" },
+  followCtaText: { ...type.bodyStrong, color: colors.onAccent },
 });

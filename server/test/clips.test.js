@@ -38,3 +38,19 @@ test("durationSeconds y uploadsOf", () => {
   assert.strictEqual(clips.durationSeconds("x"), null);
   assert.strictEqual(clips.uploadsOf("UC2t5bjwHdUX4vM2g8TRDq5g"), "UU2t5bjwHdUX4vM2g8TRDq5g");
 });
+
+test("channelInput entiende @nombre, enlaces de YouTube e identificadores, y rechaza lo demás", () => {
+  assert.deepStrictEqual(clips.channelInput("@Caedrel"), { handle: "@Caedrel" });
+  assert.deepStrictEqual(clips.channelInput("Caedrel"), { handle: "@Caedrel" });
+  assert.deepStrictEqual(clips.channelInput("https://www.youtube.com/@TenZ/shorts"), { handle: "@TenZ" });
+  assert.deepStrictEqual(clips.channelInput("m.youtube.com/channel/UC2t5bjwHdUX4vM2g8TRDq5g"), { id: "UC2t5bjwHdUX4vM2g8TRDq5g" });
+  assert.deepStrictEqual(clips.channelInput("UC2t5bjwHdUX4vM2g8TRDq5g"), { id: "UC2t5bjwHdUX4vM2g8TRDq5g" });
+  for (const bad of ["", "<script>", "https://evil.com/@x", "youtube.com/watch?v=abc", "a"]) assert.strictEqual(clips.channelInput(bad), null, bad);
+});
+
+test("channelInfo toma nombre, @, foto y suscriptores (si no están ocultos)", () => {
+  const c = clips.channelInfo({ id: "UCx", snippet: { title: "Caedrel &amp; co", customUrl: "@caedrel", thumbnails: { medium: { url: "https://yt3/x" } } }, statistics: { subscriberCount: "1200000" } });
+  assert.deepStrictEqual(c, { id: "UCx", title: "Caedrel & co", handle: "@caedrel", image: "https://yt3/x", subs: 1200000 });
+  assert.strictEqual(clips.channelInfo({ id: "UCy", snippet: {}, statistics: { hiddenSubscriberCount: true, subscriberCount: "5" } }).subs, null);
+  assert.strictEqual(clips.channelInfo(null), null);
+});
