@@ -37,7 +37,7 @@ Free, no accounts, no ads, and the API keys stay on the server, never on your ph
 <br />
 <br />
 
-### <img src="docs/icons/demo.svg" width="24" height="24" align="center" />&nbsp;Demo
+### <img src="docs/icons/demo.svg" width="24" height="24" align="top" />&nbsp;Demo
 
 <a href="https://0scar07.github.io/Kairo/demo/kairo-demo.mp4"><img src="docs/demo/kairo-demo-preview.webp" alt="Kairo in motion: the games, the profile, match details, Explore and the pros" width="100%" /></a>
 
@@ -51,7 +51,7 @@ https://github.com/user-attachments/assets/d742c1f1-c26e-4f44-955c-a063e2840adc
 
 ---
 
-## <img src="docs/icons/download.svg" width="28" height="28" align="center" />&nbsp;Download
+## <img src="docs/icons/download.svg" width="30" height="30" align="top" />&nbsp;Download
 
 <div align="center">
 
@@ -72,38 +72,38 @@ https://github.com/user-attachments/assets/d742c1f1-c26e-4f44-955c-a063e2840adc
 
 ---
 
-## <img src="docs/icons/new.svg" width="28" height="28" align="center" />&nbsp;What's new
+## <img src="docs/icons/new.svg" width="30" height="30" align="top" />&nbsp;What's new
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-<img src="docs/icons/goal.svg" width="20" height="20" align="center" /> **Weekly goal (LoL)**<br />
+<img src="docs/icons/goal.svg" width="22" height="22" align="top" /> **Weekly goal (LoL)**<br />
 "Climb 50 LP", "Win 5 of 10" or "KDA of 3 or more", with a shining progress bar, the days you played and confetti when you make it.
 
-<img src="docs/icons/week.svg" width="20" height="20" align="center" /> **Your week, Wrapped-style**<br />
+<img src="docs/icons/week.svg" width="22" height="22" align="top" /> **Your week, Wrapped-style**<br />
 A 4-page story (LP, your champion, your best match and the recap) that plays by itself and shares as an image.
 
-<img src="docs/icons/compare.svg" width="20" height="20" align="center" /> **Compare with pros**<br />
+<img src="docs/icons/compare.svg" width="22" height="22" align="top" /> **Compare with pros**<br />
 Each player over their champion's art, gold vs blue bars, who's ahead and one-tap rivals: Faker and the regional Challenger top 5.
 
 </td>
 <td width="50%" valign="top">
 
-<img src="docs/icons/clips.svg" width="20" height="20" align="center" /> **Clips → Following**<br />
+<img src="docs/icons/clips.svg" width="22" height="22" align="top" /> **Clips → Following**<br />
 Follow up to 12 pros and streamers by their YouTube @ or link and watch their Shorts in the TikTok-style player.
 
-<img src="docs/icons/live.svg" width="20" height="20" align="center" /> **Spectator mode (Valorant)**<br />
+<img src="docs/icons/live.svg" width="22" height="22" align="top" /> **Spectator mode (Valorant)**<br />
 The live match refreshes itself every 30 s, the map being played pulses and "Latest" tells you what happened. Follow a team and get a heads-up 15 min before.
 
-<img src="docs/icons/bell.svg" width="20" height="20" align="center" /> **Patch alerts** &nbsp;·&nbsp; <img src="docs/icons/globe.svg" width="20" height="20" align="center" /> **9 languages**<br />
+<img src="docs/icons/bell.svg" width="22" height="22" align="top" /> **Patch alerts** &nbsp;·&nbsp; <img src="docs/icons/globe.svg" width="22" height="22" align="top" /> **9 languages**<br />
 A notification when a patch drops for the games you pick. Now also in Italian, Turkish, Polish and Korean.
 
 </td>
 </tr>
 </table>
 
-### <img src="docs/icons/widgets.svg" width="24" height="24" align="center" />&nbsp;Home screen widgets (Android)
+### <img src="docs/icons/widgets.svg" width="24" height="24" align="top" />&nbsp;Home screen widgets (Android)
 
 <div align="center">
 <img src="assets/widgets/rank.png" height="150" alt="Rank widget: emblem, LP, this week's gain and the last 5" />
@@ -117,13 +117,13 @@ Your **Solo/Duo rank** with LP, this week and the last 5; your team's **next Val
 
 ---
 
-## <img src="docs/icons/features.svg" width="28" height="28" align="center" />&nbsp;Features
+## <img src="docs/icons/features.svg" width="30" height="30" align="top" />&nbsp;Features
 
 <table>
 <tr>
 <td width="33%" valign="top">
 
-#### <img src="docs/icons/stats.svg" width="22" height="22" align="center" />&nbsp;Stats
+#### <img src="docs/icons/stats.svg" width="20" height="20" align="top" />&nbsp;Stats
 - Rank with the **official emblem**, LP and win rate
 - Match history with filters and **minute-by-minute details**
 - **LP progress** for 7 days, 30 days or the season
@@ -133,7 +133,7 @@ Your **Solo/Duo rank** with LP, this week and the last 5; your team's **next Val
 </td>
 <td width="33%" valign="top">
 
-#### <img src="docs/icons/live.svg" width="22" height="22" align="center" />&nbsp;Live
+#### <img src="docs/icons/live.svg" width="20" height="20" align="top" />&nbsp;Live
 - LoL **live game** with runes, ranks and bans
 - **Notifications** when it starts and ends, with the result
 - **Matchups**: build, runes and counters per pairing
@@ -143,7 +143,7 @@ Your **Solo/Duo rank** with LP, this week and the last 5; your team's **next Val
 </td>
 <td width="33%" valign="top">
 
-#### <img src="docs/icons/explore.svg" width="22" height="22" align="center" />&nbsp;Explore
+#### <img src="docs/icons/explore.svg" width="20" height="20" align="top" />&nbsp;Explore
 - Netflix-style **news** and in-app patch notes
 - TikTok-style **clips** with official Shorts and the channels you follow
 - Challenger, GM and Master **leaderboards**
@@ -154,21 +154,21 @@ Your **Solo/Duo rank** with LP, this week and the last 5; your team's **next Val
 </tr>
 </table>
 
-### <img src="docs/icons/games.svg" width="24" height="24" align="center" />&nbsp;Games
+### <img src="docs/icons/games.svg" width="24" height="24" align="top" />&nbsp;Games
 
 | Game | Search | What you get |
 |---|---|---|
-| <img src="docs/games/lol.svg" width="20" height="20" align="center" /> **League of Legends** | Riot ID + region | Rank, history, mastery, rotation, **live game**, LP progress, matchups, pros, weekly goal and Your week |
-| <img src="docs/games/tft.svg" width="20" height="20" align="center" /> **Teamfight Tactics** | Riot ID + region | Ranked, Double Up, Hyper Roll, placements and all 8 players with traits and units |
-| <img src="docs/games/brawlstars.png" width="20" height="20" align="center" /> **Brawl Stars** | `#TAG` | Trophies, brawlers with power and rank, last 25 battles, records |
-| <img src="docs/games/clashroyale.png" width="20" height="20" align="center" /> **Clash Royale** | `#TAG` | Trophies, Path of Legends, current deck with elixir, last 30 battles |
-| <img src="docs/games/clashofclans.png" width="20" height="20" align="center" /> **Clash of Clans** | `#TAG` | Town Hall, league, war, donations, heroes and builder base |
-| <img src="docs/games/dota2.svg" width="20" height="20" align="center" /> **Dota 2** | Steam name or ID | Official medal, world rank, heroes and last 20 matches |
-| <img src="docs/games/fortnite.svg" width="20" height="20" align="center" /> **Fortnite** | Name + platform | Per mode: wins, K/D, top N and hours |
-| <img src="docs/games/apex.png" width="20" height="20" align="center" /> **Apex Legends** | Name + platform | Rank with RP, legend with its banner and online status |
-| <img src="docs/games/pubg.svg" width="20" height="20" align="center" /> **PUBG** | Name + platform | FPP and TPP, ranked and last 8 matches |
-| <img src="docs/games/wildrift.svg" width="20" height="20" align="center" /> **Wild Rift** | — | S+ to D tier list by lane and rank, champion pages and comparer, My mains, risers and fallers |
-| <img src="docs/games/valorant.svg" width="20" height="20" align="center" /> **Valorant** | — | Esports: latest champion, live match, schedule, results, tournaments and the teams you follow |
+| <img src="docs/games/lol.svg" width="22" height="22" align="top" /> **League of Legends** | Riot ID + region | Rank, history, mastery, rotation, **live game**, LP progress, matchups, pros, weekly goal and Your week |
+| <img src="docs/games/tft.svg" width="22" height="22" align="top" /> **Teamfight Tactics** | Riot ID + region | Ranked, Double Up, Hyper Roll, placements and all 8 players with traits and units |
+| <img src="docs/games/brawlstars.png" width="22" height="22" align="top" /> **Brawl Stars** | `#TAG` | Trophies, brawlers with power and rank, last 25 battles, records |
+| <img src="docs/games/clashroyale.png" width="22" height="22" align="top" /> **Clash Royale** | `#TAG` | Trophies, Path of Legends, current deck with elixir, last 30 battles |
+| <img src="docs/games/clashofclans.png" width="22" height="22" align="top" /> **Clash of Clans** | `#TAG` | Town Hall, league, war, donations, heroes and builder base |
+| <img src="docs/games/dota2.svg" width="22" height="22" align="top" /> **Dota 2** | Steam name or ID | Official medal, world rank, heroes and last 20 matches |
+| <img src="docs/games/fortnite.svg" width="22" height="22" align="top" /> **Fortnite** | Name + platform | Per mode: wins, K/D, top N and hours |
+| <img src="docs/games/apex.png" width="22" height="22" align="top" /> **Apex Legends** | Name + platform | Rank with RP, legend with its banner and online status |
+| <img src="docs/games/pubg.svg" width="22" height="22" align="top" /> **PUBG** | Name + platform | FPP and TPP, ranked and last 8 matches |
+| <img src="docs/games/wildrift.svg" width="22" height="22" align="top" /> **Wild Rift** | — | S+ to D tier list by lane and rank, champion pages and comparer, My mains, risers and fallers |
+| <img src="docs/games/valorant.svg" width="22" height="22" align="top" /> **Valorant** | — | Esports: latest champion, live match, schedule, results, tournaments and the teams you follow |
 
 <sub>Wild Rift has no public API and Valorant profiles are waiting for Riot's approval, so those two go straight to what is available.</sub>
 
@@ -237,7 +237,7 @@ Wild Rift publishes no builds or counters in any public source, so the app doesn
 
 ---
 
-## <img src="docs/icons/shots.svg" width="28" height="28" align="center" />&nbsp;Screenshots
+## <img src="docs/icons/shots.svg" width="30" height="30" align="top" />&nbsp;Screenshots
 
 <table>
   <tr>
@@ -307,7 +307,7 @@ Wild Rift publishes no builds or counters in any public source, so the app doesn
 
 ---
 
-## <img src="docs/icons/arch.svg" width="28" height="28" align="center" />&nbsp;Architecture
+## <img src="docs/icons/arch.svg" width="30" height="30" align="top" />&nbsp;Architecture
 
 ```mermaid
 flowchart LR
@@ -330,7 +330,7 @@ flowchart LR
 
 More detail, sequence diagrams and decisions in [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) (in Spanish).
 
-### <img src="docs/icons/stack.svg" width="24" height="24" align="center" />&nbsp;Stack
+### <img src="docs/icons/stack.svg" width="24" height="24" align="top" />&nbsp;Stack
 
 | Layer | Technology |
 |------|------------|
@@ -344,7 +344,7 @@ More detail, sequence diagrams and decisions in [docs/ARQUITECTURA.md](docs/ARQU
 
 ---
 
-## <img src="docs/icons/start.svg" width="28" height="28" align="center" />&nbsp;Getting started
+## <img src="docs/icons/start.svg" width="30" height="30" align="top" />&nbsp;Getting started
 
 You need **Node 20+** and a key from <https://developer.riotgames.com> (development keys expire every 24 h). The other games' keys are optional: each one turns on when you add its key.
 
@@ -382,7 +382,7 @@ EXPO_PUBLIC_API_URL=http://192.168.1.8:3000 npx expo start
 
 </details>
 
-### <img src="docs/icons/cloud.svg" width="24" height="24" align="center" />&nbsp;Deploy to the cloud
+### <img src="docs/icons/cloud.svg" width="24" height="24" align="top" />&nbsp;Deploy to the cloud
 
 For the app to work **without your PC on**, the backend has to be online. The repo ships [`render.yaml`](render.yaml) and a [`Dockerfile`](server/Dockerfile) (Render, Railway, Fly.io…):
 
@@ -398,7 +398,7 @@ Favorites and preferences live on the phone; the database (`DATABASE_URL`, e.g. 
 Full guide (free plan sleeping, Railway/Fly, publishing an APK, security): [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) (in Spanish).
 
 <details>
-<summary><b><img src="docs/icons/env.svg" width="20" height="20" align="center" /> Environment variables</b></summary>
+<summary><b><img src="docs/icons/env.svg" width="22" height="22" align="top" /> Environment variables</b></summary>
 
 `server/.env`
 
@@ -433,7 +433,7 @@ App: `EXPO_PUBLIC_API_URL` is the backend URL (default `http://192.168.1.8:3000`
 
 ---
 
-## <img src="docs/icons/api.svg" width="28" height="28" align="center" />&nbsp;Backend API
+## <img src="docs/icons/api.svg" width="30" height="30" align="top" />&nbsp;Backend API
 
 Every Riot route accepts `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1 · kr · jp1 · oc1 …`. Routes that return text accept `?lang=` or `?hl=` with the language.
 
@@ -526,7 +526,7 @@ No accounts: each phone registers with its token and its own secret.
 
 ---
 
-## <img src="docs/icons/dev.svg" width="28" height="28" align="center" />&nbsp;For developers
+## <img src="docs/icons/dev.svg" width="30" height="30" align="top" />&nbsp;For developers
 
 ### Structure
 
@@ -609,7 +609,7 @@ Backend errors carry a `code` (e.g. `PLAYER_NOT_FOUND`) that the app translates 
 </details>
 
 <details>
-<summary><b><img src="docs/icons/help.svg" width="20" height="20" align="center" /> Troubleshooting</b></summary>
+<summary><b><img src="docs/icons/help.svg" width="22" height="22" align="top" /> Troubleshooting</b></summary>
 
 | Symptom | Cause and fix |
 |---------|------------------|
@@ -629,7 +629,7 @@ Backend errors carry a `code` (e.g. `PLAYER_NOT_FOUND`) that the app translates 
 
 ---
 
-## <img src="docs/icons/roadmap.svg" width="28" height="28" align="center" />&nbsp;Roadmap
+## <img src="docs/icons/roadmap.svg" width="30" height="30" align="top" />&nbsp;Roadmap
 
 - [x] Full LoL and TFT, with favorites, recents and regions
 - [x] Cloud backend with cache, Riot queue and translated errors
@@ -649,7 +649,7 @@ The full list is in [docs/PENDIENTES.md](docs/PENDIENTES.md), and everything alr
 
 ---
 
-## <img src="docs/icons/star.svg" width="28" height="28" align="center" />&nbsp;Support it
+## <img src="docs/icons/star.svg" width="30" height="30" align="top" />&nbsp;Support it
 
 If Kairo is useful to you, a star helps more people find it (and helps it get into the Obtainium catalog).
 
@@ -660,7 +660,7 @@ If Kairo is useful to you, a star helps more people find it (and helps it get in
 - **Public page:** [product](docs/en.html) and [privacy](docs/privacy.html).
 - **License:** [MIT](LICENSE).
 
-## <img src="docs/icons/legal.svg" width="28" height="28" align="center" />&nbsp;Legal
+## <img src="docs/icons/legal.svg" width="30" height="30" align="top" />&nbsp;Legal
 
 Kairo isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
 
