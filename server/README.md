@@ -8,7 +8,7 @@ cp .env.example .env     # pon tu RIOT_API_KEY
 npm start                # http://localhost:3000
 ```
 
-- Rutas y ejemplos: [README principal](../README.md#-api-del-backend)
+- Rutas y ejemplos: [README principal](../README.md#api-del-backend)
 - Diseño interno (caché, errores, regiones): [docs/ARQUITECTURA.md](../docs/ARQUITECTURA.md#backend)
 
 ```

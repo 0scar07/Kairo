@@ -29,7 +29,7 @@ Mensajes claros y con prefijo: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`.
 
 ## Añadir un juego
 
-Mira "Añadir un juego" en el [README](README.md#-añadir-un-juego) y el contrato de módulos en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md#módulos-de-juego).
+Mira "Añadir un juego" en el [README](README.md#para-desarrolladores) y el contrato de módulos en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md#módulos-de-juego).
 
 ## Reportar un problema
 

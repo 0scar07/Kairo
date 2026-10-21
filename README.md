@@ -26,7 +26,7 @@ Gratis, sin cuentas, sin anuncios y con las API keys guardadas en el servidor, n
 ![React Native](https://img.shields.io/badge/React%20Native-0.86-61DAFB?logo=react&logoColor=black)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-35E0A1)
 
-[Descargar](#-descargar) · [Lo nuevo](#-lo-nuevo) · [Qué trae](#-qué-trae) · [Capturas](#-capturas) · [Arquitectura](#%EF%B8%8F-arquitectura) · [Puesta en marcha](#-puesta-en-marcha) · [API](#-api-del-backend) · [Roadmap](#%EF%B8%8F-roadmap)
+[Descargar](#descargar) · [Lo nuevo](#lo-nuevo) · [Qué trae](#qué-trae) · [Capturas](#capturas) · [Arquitectura](#arquitectura) · [Puesta en marcha](#puesta-en-marcha) · [API](#api-del-backend) · [Roadmap](#roadmap)
 
 <br />
 
@@ -37,7 +37,7 @@ Gratis, sin cuentas, sin anuncios y con las API keys guardadas en el servidor, n
 <br />
 <br />
 
-### 🎬 Demostración
+### <img src="docs/icons/demo.svg" width="24" height="24" align="center" />&nbsp;Demostración
 
 <a href="https://0scar07.github.io/Kairo/demo/kairo-demo.mp4"><img src="docs/demo/kairo-demo-preview.webp" alt="Kairo en movimiento: los juegos, el perfil, el detalle de partida, Explorar y los pros" width="100%" /></a>
 
@@ -51,7 +51,7 @@ https://github.com/user-attachments/assets/d742c1f1-c26e-4f44-955c-a063e2840adc
 
 ---
 
-## 📲 Descargar
+## <img src="docs/icons/download.svg" width="28" height="28" align="center" />&nbsp;Descargar
 
 <div align="center">
 
@@ -72,38 +72,38 @@ https://github.com/user-attachments/assets/d742c1f1-c26e-4f44-955c-a063e2840adc
 
 ---
 
-## 🆕 Lo nuevo
+## <img src="docs/icons/new.svg" width="28" height="28" align="center" />&nbsp;Lo nuevo
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-**🎯 Objetivo de la semana (LoL)**<br />
+<img src="docs/icons/goal.svg" width="20" height="20" align="center" /> **Objetivo de la semana (LoL)**<br />
 «Sube 50 LP», «Gana 5 de 10» o «KDA de 3 o más», con barra que se llena con brillo, los días jugados y confeti al cumplirlo.
 
-**📖 Tu semana, tipo Wrapped**<br />
+<img src="docs/icons/week.svg" width="20" height="20" align="center" /> **Tu semana, tipo Wrapped**<br />
 Una historia de 4 páginas (LP, tu campeón, tu mejor partida y el resumen) que se pasa sola y se comparte como imagen.
 
-**⚔️ Comparar con pros**<br />
+<img src="docs/icons/compare.svg" width="20" height="20" align="center" /> **Comparar con pros**<br />
 Cada jugador sobre el arte de su campeón, barras dorado contra azul, quién va por delante y rivales de un toque: Faker y el top 5 de Challenger.
 
 </td>
 <td width="50%" valign="top">
 
-**📺 Clips → Siguiendo**<br />
+<img src="docs/icons/clips.svg" width="20" height="20" align="center" /> **Clips → Siguiendo**<br />
 Sigue hasta 12 pros y streamers por su @ o enlace de YouTube y mira sus Shorts en el visor tipo TikTok.
 
-**🔴 Modo espectador (Valorant)**<br />
+<img src="docs/icons/live.svg" width="20" height="20" align="center" /> **Modo espectador (Valorant)**<br />
 El partido en vivo se actualiza solo cada 30 s, el mapa en juego late y «Lo último» cuenta qué pasó. Sigue a un equipo y te avisa 15 min antes.
 
-**🔔 Avisos de parches · 🌍 9 idiomas**<br />
+<img src="docs/icons/bell.svg" width="20" height="20" align="center" /> **Avisos de parches** &nbsp;·&nbsp; <img src="docs/icons/globe.svg" width="20" height="20" align="center" /> **9 idiomas**<br />
 Notificación cuando sale un parche de los juegos que elijas. Y ahora también en italiano, turco, polaco y coreano.
 
 </td>
 </tr>
 </table>
 
-### 🧩 Widgets en la pantalla de inicio (Android)
+### <img src="docs/icons/widgets.svg" width="24" height="24" align="center" />&nbsp;Widgets en la pantalla de inicio (Android)
 
 <div align="center">
 <img src="assets/widgets/rank.png" height="150" alt="Widget de rango: emblema, LP, lo ganado en la semana y las últimas 5" />
@@ -117,13 +117,13 @@ Tu **rango Solo/Dúo** con LP, lo de la semana y las últimas 5; el **próximo p
 
 ---
 
-## ✨ Qué trae
+## <img src="docs/icons/features.svg" width="28" height="28" align="center" />&nbsp;Qué trae
 
 <table>
 <tr>
 <td width="33%" valign="top">
 
-#### 📊 Estadísticas
+#### <img src="docs/icons/stats.svg" width="22" height="22" align="center" />&nbsp;Estadísticas
 - Rango con **emblema oficial**, LP y winrate
 - Historial con filtros y **detalle minuto a minuto**
 - **Progreso de LP** de 7 días, 30 días o la temporada
@@ -133,7 +133,7 @@ Tu **rango Solo/Dúo** con LP, lo de la semana y las últimas 5; el **próximo p
 </td>
 <td width="33%" valign="top">
 
-#### 🔴 En vivo
+#### <img src="docs/icons/live.svg" width="22" height="22" align="center" />&nbsp;En vivo
 - **Partida en vivo** de LoL con runas, rangos y baneos
 - **Notificaciones** al empezar y terminar, con el resultado
 - **Enfrentamientos**: build, runas y counters por cruce
@@ -143,7 +143,7 @@ Tu **rango Solo/Dúo** con LP, lo de la semana y las últimas 5; el **próximo p
 </td>
 <td width="33%" valign="top">
 
-#### 🧭 Explorar
+#### <img src="docs/icons/explore.svg" width="22" height="22" align="center" />&nbsp;Explorar
 - **Noticias** al estilo Netflix y notas del parche dentro de la app
 - **Clips** tipo TikTok con Shorts oficiales y de quien sigas
 - **Ranking** Challenger, GM y Master
@@ -154,7 +154,7 @@ Tu **rango Solo/Dúo** con LP, lo de la semana y las últimas 5; el **próximo p
 </tr>
 </table>
 
-### 🎮 Juegos
+### <img src="docs/icons/games.svg" width="24" height="24" align="center" />&nbsp;Juegos
 
 | Juego | Búsqueda | Lo que ves |
 |---|---|---|
@@ -237,7 +237,7 @@ Wild Rift no publica builds ni counters en ninguna fuente pública, así que la 
 
 ---
 
-## 📸 Capturas
+## <img src="docs/icons/shots.svg" width="28" height="28" align="center" />&nbsp;Capturas
 
 <table>
   <tr>
@@ -313,12 +313,12 @@ Wild Rift no publica builds ni counters en ninguna fuente pública, así que la 
 
 ---
 
-## 🏗️ Arquitectura
+## <img src="docs/icons/arch.svg" width="28" height="28" align="center" />&nbsp;Arquitectura
 
 ```mermaid
 flowchart LR
-    App["📱 App Kairo<br/>(Expo · Android · web)"] -- "?region=kr" --> API["🖥️ Backend Express<br/>caché · cola · errores"]
-    Widgets["🧩 Widgets"] -.-> App
+    App["App Kairo<br/>(Expo · Android · web)"] -- "?region=kr" --> API["Backend Express<br/>caché · cola · errores"]
+    Widgets["Widgets"] -.-> App
     API -- "X-Riot-Token" --> Riot[["Riot Games API"]]
     API -- "IP fija" --> SC[["Supercell<br/>BS · CR · CoC"]]
     API --> Others[["OpenDota · Fortnite · Apex · PUBG"]]
@@ -336,7 +336,7 @@ flowchart LR
 
 Más detalle, diagramas de secuencia y decisiones en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
 
-### 🧱 Stack
+### <img src="docs/icons/stack.svg" width="24" height="24" align="center" />&nbsp;Stack
 
 | Capa | Tecnología |
 |------|------------|
@@ -350,7 +350,7 @@ Más detalle, diagramas de secuencia y decisiones en [docs/ARQUITECTURA.md](docs
 
 ---
 
-## 🚀 Puesta en marcha
+## <img src="docs/icons/start.svg" width="28" height="28" align="center" />&nbsp;Puesta en marcha
 
 Necesitas **Node 20+** y una key de <https://developer.riotgames.com> (las de desarrollo caducan cada 24 h). Las de los demás juegos son opcionales: cada uno se activa al poner la suya.
 
@@ -388,7 +388,7 @@ EXPO_PUBLIC_API_URL=http://192.168.1.8:3000 npx expo start
 
 </details>
 
-### ☁️ Desplegar en la nube
+### <img src="docs/icons/cloud.svg" width="24" height="24" align="center" />&nbsp;Desplegar en la nube
 
 Para que la app funcione **sin tu PC encendida**, el backend tiene que estar en internet. El repo trae [`render.yaml`](render.yaml) y un [`Dockerfile`](server/Dockerfile) (Render, Railway, Fly.io…):
 
@@ -404,7 +404,7 @@ Los favoritos y preferencias viven en el celular; la base de datos (`DATABASE_UR
 Guía completa (plan gratuito que se duerme, Railway/Fly, publicar un APK, seguridad): [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md).
 
 <details>
-<summary><b>⚙️ Variables de entorno</b></summary>
+<summary><b><img src="docs/icons/env.svg" width="20" height="20" align="center" /> Variables de entorno</b></summary>
 
 `server/.env`
 
@@ -439,7 +439,7 @@ App: `EXPO_PUBLIC_API_URL` es la URL del backend (por defecto `http://192.168.1.
 
 ---
 
-## 🔌 API del backend
+## <img src="docs/icons/api.svg" width="28" height="28" align="center" />&nbsp;API del backend
 
 Todas las rutas de Riot aceptan `?region=la1 · la2 · na1 · br1 · euw1 · eun1 · tr1 · kr · jp1 · oc1 …`. Las que traen textos aceptan `?lang=` o `?hl=` con el idioma.
 
@@ -532,7 +532,7 @@ Sin cuentas: cada celular se registra con su token y un secreto propio.
 
 ---
 
-## 🧑‍💻 Para desarrolladores
+## <img src="docs/icons/dev.svg" width="28" height="28" align="center" />&nbsp;Para desarrolladores
 
 ### Estructura
 
@@ -615,7 +615,7 @@ Los errores del backend llevan un `code` (por ejemplo `PLAYER_NOT_FOUND`) que la
 </details>
 
 <details>
-<summary><b>🩺 Problemas frecuentes</b></summary>
+<summary><b><img src="docs/icons/help.svg" width="20" height="20" align="center" /> Problemas frecuentes</b></summary>
 
 | Síntoma | Causa y solución |
 |---------|------------------|
@@ -635,7 +635,7 @@ Los errores del backend llevan un `code` (por ejemplo `PLAYER_NOT_FOUND`) que la
 
 ---
 
-## 🗺️ Roadmap
+## <img src="docs/icons/roadmap.svg" width="28" height="28" align="center" />&nbsp;Roadmap
 
 - [x] LoL y TFT completos, con favoritos, recientes y región
 - [x] Backend en la nube con caché, cola hacia Riot y errores traducidos
@@ -655,7 +655,7 @@ La lista completa está en [docs/PENDIENTES.md](docs/PENDIENTES.md), y todo lo q
 
 ---
 
-## ⭐ Apóyalo
+## <img src="docs/icons/star.svg" width="28" height="28" align="center" />&nbsp;Apóyalo
 
 Si Kairo te sirve, una estrella ayuda a que más gente lo encuentre (y a que entre al catálogo de Obtainium).
 
@@ -666,7 +666,7 @@ Si Kairo te sirve, una estrella ayuda a que más gente lo encuentre (y a que ent
 - **Página pública:** [producto](docs/index.html), [privacidad](docs/privacy.html) y el texto para el portal de Riot en [docs/RIOT-FORMULARIO.md](docs/RIOT-FORMULARIO.md).
 - **Licencia:** [MIT](LICENSE).
 
-## ⚖️ Aviso legal
+## <img src="docs/icons/legal.svg" width="28" height="28" align="center" />&nbsp;Aviso legal
 
 Kairo no está respaldada por Riot Games ni refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de sus propiedades. Riot Games y todas las propiedades asociadas son marcas comerciales o marcas registradas de Riot Games, Inc.
 
