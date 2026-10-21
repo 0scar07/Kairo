@@ -4,6 +4,10 @@ import en from "./locales/en";
 import pt from "./locales/pt";
 import fr from "./locales/fr";
 import de from "./locales/de";
+import it from "./locales/it";
+import tr from "./locales/tr";
+import pl from "./locales/pl";
+import ko from "./locales/ko";
 
 /**
  * Idiomas de la app. Para añadir uno: crear src/i18n/locales/<id>.js con las mismas claves que es.js
@@ -18,9 +22,13 @@ export const LANGUAGES = [
   { id: "pt", label: "Português", ddragon: "pt_BR", thousands: "." },
   { id: "fr", label: "Français",  ddragon: "fr_FR", thousands: " " },
   { id: "de", label: "Deutsch",   ddragon: "de_DE", thousands: "." },
+  { id: "it", label: "Italiano",  ddragon: "it_IT", thousands: "." },
+  { id: "tr", label: "Türkçe",    ddragon: "tr_TR", thousands: "." },
+  { id: "pl", label: "Polski",    ddragon: "pl_PL", thousands: " " },
+  { id: "ko", label: "한국어",     ddragon: "ko_KR", thousands: "," },
 ];
 
-const DICTS = { es, en, pt, fr, de };
+const DICTS = { es, en, pt, fr, de, it, tr, pl, ko };
 
 export const DEFAULT_LANGUAGE = "es";   // el idioma de referencia: de aquí salen las claves y los textos de respaldo
 export const AUTO = "auto";

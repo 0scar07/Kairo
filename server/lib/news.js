@@ -15,11 +15,11 @@ const RIOT_SITES = {
   wildrift: "https://wildrift.leagueoflegends.com",
 };
 // Idioma de la app → sección de las webs de Riot
-const LOCALES = { es: "es-mx", en: "en-us", pt: "pt-br", fr: "fr-fr", de: "de-de" };
+const LOCALES = { es: "es-mx", en: "en-us", pt: "pt-br", fr: "fr-fr", de: "de-de", it: "it-it", tr: "tr-tr", pl: "pl-pl", ko: "ko-kr" };
 // Steam: juegos y su appid
 const STEAM_APPS = { dota2: 570, apex: 1172470, pubg: 578080 };
 // fortnite-api.com usa sus propios códigos de idioma
-const FORTNITE_LANGS = { es: "es-419", en: "en", pt: "pt-BR", fr: "fr", de: "de" };
+const FORTNITE_LANGS = { es: "es-419", en: "en", pt: "pt-BR", fr: "fr", de: "de", it: "it", tr: "tr", pl: "pl", ko: "ko" };
 
 const PATCH_URL = /patch-notes|patch-\d/;
 

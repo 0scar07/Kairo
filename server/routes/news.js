@@ -9,7 +9,7 @@ const { nextData } = require("../lib/wildrift");
 /**
  * Noticias de todos los juegos (pestaña Noticias de Explorar). Fuentes públicas sin key; si alguna falla, las demás
  * se siguen mostrando.
- *   GET /news?lang=es|en|pt|fr|de            lo último de cada juego, de lo más nuevo a lo más viejo
+ *   GET /news?lang=es|en|pt|fr|de|it|tr|pl|ko            lo último de cada juego, de lo más nuevo a lo más viejo
  *   GET /news/article?game=lol&path=/es-mx/news/…   un artículo de Riot (notas del parche) listo para leer en la app
  */
 const sites = Object.fromEntries(Object.entries(news.RIOT_SITES).map(([game, base]) => [game, createUpstream({
@@ -78,11 +78,11 @@ async function valorantChampion() {
   }];
 }
 
-router.get("/", handle(async (req, res) => {
-  const lang = news.LOCALES[String(req.query.lang)] ? String(req.query.lang) : "en";
-  const locale = news.LOCALES[lang];
-  // Ya resumidas (las páginas de Riot pesan cientos de KB): 30 min por idioma
-  const items = await cache.wrap(`news:${lang}`, 30 * MIN, async () => {
+// Lo último de todos los juegos en un idioma. Ya resumidas (las páginas de Riot pesan cientos de KB): 30 min por idioma.
+// También lo usan los avisos de parches nuevos (lib/patchTracker.js).
+function loadNews(lang) {
+  const locale = news.LOCALES[lang] || news.LOCALES.en;
+  return cache.wrap(`news:${lang}`, 30 * MIN, async () => {
     const sources = [
       ...Object.keys(news.RIOT_SITES).map(game => riotGame(game, locale)),
       ...Object.keys(news.STEAM_APPS).map(steamGame),
@@ -94,6 +94,11 @@ router.get("/", handle(async (req, res) => {
     if (!all.length) throw new HttpError(502, "No se pudieron leer las noticias", { code: "UPSTREAM_ERROR" });
     return all.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
   });
+}
+
+router.get("/", handle(async (req, res) => {
+  const lang = news.LOCALES[String(req.query.lang)] ? String(req.query.lang) : "en";
+  const items = await loadNews(lang);
   res.set("Cache-Control", "public, max-age=900");
   res.json({ items });
 }));
@@ -112,3 +117,4 @@ router.get("/article", handle(async (req, res) => {
 }));
 
 module.exports = router;
+module.exports.loadNews = loadNews;

@@ -61,3 +61,43 @@ window.addEventListener("message",function(e){try{var m=typeof e.data==="string"
 window.onYouTubeIframeAPIReady=init;
 </script><script src="https://www.youtube.com/iframe_api"></script><script>var tries=0;(function wait(){if(player)return;if(window.YT&&YT.Player&&YT.loaded){init();return;}if(++tries<60)setTimeout(wait,200);})();</script></body></html>`;
 }
+
+// ── Siguiendo: canales de YouTube que eligió el usuario (pros, streamers). Viven solo en el celular.
+const FOLLOW_KEY = "kairo_clips_following";
+export const MAX_FOLLOWING = 12;   // el servidor no lee más de 12 canales a la vez
+const followListeners = new Set();
+export function onFollowingChanged(fn) { followListeners.add(fn); return () => followListeners.delete(fn); }
+
+export async function loadFollowing() {
+  try { return JSON.parse((await AsyncStorage.getItem(FOLLOW_KEY)) || "[]"); } catch { return []; }
+}
+async function saveFollowing(list) {
+  await AsyncStorage.setItem(FOLLOW_KEY, JSON.stringify(list));
+  followingCache = null;
+  followListeners.forEach(fn => { try { fn(list); } catch (e) { console.warn("Oyente de canales:", e.message); } });
+  return list;
+}
+// Sigue o deja de seguir un canal ({ id, title, image, handle, game }). Devuelve { list, following }
+export async function toggleFollowChannel(channel) {
+  const list = await loadFollowing();
+  const following = !list.some(c => c.id === channel.id);
+  if (following && list.length >= MAX_FOLLOWING) return { list, following: false, full: true };
+  const next = following ? [{ id: channel.id, title: channel.title, image: channel.image || null, handle: channel.handle || null, game: channel.game || "lol" }, ...list] : list.filter(c => c.id !== channel.id);
+  return { list: await saveFollowing(next), following };
+}
+
+// Un canal por lo que pegue el usuario: "@nombre", enlace de YouTube o "UC…"
+export const findChannel = text => api.get("/clips/channel", { params: { c: text } }).then(r => r.data.channel);
+export const getSuggested = () => api.get("/clips/suggested").then(r => r.data.channels || []);
+
+let followingCache = null;   // { key, at, promise }
+export function getFollowingClips(list, force) {
+  if (!list.length) return Promise.resolve([]);
+  const key = list.map(c => c.id).join(",");
+  if (!force && followingCache?.key === key && Date.now() - followingCache.at < TTL) return followingCache.promise;
+  const promise = api.get("/clips/following", { params: { c: key, g: list.map(c => c.game || "lol").join(",") } })
+    .then(r => (r.data.items || []).map(c => ({ ...c, channel: c.channel || list.find(f => f.id === c.channelId)?.title || null })));
+  followingCache = { key, at: Date.now(), promise };
+  promise.catch(() => { followingCache = null; });
+  return promise;
+}

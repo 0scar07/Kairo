@@ -7,6 +7,19 @@ Las descargas están en [GitHub Releases](https://github.com/0scar07/Kairo/relea
 
 ## v1.5.0 · por aire
 
+### 2026-10-21
+- **Objetivo de la semana** en Mi perfil (LoL): «Sube 50 LP», «Gana 5 de 10» o «KDA de 3 o más», con barra que se
+  llena con brillo, los días jugados de lunes a domingo y confeti al cumplirlo. Se elige cuál destacar y la meta.
+- **Tu semana en LoL**, tipo Wrapped: historia de 4 páginas (LP, tu campeón, tu mejor partida y el resumen) que se
+  pasa sola y se comparte como imagen.
+- **Comparar** con más vida: cada jugador sobre el arte de su campeón, barras dorado contra azul, quién va por
+  delante y nuevos rivales con un toque (Faker y el top 5 de Challenger de la región).
+- **Clips → Siguiendo:** sigue pros y streamers por su @ o enlace de YouTube (hasta 12) y mira sus Shorts.
+- **Modo espectador** en Valorant: el partido en vivo se actualiza solo cada 30 segundos, el mapa en juego late y
+  «Lo último» cuenta qué pasó. Botón **Seguir** en cada equipo, con aviso 15 minutos antes de sus partidos.
+- **Avisos de parches nuevos** de los juegos que elijas (LoL, TFT, Valorant, Wild Rift, Dota 2, Apex y PUBG).
+- **4 idiomas nuevos:** italiano, turco, polaco y coreano (9 en total).
+
 ### 2026-10-19
 - **Clips** en Explorar, tipo TikTok: los Shorts oficiales de YouTube de 9 juegos en un visor a pantalla completa;
   deslizas hacia abajo y el siguiente arranca solo. Para ti / Esports, filtro por juego, sonido que se recuerda, tocar

@@ -1,3 +1,4 @@
+import { Linking } from "react-native";
 import { navigateWhenReady } from "../navigation/ref";
 
 // "Nombre#TAG" -> { gameName, tagLine }
@@ -11,6 +12,8 @@ function splitRiotId(riotId) {
  *  - resumen semanal y cambios de rango -> el perfil del jugador
  *  - inicio y resultado de partida -> la partida en vivo
  *  - partida oficial de un pro seguido -> la pantalla del pro
+ *  - parche nuevo -> las notas del parche dentro de la app (o la web si no es de Riot)
+ *  - partido de un equipo de Valorant seguido -> el detalle del partido
  */
 export function openFromNotification(data) {
   if (!data || data.demo) return;
@@ -21,6 +24,15 @@ export function openFromNotification(data) {
   }
   if (data.type === "pro_match") {
     if (data.slug && data.playerId) navigateWhenReady("ProPlayer", { slug: data.slug, playerId: data.playerId, leagueSlug: data.leagueSlug });
+    return;
+  }
+  if (data.type === "patch") {
+    if (data.game && data.path) navigateWhenReady("NewsArticle", { game: data.game, path: data.path });
+    else if (data.url) Linking.openURL(data.url).catch(() => {});
+    return;
+  }
+  if (data.type === "val_match") {
+    if (data.id) navigateWhenReady("VALMatch", { id: data.id });
     return;
   }
   if (data.type === "trophy_record") {

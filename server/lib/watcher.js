@@ -74,8 +74,8 @@ function isQuiet(settings, nowMs) {
 const newState = (puuid, region) => ({ puuid, region, current: null, pending: [], lastCheckedAt: 0, notifiedStart: null, notifiedEnd: [] });
 
 class Watcher {
-  constructor({ store, push, riot = defaultRiot, names = championName, art = defaultArt, rank = null, trophies = null, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
-    Object.assign(this, { store, push, riot, names, art, rank, trophies, now, maxPerTick, canWatch, log });
+  constructor({ store, push, riot = defaultRiot, names = championName, art = defaultArt, rank = null, trophies = null, patches = null, now = Date.now, maxPerTick = 40, canWatch = () => true, log = console }) {
+    Object.assign(this, { store, push, riot, names, art, rank, trophies, patches, now, maxPerTick, canWatch, log });
     this.running = false;
     this.timer = null;
     this.receiptQueue = [];   // avisos enviados cuyo recibo falta por revisar (en memoria: si se pierde, no pasa nada grave)
@@ -135,6 +135,7 @@ class Watcher {
       if (this.rank) await this.guard(() => this.rank.tick(Math.max(budget, 3)));
 
       if (this.trophies) await this.trophies.tick().catch(e => this.log.warn("Trofeos:", e.message));
+      if (this.patches) await this.patches.tick().catch(e => this.log.warn("Parches:", e.message));
 
       await this.checkReceipts();
       this.stats.tracked = targets.size;

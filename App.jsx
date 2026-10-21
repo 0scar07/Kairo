@@ -27,6 +27,7 @@ import WRChampionsScreen from "./src/games/wildrift/ChampionsScreen";
 import WRCompareScreen from "./src/games/wildrift/CompareScreen";
 import VALEsportsScreen from "./src/games/valorant/EsportsScreen";
 import VALMatchScreen from "./src/games/valorant/MatchScreen";
+import WeekRecapScreen from "./src/games/lol/WeekRecapScreen";
 import NewsArticleScreen from "./src/news/ArticleScreen";
 import ClipsScreen from "./src/clips/ClipsScreen";
 import MyProfileScreen from "./src/screens/MyProfileScreen";
@@ -112,6 +113,7 @@ function RootStack() {
       <Stack.Screen name="WRCompare" component={WRCompareScreen} options={{ title: t("wr.compare") }} />
       <Stack.Screen name="VALEsports" component={VALEsportsScreen} options={{ title: t("wr.esports") }} />
       <Stack.Screen name="VALMatch" component={VALMatchScreen} options={{ title: "Valorant" }} />
+      <Stack.Screen name="WeekRecap" component={WeekRecapScreen} options={{ headerShown: false, animation: "fade_from_bottom", title: t("recap.kicker") }} />
       <Stack.Screen name="NewsArticle" component={NewsArticleScreen} options={{ headerShown: false, title: t("explore.tabNews") }} />
       <Stack.Screen name="Clips" component={ClipsScreen} options={{ headerShown: false, title: t("explore.tabClips"), animation: "fade_from_bottom" }} />
       {/* Buscar desde cualquier pestaña: hoja en iOS (se cierra deslizando), pantalla que sube en Android */}

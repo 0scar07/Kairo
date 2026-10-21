@@ -1,19 +1,36 @@
-import React, { useState } from "react";
-import { View, Text, Switch, StyleSheet, Alert } from "react-native";
-import { Card, SectionLabel, SettingRow } from "../components/ui";
+import React, { useEffect, useState } from "react";
+import { View, Text, Switch, ScrollView, StyleSheet, Alert } from "react-native";
+import Animated, { FadeInDown, FadeOut, LinearTransition, useReducedMotion } from "react-native-reanimated";
+import { Card, Chip, SectionLabel, SettingRow } from "../components/ui";
 import Icon from "../components/Icon";
 import TimeStepper from "./TimeStepper";
 import { useNotifications } from "./NotificationsProvider";
 import { useT } from "../i18n/I18nProvider";
 import { errorMessage } from "../utils/format";
 import { emitLive } from "./events";
+import { loadFollowedTeams, onFollowedTeamsChanged } from "../utils/followedTeams";
 import { accents, colors, sizes, spacing, type, withAlpha } from "../theme";
+
+// Juegos con notas del parche que el servidor puede avisar (server/lib/patchTracker.js)
+const PATCH_GAMES = [["lol", "LoL"], ["tft", "TFT"], ["valorant", "VAL"], ["wildrift", "WR"], ["dota2", "Dota 2"], ["apex", "Apex"], ["pubg", "PUBG"]];
 
 // Ajustes > Notificaciones: interruptor general, qué avisar, horario silencioso, estado del permiso y una prueba
 export default function NotificationsSection() {
   const t = useT();
   const { supported, permission, prefs, setPref, openSystemSettings, askPermission, sendTest } = useNotifications();
   const [sending, setSending] = useState(false);
+  const [teams, setTeams] = useState([]);
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    loadFollowedTeams().then(setTeams);
+    return onFollowedTeamsChanged(setTeams);
+  }, []);
+  const patchGames = prefs.patchGames || ["lol"];
+  // Elegir un juego más o uno menos; siempre queda al menos uno (para no avisar de nada, se apaga el interruptor)
+  const togglePatchGame = id => {
+    const next = patchGames.includes(id) ? patchGames.filter(g => g !== id) : [...patchGames, id];
+    if (next.length) setPref({ patchGames: next });
+  };
   const accent = accents.lol;
   const track = { false: colors.surfaceHigh, true: withAlpha(accent, 0.5) };
   const toggle = (value, onChange) => (
@@ -68,6 +85,24 @@ export default function NotificationsSection() {
         <View style={styles.divider} />
         <SettingRow icon="trophy" iconColor="#FF9F0A" label={t("notif.trophyAlerts")} hint={t("notif.trophyAlertsHint")} disabled={off} right={toggle(prefs.trophyAlerts, v => setPref({ trophyAlerts: v }))} />
         <View style={styles.divider} />
+        <SettingRow icon="news" iconColor="#35E0A1" label={t("notif.patchAlerts")} hint={t("notif.patchAlertsHint")} disabled={off} right={toggle(prefs.patchAlerts !== false, v => setPref({ patchAlerts: v }))} />
+        {prefs.patchAlerts !== false && !off && (
+          <Animated.View entering={reduce ? undefined : FadeInDown.duration(260)} exiting={reduce ? undefined : FadeOut.duration(160)} layout={reduce ? undefined : LinearTransition.springify().damping(18)}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+              {PATCH_GAMES.map(([id, label]) => <Chip key={id} label={label} game={id} active={patchGames.includes(id)} onPress={() => togglePatchGame(id)} />)}
+            </ScrollView>
+          </Animated.View>
+        )}
+        <View style={styles.divider} />
+        <SettingRow
+          icon="calendar"
+          iconColor={accents.valorant}
+          label={t("notif.valAlerts")}
+          hint={teams.length ? t("notif.valAlertsTeams", { teams: teams.map(tm => tm.acronym || tm.name).join(", ") }) : t("notif.valAlertsHint")}
+          disabled={off}
+          right={toggle(prefs.valAlerts !== false, v => setPref({ valAlerts: v }))}
+        />
+        <View style={styles.divider} />
         <SettingRow
           label={t("notif.quiet")}
           hint={t("notif.quietHint")}
@@ -118,4 +153,5 @@ const styles = StyleSheet.create({
   status:      { flexDirection: "row", alignItems: "center", gap: spacing.xs },
   dot:         { width: sizes.dot + 2, height: sizes.dot + 2, borderRadius: sizes.dot },
   statusText:  { ...type.smallStrong, color: colors.textSecondary },
+  chips:       { paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
 });

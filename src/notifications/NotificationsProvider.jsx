@@ -13,8 +13,12 @@ import {
 import { DEFAULT_PREFS, clearDevice, loadDevice, loadLastHandled, loadPrefs, saveDevice, saveLastHandled, savePrefs } from "./store";
 import { isAuthError, putFavorites, putSettings, putToken, registerDevice, sendTest as sendTestRequest } from "./api";
 import { emitLive } from "./events";
+import { syncTeamAlerts } from "./teamAlerts";
 
 const MAX_ALERTS = 30;   // tope de favoritos con alertas (el servidor rechaza más)
+// Idiomas que el servidor sabe escribir en las notificaciones (server/lib/pushText.js); los demás van en inglés
+const SERVER_LOCALES = ["es", "en", "pt", "fr", "de"];
+const serverLocale = l => (SERVER_LOCALES.includes(l) ? l : "en");
 
 const NotificationsContext = createContext({
   supported: false, permission: "undetermined", prefs: DEFAULT_PREFS, setPref: () => {}, toggleAlerts: async () => {},
@@ -63,7 +67,8 @@ export function NotificationsProvider({ children }) {
     return {
       favorites,
       settings: {
-        enabled: p.enabled, notifyStart: p.notifyStart, notifyEnd: p.notifyEnd, weekly: p.weekly, rankAlerts: p.rankAlerts, trophyAlerts: p.trophyAlerts, locale: languageRef.current,
+        enabled: p.enabled, notifyStart: p.notifyStart, notifyEnd: p.notifyEnd, weekly: p.weekly, rankAlerts: p.rankAlerts, trophyAlerts: p.trophyAlerts,
+        patchAlerts: p.patchAlerts, patchGames: p.patchGames, locale: serverLocale(languageRef.current),
         // hora local menos UTC en minutos (Bogotá = -300); getTimezoneOffset devuelve lo contrario
         quiet: { enabled: p.quiet.enabled, from: p.quiet.from, to: p.quiet.to, utcOffsetMinutes: -new Date().getTimezoneOffset() },
       },
@@ -172,7 +177,9 @@ export function NotificationsProvider({ children }) {
   const setPref = useCallback(patch => {
     const next = { ...prefsRef.current, ...patch, quiet: { ...prefsRef.current.quiet, ...patch.quiet } };
     setPrefsState(next);
-    savePrefs(next).catch(e => console.warn("No se pudieron guardar las preferencias:", e.message));
+    savePrefs(next)
+      .then(() => { if ("enabled" in patch || "valAlerts" in patch) return syncTeamAlerts(); })
+      .catch(e => console.warn("No se pudieron guardar las preferencias:", e.message));
     scheduleSync(800);
   }, [scheduleSync]);
 

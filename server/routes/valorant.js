@@ -45,9 +45,10 @@ router.get("/esports", handle(async (req, res) => {
 router.get("/match/:id", handle(async (req, res) => {
   const id = String(req.params.id);
   if (!/^\d{1,10}$/.test(id)) throw new HttpError(400, "Partido no válido", { code: "INVALID_MATCH_ID" });
-  const match = await esports.get(`/matches/${id}`, { ttl: MIN, notFound: { message: "Partido no encontrado", code: "MATCH_NOT_FOUND" } });
+  // 20 s: el modo espectador de la app vuelve a pedirlo cada 30 s mientras se juega
+  const match = await esports.get(`/matches/${id}`, { ttl: 20_000, notFound: { message: "Partido no encontrado", code: "MATCH_NOT_FOUND" } });
   if (match?.videogame?.slug && match.videogame.slug !== "valorant") throw new HttpError(404, "Partido no encontrado", { code: "MATCH_NOT_FOUND" });
-  res.set("Cache-Control", "public, max-age=60");
+  res.set("Cache-Control", match?.status === "running" ? "public, max-age=15" : "public, max-age=60");
   res.json(ps.normalizeMatch(match));
 }));
 
