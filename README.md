@@ -158,17 +158,17 @@ Tu **rango Solo/Dúo** con LP, lo de la semana y las últimas 5; el **próximo p
 
 | Juego | Búsqueda | Lo que ves |
 |---|---|---|
-| <img src="https://img.shields.io/badge/-%20-C89B3C" height="10" /> **League of Legends** | Riot ID + región | Rango, historial, maestría, rotación, **partida en vivo**, progreso de LP, enfrentamientos, pros, objetivo y Tu semana |
-| <img src="https://img.shields.io/badge/-%20-0BC4E3" height="10" /> **Teamfight Tactics** | Riot ID + región | Ranked, Double Up, Hyper Roll, posiciones y los 8 jugadores con rasgos y unidades |
-| <img src="https://img.shields.io/badge/-%20-FFCE1F" height="10" /> **Brawl Stars** | `#TAG` | Trofeos, brawlers con poder y rango, últimas 25 batallas, récords |
-| <img src="https://img.shields.io/badge/-%20-3F8CFF" height="10" /> **Clash Royale** | `#TAG` | Trofeos, Senda de leyendas, mazo actual con elixir, últimas 30 batallas |
-| <img src="https://img.shields.io/badge/-%20-79C942" height="10" /> **Clash of Clans** | `#TAG` | Ayuntamiento, liga, guerra, donaciones, héroes y base del constructor |
-| <img src="https://img.shields.io/badge/-%20-E4572E" height="10" /> **Dota 2** | Nombre de Steam o ID | Medalla oficial, puesto mundial, héroes y últimas 20 partidas |
-| <img src="https://img.shields.io/badge/-%20-A855F7" height="10" /> **Fortnite** | Nombre + plataforma | Por modo: victorias, K/D, top N y horas |
-| <img src="https://img.shields.io/badge/-%20-E23E57" height="10" /> **Apex Legends** | Nombre + plataforma | Rango con RP, leyenda con su banner y estado en línea |
-| <img src="https://img.shields.io/badge/-%20-F5A623" height="10" /> **PUBG** | Nombre + plataforma | FPP y TPP, clasificatoria y últimas 8 partidas |
-| <img src="https://img.shields.io/badge/-%20-4FC3F7" height="10" /> **Wild Rift** | — | Tier list S+ a D por carril y rango, ficha y comparador de campeones, Mis mains, los que suben y bajan |
-| <img src="https://img.shields.io/badge/-%20-FF4655" height="10" /> **Valorant** | — | Esports: último campeón, partido en vivo, calendario, resultados, torneos y equipos que sigues |
+| <img src="docs/games/lol.svg" width="20" height="20" align="center" /> **League of Legends** | Riot ID + región | Rango, historial, maestría, rotación, **partida en vivo**, progreso de LP, enfrentamientos, pros, objetivo y Tu semana |
+| <img src="docs/games/tft.svg" width="20" height="20" align="center" /> **Teamfight Tactics** | Riot ID + región | Ranked, Double Up, Hyper Roll, posiciones y los 8 jugadores con rasgos y unidades |
+| <img src="docs/games/brawlstars.png" width="20" height="20" align="center" /> **Brawl Stars** | `#TAG` | Trofeos, brawlers con poder y rango, últimas 25 batallas, récords |
+| <img src="docs/games/clashroyale.png" width="20" height="20" align="center" /> **Clash Royale** | `#TAG` | Trofeos, Senda de leyendas, mazo actual con elixir, últimas 30 batallas |
+| <img src="docs/games/clashofclans.png" width="20" height="20" align="center" /> **Clash of Clans** | `#TAG` | Ayuntamiento, liga, guerra, donaciones, héroes y base del constructor |
+| <img src="docs/games/dota2.svg" width="20" height="20" align="center" /> **Dota 2** | Nombre de Steam o ID | Medalla oficial, puesto mundial, héroes y últimas 20 partidas |
+| <img src="docs/games/fortnite.svg" width="20" height="20" align="center" /> **Fortnite** | Nombre + plataforma | Por modo: victorias, K/D, top N y horas |
+| <img src="docs/games/apex.png" width="20" height="20" align="center" /> **Apex Legends** | Nombre + plataforma | Rango con RP, leyenda con su banner y estado en línea |
+| <img src="docs/games/pubg.svg" width="20" height="20" align="center" /> **PUBG** | Nombre + plataforma | FPP y TPP, clasificatoria y últimas 8 partidas |
+| <img src="docs/games/wildrift.svg" width="20" height="20" align="center" /> **Wild Rift** | — | Tier list S+ a D por carril y rango, ficha y comparador de campeones, Mis mains, los que suben y bajan |
+| <img src="docs/games/valorant.svg" width="20" height="20" align="center" /> **Valorant** | — | Esports: último campeón, partido en vivo, calendario, resultados, torneos y equipos que sigues |
 
 <sub>Wild Rift no tiene API pública y los perfiles de Valorant esperan la aprobación de Riot, así que esos dos van directo a lo que sí hay.</sub>
 

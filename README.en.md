@@ -158,17 +158,17 @@ Your **Solo/Duo rank** with LP, this week and the last 5; your team's **next Val
 
 | Game | Search | What you get |
 |---|---|---|
-| <img src="https://img.shields.io/badge/-%20-C89B3C" height="10" /> **League of Legends** | Riot ID + region | Rank, history, mastery, rotation, **live game**, LP progress, matchups, pros, weekly goal and Your week |
-| <img src="https://img.shields.io/badge/-%20-0BC4E3" height="10" /> **Teamfight Tactics** | Riot ID + region | Ranked, Double Up, Hyper Roll, placements and all 8 players with traits and units |
-| <img src="https://img.shields.io/badge/-%20-FFCE1F" height="10" /> **Brawl Stars** | `#TAG` | Trophies, brawlers with power and rank, last 25 battles, records |
-| <img src="https://img.shields.io/badge/-%20-3F8CFF" height="10" /> **Clash Royale** | `#TAG` | Trophies, Path of Legends, current deck with elixir, last 30 battles |
-| <img src="https://img.shields.io/badge/-%20-79C942" height="10" /> **Clash of Clans** | `#TAG` | Town Hall, league, war, donations, heroes and builder base |
-| <img src="https://img.shields.io/badge/-%20-E4572E" height="10" /> **Dota 2** | Steam name or ID | Official medal, world rank, heroes and last 20 matches |
-| <img src="https://img.shields.io/badge/-%20-A855F7" height="10" /> **Fortnite** | Name + platform | Per mode: wins, K/D, top N and hours |
-| <img src="https://img.shields.io/badge/-%20-E23E57" height="10" /> **Apex Legends** | Name + platform | Rank with RP, legend with its banner and online status |
-| <img src="https://img.shields.io/badge/-%20-F5A623" height="10" /> **PUBG** | Name + platform | FPP and TPP, ranked and last 8 matches |
-| <img src="https://img.shields.io/badge/-%20-4FC3F7" height="10" /> **Wild Rift** | — | S+ to D tier list by lane and rank, champion pages and comparer, My mains, risers and fallers |
-| <img src="https://img.shields.io/badge/-%20-FF4655" height="10" /> **Valorant** | — | Esports: latest champion, live match, schedule, results, tournaments and the teams you follow |
+| <img src="docs/games/lol.svg" width="20" height="20" align="center" /> **League of Legends** | Riot ID + region | Rank, history, mastery, rotation, **live game**, LP progress, matchups, pros, weekly goal and Your week |
+| <img src="docs/games/tft.svg" width="20" height="20" align="center" /> **Teamfight Tactics** | Riot ID + region | Ranked, Double Up, Hyper Roll, placements and all 8 players with traits and units |
+| <img src="docs/games/brawlstars.png" width="20" height="20" align="center" /> **Brawl Stars** | `#TAG` | Trophies, brawlers with power and rank, last 25 battles, records |
+| <img src="docs/games/clashroyale.png" width="20" height="20" align="center" /> **Clash Royale** | `#TAG` | Trophies, Path of Legends, current deck with elixir, last 30 battles |
+| <img src="docs/games/clashofclans.png" width="20" height="20" align="center" /> **Clash of Clans** | `#TAG` | Town Hall, league, war, donations, heroes and builder base |
+| <img src="docs/games/dota2.svg" width="20" height="20" align="center" /> **Dota 2** | Steam name or ID | Official medal, world rank, heroes and last 20 matches |
+| <img src="docs/games/fortnite.svg" width="20" height="20" align="center" /> **Fortnite** | Name + platform | Per mode: wins, K/D, top N and hours |
+| <img src="docs/games/apex.png" width="20" height="20" align="center" /> **Apex Legends** | Name + platform | Rank with RP, legend with its banner and online status |
+| <img src="docs/games/pubg.svg" width="20" height="20" align="center" /> **PUBG** | Name + platform | FPP and TPP, ranked and last 8 matches |
+| <img src="docs/games/wildrift.svg" width="20" height="20" align="center" /> **Wild Rift** | — | S+ to D tier list by lane and rank, champion pages and comparer, My mains, risers and fallers |
+| <img src="docs/games/valorant.svg" width="20" height="20" align="center" /> **Valorant** | — | Esports: latest champion, live match, schedule, results, tournaments and the teams you follow |
 
 <sub>Wild Rift has no public API and Valorant profiles are waiting for Riot's approval, so those two go straight to what is available.</sub>
 
