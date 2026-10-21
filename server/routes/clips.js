@@ -25,9 +25,10 @@ const ytApi = createUpstream({
   keyEnv: "YOUTUBE_API_KEY", query: key => ({ key }), timeout: 10000,
 });
 
-// Con la API: la lista de subidas del canal (1 unidad) y sus videos con duración y estadísticas (1 unidad)
+// Con la API: la lista de subidas del canal (1 unidad) y sus videos con duración y estadísticas (1 unidad). En los
+// canales que sigue alguien se miran las últimas 50 subidas (mismo costo): muchos streamers suben sobre todo videos largos.
 async function apiClips(source) {
-  const list = await ytApi.get("/playlistItems", { ttl: 20 * MIN, query: { part: "contentDetails", playlistId: clips.uploadsOf(source.channel), maxResults: 20 } });
+  const list = await ytApi.get("/playlistItems", { ttl: 20 * MIN, query: { part: "contentDetails", playlistId: clips.uploadsOf(source.channel), maxResults: source.followed ? 50 : 20 } });
   const ids = (list?.items || []).map(i => i.contentDetails?.videoId).filter(Boolean);
   if (!ids.length) return [];
   const videos = await ytApi.get("/videos", { ttl: 20 * MIN, query: { part: "snippet,contentDetails,statistics", id: ids.join(",") } });

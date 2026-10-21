@@ -19,6 +19,9 @@ Las descargas están en [GitHub Releases](https://github.com/0scar07/Kairo/relea
   «Lo último» cuenta qué pasó. Botón **Seguir** en cada equipo, con aviso 15 minutos antes de sus partidos.
 - **Avisos de parches nuevos** de los juegos que elijas (LoL, TFT, Valorant, Wild Rift, Dota 2, Apex y PUBG).
 - **4 idiomas nuevos:** italiano, turco, polaco y coreano (9 en total).
+- **Widgets en la pantalla de inicio** (Android, con el APK nuevo): tu rango Solo/Dúo con LP, lo de la semana y las
+  últimas 5; el próximo partido de Valorant de tu equipo; y quién de tus favoritos está en partida. Tocar uno abre su
+  pantalla en Kairo.
 
 ### 2026-10-19
 - **Clips** en Explorar, tipo TikTok: los Shorts oficiales de YouTube de 9 juegos en un visor a pantalla completa;

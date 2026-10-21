@@ -21,6 +21,7 @@ export const NOTIF_PREFS_KEY = "kairo_notifications";
 export const NOTIF_DEVICE_KEY = "kairo_notification_device";
 export const NOTIF_LAST_KEY = "kairo_notification_last";
 export const HISTORY_TOUCH_KEY = "kairo_history_touch";
+export const WIDGET_KEY = "kairo_widget";   // lo que muestran los widgets de Android (ver src/widget)
 export const LOL_WEEK_KEY = "kairo_lol_week";   // fotos diarias de LP y objetivos de la semana (ver games/lol/week.js)
 export const FOLLOWED_TEAMS_KEY = "kairo_followed_teams";   // equipos de Valorant seguidos (ver utils/followedTeams.js)
 export const FOLLOWED_PROS_KEY = "kairo_followed_pros";   // jugadores profesionales seguidos (ver utils/followedPros.js)
